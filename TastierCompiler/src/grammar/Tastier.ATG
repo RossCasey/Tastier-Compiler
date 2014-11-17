@@ -370,11 +370,10 @@ ProcDecl                        (.  string name; string label; Scope currentScop
   '(' ')'
   '{'                           (.
                                     program.Add(new Instruction("", "Enter 0"));
-
+                                    enterInstLocation = program.Count - 1;
                                     if(name == "Main") {
                                       program.AddRange(constantDeclarations);
                                     }
-                                    enterInstLocation = program.Count - 1;
                                     label = generateProcedureName(name);
                                     openProcedureDeclarations.Push(name);
                                     /*
