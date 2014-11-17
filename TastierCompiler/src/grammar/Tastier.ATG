@@ -570,7 +570,7 @@ Tastier                         (.  string name; bool external = false; .)
                                     openScopes.Push(new Scope());
                                 .)
   '{'
-  { VarDecl<external> | ProcDecl | ExternDecl }
+  { ConstDecl }{ VarDecl<external> | ProcDecl | ExternDecl }
   '}'                           (.
                                     if (openScopes.Peek().Count == 0) {
                                       Warn("Warning: Program " + name + " is empty ");
@@ -620,6 +620,19 @@ Type<out TastierType type>
  ( "int"                        (.  type = TastierType.Integer; .)
  | "bool"                       (.  type = TastierType.Boolean; .)
  ).
+
+/*------------------------------------------------------------------------*/
+ConstDecl                       (.
+                                    string name; TastierType type; Scope currentScope = openScopes.Peek();
+                                .)
+= Type<out type>
+  Ident<out name>               (.
+                                    currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var)));
+                                .)
+  { ',' Ident<out name>        (.
+                                    currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var)));
+                                .)
+  } ','.
 
 /*------------------------------------------------------------------------*/
 
