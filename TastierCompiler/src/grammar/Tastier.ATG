@@ -125,7 +125,7 @@ Scope externalDeclarations = new Scope();
 Program program = new Program();
 Program header = new Program();
 
-Bool constantsDeclared = false;
+bool constantsDeclared = false;
 
 Stack<string> openProcedureDeclarations = new Stack<string>();
 
