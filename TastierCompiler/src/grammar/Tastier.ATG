@@ -633,25 +633,38 @@ ConstDecl                       (.
                                 .)
   ":="
   ( number                      (.
+                                    if (type != TastierType.Integer) {
+                                      SemErr("integer type expected");
+                                    }
                                     n = Convert.ToInt32(t.val);
                                     program.Add(new Instruction("", "Const " + n));
-                                    type = TastierType.Integer;
+                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | '-'
     number                      (.
                                     if (type != TastierType.Integer) {
                                       SemErr("integer type expected");
-                                      type = TastierType.Integer;
                                     }
+                                    n = Convert.ToInt32(t.val);
+                                    program.Add(new Instruction("", "Const " + n));
                                     program.Add(new Instruction("", "Neg"));
                                     program.Add(new Instruction("", "Const 1"));
                                     program.Add(new Instruction("", "Add"));
+                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "true"                      (.
-                                    program.Add(new Instruction("", "Const " + 1)); type = TastierType.Boolean;
+                                    if(type != TastierType.Boolean) {
+                                      SemErr("boolean type expected")
+                                    }
+                                    program.Add(new Instruction("", "Const " + 1));
+                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "false"                     (.
-                                    program.Add(new Instruction("", "Const " + 0)); type = TastierType.Boolean;
+                                    if(type != TastierType.Boolean) {
+                                      SemErr("boolean type expected")
+                                    }
+                                    program.Add(new Instruction("", "Const " + 1));
+                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   ).
 
