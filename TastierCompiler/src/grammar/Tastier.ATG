@@ -644,6 +644,7 @@ ConstDecl                       (.
                                       SemErr("integer type expected");
                                     }
                                     n = Convert.ToInt32(t.val);
+                                    program.Add(new Instruction("", "Enter " + 1));
                                     program.Add(new Instruction("", "Const " + n));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
