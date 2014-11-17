@@ -487,17 +487,17 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
-    | String<out address> ';'   (.
+    | String<out strAddress> ';'(.
                                     if (type != (TastierType)sym.Item3) {
                                       SemErr("incompatible types");
                                     }
                                     if (sym.Item4 == 0) {
-                                        program.Add(new Instruction("", "Const " + address));
+                                        program.Add(new Instruction("", "Const " + strAddress));
                                         program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                     }
                                     else {
                                       int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                      program.Add(new Instruction("", "Const " + address));
+                                      program.Add(new Instruction("", "Const " + strAddress));
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
@@ -645,7 +645,7 @@ Term<out TastierType type>      (.  TastierType type1; Instruction inst; .)
   }.
 /*------------------------------------------------------------------------*/
 
-String<out int address>         (.  int address;  .)
+String<out int strSddress>      (.  int strSddress;  .)
 = string                        (.
                                   type = TastierType.String;
                                   string value = t.val;
@@ -659,7 +659,7 @@ String<out int address>         (.  int address;  .)
                                     program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
                                     nextAddress++;
                                   }
-                                  address = stringAddress;
+                                  strAddress = stringAddress;
                                .).
 /*------------------------------------------------------------------------*/
 
