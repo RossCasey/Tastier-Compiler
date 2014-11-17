@@ -684,14 +684,14 @@ VarDecl<bool external>          (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (((int)TastierKind.Var) || ((int)TastierKind.Const))));
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (((int)TastierKind.Var) || ((int)TastierKind.Const)))));
                                     }
                                 .)
   { ',' Ident<out name>         (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (((int)TastierKind.Var) || ((int)TastierKind.Const))));
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (((int)TastierKind.Var) || ((int)TastierKind.Const)))));
                                     }
                                 .)
   } ';'.
