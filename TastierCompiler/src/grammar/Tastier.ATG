@@ -348,29 +348,6 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                 .)
   | "true"                      (.  program.Add(new Instruction("", "Const " + 1)); type = TastierType.Boolean; .)
   | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = TastierType.Boolean; .)
-  | string                      (.
-                                    type = TastierType.String;
-                                    string value = t.val;
-                                    char[] array = value.ToCharArray();
-                                    int stringAddress = nextAddress;
-                                    program.Add(new Instruction("", "Const " + array.Count()));
-                                    program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
-                                    nextAddress++;
-                                    for(int i=1; i< array.Count()-1; i++) {
-                                      program.Add(new Instruction("", "Const " + (int)array[i]));
-                                      program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
-                                      nextAddress++;
-                                    }
-                                    program.Add(new Instruction("", "Const " + stringAddress));
-                                    Symbol str = lookup(openScopes,name);
-                                    if(str.Item4 == 0) {
-                                      program.Add(new Instruction("", "StoG " + str.Item5+3));
-                                    }
-                                    else {
-                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
-                                    }
-                                 .)
   ).
 
 /*------------------------------------------------------------------------*/
@@ -507,6 +484,20 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     }
                                     else {
                                       int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                    }
+                                .)
+    | String<out address> ';'   (.
+                                    if (type != (TastierType)sym.Item3) {
+                                      SemErr("incompatible types");
+                                    }
+                                    if (sym.Item4 == 0) {
+                                        program.Add(new Instruction("", "Const " + address));
+                                        program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    }
+                                    else {
+                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                      program.Add(new Instruction("", "Const " + address));
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
@@ -652,7 +643,24 @@ Term<out TastierType type>      (.  TastierType type1; Instruction inst; .)
                                     program.Add(inst);
                                 .)
   }.
+/*------------------------------------------------------------------------*/
 
+String<out int address>         (.  int address;  .)
+= string                        (.
+                                  type = TastierType.String;
+                                  string value = t.val;
+                                  char[] array = value.ToCharArray();
+                                  int stringAddress = nextAddress;
+                                  program.Add(new Instruction("", "Const " + array.Count()));
+                                  program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
+                                  nextAddress++;
+                                  for(int i=1; i< array.Count()-1; i++) {
+                                    program.Add(new Instruction("", "Const " + (int)array[i]));
+                                    program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
+                                    nextAddress++;
+                                  }
+                                  address = stringAddress;
+                               .).
 /*------------------------------------------------------------------------*/
 
 Type<out TastierType type>
