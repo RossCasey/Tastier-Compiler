@@ -583,7 +583,7 @@ Tastier                         (.  string name; bool external = false; .)
 
                                     header.Add(new Instruction("", ".names " + (externalDeclarations.Count + openScopes.Peek().Count)));
                                     foreach (Symbol s in openScopes.Peek()) {
-                                      if (s.Item2 == (int)TastierKind.Var) {
+                                      if ((s.Item2 == (int)TastierKind.Var) || (s.Item2 == (int)TastierKind.Const)) {
                                         header.Add(new Instruction("", ".var " + ((int)s.Item3) + " " + s.Item1));
                                       } else if (s.Item2 == (int)TastierKind.Proc) {
                                         header.Add(new Instruction("", ".proc " + s.Item1));
