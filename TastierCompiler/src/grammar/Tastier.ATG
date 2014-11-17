@@ -404,7 +404,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     // now we can generate the Enter instruction properly
                                     program[enterInstLocation] =
                                       new Instruction(label, "Enter " +
-                                                      currentScope.Count(s => s.Item2 == (int)TastierKind.Var));
+                                                      (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const)));
                                     openProcedureDeclarations.Pop();
                                 .).
 
@@ -684,14 +684,14 @@ VarDecl<bool external>          (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var)));
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const) ));
                                     }
                                 .)
   { ',' Ident<out name>         (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var)));
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const) ));
                                     }
                                 .)
   } ';'.
