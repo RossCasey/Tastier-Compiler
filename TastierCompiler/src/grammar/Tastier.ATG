@@ -645,7 +645,6 @@ Term<out TastierType type>      (.  TastierType type1; Instruction inst; .)
 
 String
 = string                        (.
-                                  type = TastierType.String;
                                   string value = t.val;
                                   char[] array = value.ToCharArray();
                                   int stringAddress = nextAddress;
