@@ -639,7 +639,7 @@ ConstDecl                       (.
                                       program.Add(new Instruction("ConstDecl", "Enter 0"));
                                       constantsDeclared = true;
                                     } else {
-                                      program.RemoveRange(program.Count-2,program.Count-1);
+                                      program.RemoveRange(program.Count-2,2);
                                     }
                                 .)
 = "const"
