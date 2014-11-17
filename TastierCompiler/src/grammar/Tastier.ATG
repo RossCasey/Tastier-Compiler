@@ -308,7 +308,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                     }
                                     else {
                                       type = (TastierType)sym.Item3;
-                                      if ((TastierKind)sym.Item2 == TastierKind.Var) {
+                                      if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
                                         if (sym.Item4 == 0) {
                                             if (isExternal) {
                                               program.Add(new Instruction("", "LoadG " + sym.Item1));
@@ -320,7 +320,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                             int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
                                             program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
                                         }
-                                      } else SemErr("variable expected");
+                                      } else SemErr("variable or constant expected");
                                     }
                                 .)
   | number                      (.
@@ -639,7 +639,7 @@ ConstDecl                       (.
                                 .)
   ":="
   ( number                      (.
-                                    if ((TastierType)sym.Item3 != TastierType.Integer) {
+                                    if (type != TastierType.Integer) {
                                       SemErr("integer type expected");
                                     }
                                     n = Convert.ToInt32(t.val);
@@ -648,7 +648,7 @@ ConstDecl                       (.
                                 .)
   | '-'
     number                      (.
-                                    if ((TastierType)sym.Item3 != TastierType.Integer) {
+                                    if (type != TastierType.Integer) {
                                       SemErr("integer type expected");
                                     }
                                     n = Convert.ToInt32(t.val);
@@ -659,14 +659,14 @@ ConstDecl                       (.
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "true"                      (.
-                                    if((TastierType)sym.Item3 != TastierType.Boolean) {
+                                    if(type != TastierType.Boolean) {
                                       SemErr("boolean type expected");
                                     }
                                     program.Add(new Instruction("", "Const " + 1));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "false"                     (.
-                                    if((TastierType)sym.Item3 != TastierType.Boolean) {
+                                    if(type != TastierType.Boolean) {
                                       SemErr("boolean type expected");
                                     }
                                     program.Add(new Instruction("", "Const " + 1));
