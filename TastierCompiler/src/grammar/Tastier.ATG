@@ -487,7 +487,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
-    | String<out strAddress> ';'(.
+    | String ';'(.
                                     if (type != (TastierType)sym.Item3) {
                                       SemErr("incompatible types");
                                     }
@@ -645,7 +645,7 @@ Term<out TastierType type>      (.  TastierType type1; Instruction inst; .)
   }.
 /*------------------------------------------------------------------------*/
 
-String<out int strAddress>      
+String
 = string                        (.
                                   type = TastierType.String;
                                   string value = t.val;
@@ -659,7 +659,7 @@ String<out int strAddress>
                                     program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
                                     nextAddress++;
                                   }
-                                  strAddress = stringAddress;
+                                  program.Add(new Instruction("", "Const " + stringAddress));
                                .).
 /*------------------------------------------------------------------------*/
 
