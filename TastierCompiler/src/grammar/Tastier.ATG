@@ -448,6 +448,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     }
                                 .)
   ( ":="                        (.
+                                    //error if user tries to reassign constant
                                     if ((TastierKind)sym.Item2 == TastierKind.Const) {
                                       SemErr("cannot re-assign a constant");
                                     }
