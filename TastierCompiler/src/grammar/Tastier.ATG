@@ -416,6 +416,7 @@ RelOp<out Instruction inst>
   | '>'                         (.  inst = new Instruction("", "Gtr"); .)
   | "!="                        (.  inst = new Instruction("", "NtEqu"); .)
   | "<="                        (.  inst = new Instruction("", "LssEq"); .)
+  | ">="                        (.  inst = new Instruction("", "GtrEq"); .)
   ).
 
 /*------------------------------------------------------------------------*/

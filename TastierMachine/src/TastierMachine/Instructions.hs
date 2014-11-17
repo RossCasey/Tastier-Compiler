@@ -11,6 +11,7 @@ data Instruction = Add
                  | Gtr
                  | NtEqu
                  | LssEq
+                 | GtrEq
                  | Neg
                  | Load
                  | Sto
