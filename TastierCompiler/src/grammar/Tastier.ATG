@@ -631,7 +631,7 @@ Type<out TastierType type>
  | "bool"                       (.  type = TastierType.Boolean; .)
  ).
 
-/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------
 ConstDecl                       (.
                                     int n; string name; TastierType type; Scope currentScope = openScopes.Peek();
                                     Symbol sym;
@@ -684,13 +684,12 @@ ConstDecl                       (.
                                     program.Add(new Instruction("", "Const " + 1));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
-  ) ';'.
-                         /*                         (.
+  ) ';'                         (.
                                     program.Add(new Instruction("", "Leave"));
                                     program.Add(new Instruction("", "Ret"));
-                                .). */
+                                .).
 
-/*------------------------------------------------------------------------*/
+------------------------------------------------------------------------*/
 
 VarDecl<bool external>          (.
                                     string name; TastierType type; Scope currentScope = openScopes.Peek();
