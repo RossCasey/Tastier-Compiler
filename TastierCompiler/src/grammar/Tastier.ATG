@@ -261,7 +261,7 @@ letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
-  quote = '\"'
+  quote = '\"'.
 
 TOKENS
   ident  = letter {letter | digit}.
