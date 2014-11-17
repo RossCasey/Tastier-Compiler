@@ -1,0 +1,5 @@
+generated/*
+doc/*
+*.exe
+*.asm
+*.bc
