@@ -684,10 +684,11 @@ ConstDecl                       (.
                                     program.Add(new Instruction("", "Const " + 1));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
-  ) ';'                         (.
+  ) ';'.
+                         /*                         (.
                                     program.Add(new Instruction("", "Leave"));
                                     program.Add(new Instruction("", "Ret"));
-                                .).
+                                .). */
 
 /*------------------------------------------------------------------------*/
 
