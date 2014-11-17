@@ -125,8 +125,7 @@ Scope externalDeclarations = new Scope();
 Program program = new Program();
 Program header = new Program();
 
-//necessary as code that is not inside a function is not executed.
-Program constantDeclarations = new Program();
+Bool constantsDeclared = false;
 
 Stack<string> openProcedureDeclarations = new Stack<string>();
 
@@ -371,8 +370,8 @@ ProcDecl                        (.  string name; string label; Scope currentScop
   '{'                           (.
                                     program.Add(new Instruction("", "Enter 0"));
                                     enterInstLocation = program.Count - 1;
-                                    if(name == "Main") {
-                                      program.AddRange(constantDeclarations);
+                                    if((name == "Main") && (constantsDeclared)) {
+                                      program.Add("Call 1 ConstDecl");
                                     }
                                     label = generateProcedureName(name);
                                     openProcedureDeclarations.Push(name);
@@ -586,6 +585,7 @@ Tastier                         (.  string name; bool external = false; .)
                                     if (openScopes.Peek().Count == 0) {
                                       Warn("Warning: Program " + name + " is empty ");
                                     }
+                                    if (constantsDec)
 
                                     header.Add(new Instruction("", ".names " + (externalDeclarations.Count + openScopes.Peek().Count)));
                                     foreach (Symbol s in openScopes.Peek()) {
@@ -637,6 +637,13 @@ Type<out TastierType type>
 ConstDecl                       (.
                                     int n; string name; TastierType type; Scope currentScope = openScopes.Peek();
                                     Symbol sym;
+                                    if(!constantsDeclared) {
+                                      program.Add(new Instruction("ConstDecl: ", "Enter 0"));
+                                      constantsDeclared = true;
+                                    } else {
+                                      program.RemoveRange(program.Count-2,program.Count-1);
+                                    }
+}
                                 .)
 = "const"
   Type<out type>
@@ -650,8 +657,8 @@ ConstDecl                       (.
                                       SemErr("integer type expected");
                                     }
                                     n = Convert.ToInt32(t.val);
-                                    constantDeclarations.Add(new Instruction("", "Const " + n));
-                                    constantDeclarations.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    program.Add(new Instruction("", "Const " + n));
+                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | '-'
     number                      (.
@@ -659,27 +666,30 @@ ConstDecl                       (.
                                       SemErr("integer type expected");
                                     }
                                     n = Convert.ToInt32(t.val);
-                                    constantDeclarations.Add(new Instruction("", "Const " + n));
-                                    constantDeclarations.Add(new Instruction("", "Neg"));
-                                    constantDeclarations.Add(new Instruction("", "Const 1"));
-                                    constantDeclarations.Add(new Instruction("", "Add"));
-                                    constantDeclarations.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    program.Add(new Instruction("", "Const " + n));
+                                    program.Add(new Instruction("", "Neg"));
+                                    program.Add(new Instruction("", "Const 1"));
+                                    program.Add(new Instruction("", "Add"));
+                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "true"                      (.
                                     if(type != TastierType.Boolean) {
                                       SemErr("boolean type expected");
                                     }
-                                    constantDeclarations.Add(new Instruction("", "Const " + 1));
-                                    constantDeclarations.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    program.Add(new Instruction("", "Const " + 1));
+                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "false"                     (.
                                     if(type != TastierType.Boolean) {
                                       SemErr("boolean type expected");
                                     }
-                                    constantDeclarations.Add(new Instruction("", "Const " + 1));
-                                    constantDeclarations.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    program.Add(new Instruction("", "Const " + 1));
+                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
-  ) ';'.
+  ) ';'                         (.
+                                    program.Add(new Instruction("", "Leave"));
+                                    program.Add(new Instruction("", "Ret"));
+                                .).
 
 /*------------------------------------------------------------------------*/
 
