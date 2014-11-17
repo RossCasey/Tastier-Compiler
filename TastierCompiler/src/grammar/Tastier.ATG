@@ -362,6 +362,14 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       nextAddress++;
                                     }
                                     program.Add(new Instruction("", "Const " + stringAddress));
+                                    Symbol str = lookup(openScopes,name);
+                                    if(str.Item4 == 0) {
+                                      program.Add(new Instruction("", "StoG " + str.Item5+3));
+                                    }
+                                    else {
+                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                    }
                                  .)
   ).
 
