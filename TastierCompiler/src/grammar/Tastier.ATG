@@ -643,7 +643,7 @@ ConstDecl                       (.
                                     }
                                 .)
 = "const".
-*/
+/*
   Type<out type>
   Ident<out name>               (.
                                     sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
