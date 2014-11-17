@@ -448,7 +448,10 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     }
                                 .)
   ( ":="                        (.
-                                    if ((TastierKind)sym.Item2 != TastierKind.Var) {
+                                    if ((TastierKind)sym.Item2 == TastierKind.Const) {
+                                      SemErr("cannot re-assign a constant");
+                                    }
+                                    else if ((TastierKind)sym.Item2 != TastierKind.Var) {
                                       SemErr("cannot assign to non-variable");
                                     }
                                 .)
