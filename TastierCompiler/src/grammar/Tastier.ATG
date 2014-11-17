@@ -352,6 +352,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                     type = TastierType.String;
                                     string value = t.val;
                                     char[] array = value.ToCharArray();
+                                    int stringAddress = nextAddress;
                                     program.Add(new Instruction("", "Const " + array.Count()));
                                     program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
                                     nextAddress++;
@@ -360,6 +361,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
                                       nextAddress++;
                                     }
+                                    program.Add(new Instruction("", "Const " + nextAddress));
                                  .)
   ).
 
@@ -649,6 +651,7 @@ Type<out TastierType type>
 =                               (.  type = TastierType.Undefined; .)
  ( "int"                        (.  type = TastierType.Integer; .)
  | "bool"                       (.  type = TastierType.Boolean; .)
+ | "string"                     (.  type = TastierType.String;  .)
  ).
 
 /*------------------------------------------------------------------------*/
