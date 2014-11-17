@@ -361,7 +361,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("", "Const " + nextAddress));
+                                    program.Add(new Instruction("", "Const " + stringAddress));
                                  .)
   ).
 
