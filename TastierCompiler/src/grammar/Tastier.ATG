@@ -631,7 +631,7 @@ Type<out TastierType type>
  | "bool"                       (.  type = TastierType.Boolean; .)
  ).
 
-/*------------------------------------------------------------------------
+/*------------------------------------------------------------------------*/
 ConstDecl                       (.
                                     int n; string name; TastierType type; Scope currentScope = openScopes.Peek();
                                     Symbol sym;
@@ -643,7 +643,8 @@ ConstDecl                       (.
                                     }
 }
                                 .)
-= "const"
+= "const".
+/*
   Type<out type>
   Ident<out name>               (.
                                     sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
