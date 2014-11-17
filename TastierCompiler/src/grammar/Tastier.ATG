@@ -645,7 +645,7 @@ Term<out TastierType type>      (.  TastierType type1; Instruction inst; .)
   }.
 /*------------------------------------------------------------------------*/
 
-String<out int strAddress>      (.  int strAddress1;  .)
+String<out int strAddress>      
 = string                        (.
                                   type = TastierType.String;
                                   string value = t.val;
