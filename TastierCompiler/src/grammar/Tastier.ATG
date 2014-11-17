@@ -652,7 +652,7 @@ ConstDecl                       (.
   ":="
   ( number                      (.
                                     if (type != TastierType.Integer) {
-                                      SemErr("integer type expected");
+                                      SemErr("cannot assign integer value to non-integer constant");
                                     }
                                     n = Convert.ToInt32(t.val);
                                     program.Add(new Instruction("", "Const " + n));
@@ -661,7 +661,7 @@ ConstDecl                       (.
   | '-'
     number                      (.
                                     if (type != TastierType.Integer) {
-                                      SemErr("integer type expected");
+                                      SemErr("cannot assign integer value to non-integer constant");
                                     }
                                     n = Convert.ToInt32(t.val);
                                     program.Add(new Instruction("", "Const " + n));
@@ -672,14 +672,14 @@ ConstDecl                       (.
                                 .)
   | "true"                      (.
                                     if(type != TastierType.Boolean) {
-                                      SemErr("boolean type expected");
+                                      SemErr("cannot assign boolean value to non-boolean constant");
                                     }
                                     program.Add(new Instruction("", "Const " + 1));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "false"                     (.
                                     if(type != TastierType.Boolean) {
-                                      SemErr("boolean type expected");
+                                      SemErr("cannot assign boolean value to non-boolean constant");
                                     }
                                     program.Add(new Instruction("", "Const " + 1));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
