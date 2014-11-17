@@ -266,7 +266,7 @@ letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
 TOKENS
   ident  = letter {letter | digit}.
   number = digit {digit}.
-  string = quote {letter | digit} quote
+  string = quote {letter | digit} quote.
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
