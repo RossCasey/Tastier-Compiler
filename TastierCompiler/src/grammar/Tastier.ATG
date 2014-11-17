@@ -469,7 +469,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       SemErr("cannot assign to non-variable");
                                     }
                                 .)
-    Expr<out type> ';'
+    (Expr<out type> ';'
                                 (.
                                     if (type != (TastierType)sym.Item3) {
                                       SemErr("incompatible types");
@@ -499,7 +499,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
-    )
+    ).
   | '(' ')' ';'                 (.
                                     if ((TastierKind)sym.Item2 != TastierKind.Proc) {
                                       SemErr("object is not a procedure");
