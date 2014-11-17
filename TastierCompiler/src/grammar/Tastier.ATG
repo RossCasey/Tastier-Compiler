@@ -1,5 +1,8 @@
 COMPILER Tastier
 
+
+  int memoryAddressOffset = 1000;
+  int nextAddress = 0;
 /*
   First, let's declare all the types we're going to use.
 */
@@ -7,7 +10,8 @@ COMPILER Tastier
   enum TastierType : int {   // types for variables
     Undefined,
     Integer,
-    Boolean
+    Boolean,
+    String
   };
 
   enum TastierKind : int {  // kinds of symbol
@@ -257,10 +261,12 @@ letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
+  quote = '\"'
 
 TOKENS
   ident  = letter {letter | digit}.
   number = digit {digit}.
+  string = quote {letter | digit} quote
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -342,6 +348,19 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                 .)
   | "true"                      (.  program.Add(new Instruction("", "Const " + 1)); type = TastierType.Boolean; .)
   | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = TastierType.Boolean; .)
+  | string                      (.
+                                    type = TastierType.String;
+                                    string value = t.val;
+                                    char[] array = value.ToCharArray();
+                                    program.Add(new Instruction("", "Const " + array.Count()));
+                                    program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
+                                    nextAddress++;
+                                    for(int i=1; i< array.Count()-1; i++) {
+                                      program.Add(new Instruction("", "Const " + (int)array[i]));
+                                      program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
+                                      nextAddress++;
+                                    }
+                                 .)
   ).
 
 /*------------------------------------------------------------------------*/
