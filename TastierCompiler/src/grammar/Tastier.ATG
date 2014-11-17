@@ -371,7 +371,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     program.Add(new Instruction("", "Enter 0"));
                                     enterInstLocation = program.Count - 1;
                                     if((name == "Main") && (constantsDeclared)) {
-                                      program.Add("Call 1 ConstDecl");
+                                      program.Add(new Instruction("","Call 1 ConstDecl"));
                                     }
                                     label = generateProcedureName(name);
                                     openProcedureDeclarations.Push(name);
@@ -585,7 +585,6 @@ Tastier                         (.  string name; bool external = false; .)
                                     if (openScopes.Peek().Count == 0) {
                                       Warn("Warning: Program " + name + " is empty ");
                                     }
-
                                     header.Add(new Instruction("", ".names " + (externalDeclarations.Count + openScopes.Peek().Count)));
                                     foreach (Symbol s in openScopes.Peek()) {
                                       if ((s.Item2 == (int)TastierKind.Var) || (s.Item2 == (int)TastierKind.Const)) {
