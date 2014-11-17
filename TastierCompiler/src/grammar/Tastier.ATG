@@ -585,7 +585,6 @@ Tastier                         (.  string name; bool external = false; .)
                                     if (openScopes.Peek().Count == 0) {
                                       Warn("Warning: Program " + name + " is empty ");
                                     }
-                                    if (constantsDec)
 
                                     header.Add(new Instruction("", ".names " + (externalDeclarations.Count + openScopes.Peek().Count)));
                                     foreach (Symbol s in openScopes.Peek()) {
