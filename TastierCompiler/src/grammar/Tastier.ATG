@@ -654,14 +654,14 @@ ConstDecl                       (.
                                 .)
   | "true"                      (.
                                     if(type != TastierType.Boolean) {
-                                      SemErr("boolean type expected")
+                                      SemErr("boolean type expected");
                                     }
                                     program.Add(new Instruction("", "Const " + 1));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "false"                     (.
                                     if(type != TastierType.Boolean) {
-                                      SemErr("boolean type expected")
+                                      SemErr("boolean type expected");
                                     }
                                     program.Add(new Instruction("", "Const " + 1));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
