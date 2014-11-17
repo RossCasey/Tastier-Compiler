@@ -488,16 +488,14 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     }
                                 .)
     | String ';'(.
-                                    if (type != (TastierType)sym.Item3) {
+                                    if (TastierType.String != (TastierType)sym.Item3) {
                                       SemErr("incompatible types");
                                     }
                                     if (sym.Item4 == 0) {
-                                        program.Add(new Instruction("", "Const " + strAddress));
                                         program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                     }
                                     else {
                                       int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                      program.Add(new Instruction("", "Const " + strAddress));
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
