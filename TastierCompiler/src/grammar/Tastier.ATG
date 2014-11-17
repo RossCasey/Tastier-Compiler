@@ -625,11 +625,12 @@ Type<out TastierType type>
 /*------------------------------------------------------------------------*/
 ConstDecl                       (.
                                     int n; string name; TastierType type; Scope currentScope = openScopes.Peek();
-                                    Symbol sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var));
+                                    Symbol sym;
                                 .)
 = "Const"
   Type<out type>
   Ident<out name>               (.
+                                    sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var));
                                     currentScope.Push(sym);
                                 .)
   ":="
