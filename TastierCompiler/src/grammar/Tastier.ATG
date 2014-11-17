@@ -372,6 +372,8 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     enterInstLocation = program.Count - 1;
                                     if((name == "Main") && (constantsDeclared)) {
                                       program.Add(new Instruction("","Call 1 ConstDecl"));
+                                    } else if(name=="ConstDecl") {
+                                      SemErr("ConstDecl is a protected procedure name. Please rename your procedure.");
                                     }
                                     label = generateProcedureName(name);
                                     openProcedureDeclarations.Push(name);
@@ -589,7 +591,6 @@ Tastier                         (.  string name; bool external = false; .)
                                     foreach (Symbol s in openScopes.Peek()) {
                                       if ((s.Item2 == (int)TastierKind.Var) || (s.Item2 == (int)TastierKind.Const)) {
                                         header.Add(new Instruction("", ".var " + ((int)s.Item3) + " " + s.Item1));
-                                        Console.WriteLine(s.Item1);
                                       } else if (s.Item2 == (int)TastierKind.Proc) {
                                         header.Add(new Instruction("", ".proc " + s.Item1));
                                       } else {
