@@ -125,6 +125,9 @@ Scope externalDeclarations = new Scope();
 Program program = new Program();
 Program header = new Program();
 
+//necessary as code that is not inside a function is not executed.
+Program constantDeclarations = new Program();
+
 Stack<string> openProcedureDeclarations = new Stack<string>();
 
 /*
@@ -367,6 +370,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
   '(' ')'
   '{'                           (.
                                     program.Add(new Instruction("", "Enter 0"));
+                                    program.AddRange(constantDeclarations);
                                     enterInstLocation = program.Count - 1;
                                     label = generateProcedureName(name);
                                     openProcedureDeclarations.Push(name);
@@ -644,9 +648,9 @@ ConstDecl                       (.
                                       SemErr("integer type expected");
                                     }
                                     n = Convert.ToInt32(t.val);
-                                    program.Add(new Instruction("", "Enter " + 1));
-                                    program.Add(new Instruction("", "Const " + n));
-                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    constandDeclarations.Add(new Instruction("", "Enter " + 1));
+                                    constandDeclarations.Add(new Instruction("", "Const " + n));
+                                    constandDeclarations.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | '-'
     number                      (.
@@ -654,25 +658,25 @@ ConstDecl                       (.
                                       SemErr("integer type expected");
                                     }
                                     n = Convert.ToInt32(t.val);
-                                    program.Add(new Instruction("", "Const " + n));
-                                    program.Add(new Instruction("", "Neg"));
-                                    program.Add(new Instruction("", "Const 1"));
-                                    program.Add(new Instruction("", "Add"));
-                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    constandDeclarations.Add(new Instruction("", "Const " + n));
+                                    constandDeclarations.Add(new Instruction("", "Neg"));
+                                    constandDeclarations.Add(new Instruction("", "Const 1"));
+                                    constandDeclarations.Add(new Instruction("", "Add"));
+                                    constandDeclarations.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "true"                      (.
                                     if(type != TastierType.Boolean) {
                                       SemErr("boolean type expected");
                                     }
-                                    program.Add(new Instruction("", "Const " + 1));
-                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    constandDeclarations.Add(new Instruction("", "Const " + 1));
+                                    constandDeclarations.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   | "false"                     (.
                                     if(type != TastierType.Boolean) {
                                       SemErr("boolean type expected");
                                     }
-                                    program.Add(new Instruction("", "Const " + 1));
-                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    constandDeclarations.Add(new Instruction("", "Const " + 1));
+                                    constandDeclarations.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   ) ';'.
 
