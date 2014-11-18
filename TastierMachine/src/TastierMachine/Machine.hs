@@ -62,13 +62,13 @@ import Data.List (intersperse)
 {-- Int is a pointer to the address in memory --}
 stringPrint :: Int -> [Int16] -> String
 stringPrint addr listA = let ptAddr = addr
-                             len = listA !! ptAddr
+                             len = (from Integral listA !! ptAddr)
                              stAddr = ptAddr + 1
                              endAddr = stAddr + (len - 1)
                              valueList = map (listA!!) [stAddr..endAddr]
                              charList = map (chr . fromIntegral) valueList
                              str = show charList
-                             stringNoQuotes = map (str!!) [1..(fromIntegral len)]
+                             stringNoQuotes = map (str!!) [1..len]
                          in stringNoQuotes
 
 
