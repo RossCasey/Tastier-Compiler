@@ -3,6 +3,9 @@ COMPILER Tastier
 
   int memoryAddressOffset = 1000;
   int nextAddress = 0;
+  bool multipleArgs = false;
+  int numArgs = 0;
+
 /*
   First, let's declare all the types we're going to use.
 */
@@ -589,17 +592,36 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
 | "write"
   Expr<out type>                 (.
                                     if (type == TastierType.Integer) {
-                                      program.Add(new Instruction("", "Write"));
+                                      program.Add(new Instruction("", "Const " + (int)type));
                                     } else if (type == TastierType.String) {
-                                      program.Add(new Instruction("", "WriteStr"));
+                                      program.Add(new Instruction("", "Const " + (int)type));
                                     } else {
                                       SemErr("unexpected variable type");
                                     }
+                                    numArgs = 1;
+                                    multipleArgs = false;
                                  .)
   { ',' Expr<out type>          (.
-
+                                    multipleArgs = true;
+                                    numArgs++;
+                                    if((type != TastierType.String) && (type != TastierType.Integer)) {
+                                      SemErr("unexpected variable type");
+                                    }
+                                    program.Add(new Instrunction("", "Const " + (int)type));
                                 .)
-  } ';'
+  } ';'                         (.
+                                    if(!multipleArgs) {
+                                      program.RemoveAt(program.Count()-1);
+                                      if (type == TastierType.Integer) {
+                                        program.Add(new Instruction("", "Write";
+                                      } else if (type == TastierType.String) {
+                                        program.Add(new Instruction("", "WriteStr";
+                                      }
+                                    } else {
+                                      program.Add(new Instruction("", "Const " (numArgs * 2)));
+                                      program.Add(new Instruction("", "WriteMul"));
+                                    }
+                                .)
 
 | '{' { Stat | VarDecl<external> } '}' .
 
