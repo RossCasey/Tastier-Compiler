@@ -275,7 +275,7 @@ run = do
           let tupleList = (makeTuple typeList valueList)
           let strings = valueOrPointer tupleList (elems dmem)
           let combStr = show strings
-          let strNoQuotes = filter (\='\"') combStr
+          let strNoQuotes = filter (/='\"') combStr
           tell $ [strNoQuotes]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
