@@ -226,7 +226,8 @@ run = do
           let valueList = map (dmem!) [stAddr..endAddr]
           let charList = map (chr . fromIntegral) valueList
           let stringOut = map (show) charList
-          tell $ "bare words"
+          let test = show 1234
+          tell $ [test]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
