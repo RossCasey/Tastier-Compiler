@@ -71,7 +71,7 @@ stringPrint addr listA = let ptAddr = addr
                              stringNoQuotes = map (str!!) [1..len]
                          in stringNoQuotes
 
-intPrint :: Int16 -> String
+intPrint :: Int -> String
 intPrint num = show (fromIntegral num)
 
 everyEven :: (Num a) => (Eq a) => [a] -> [a]
@@ -89,7 +89,7 @@ makeTuple (x:xs) (y:ys) = [(x,y)] ++ (makeTuple xs ys)
 
 
 valueOrPointer :: (Int, Int) -> [Int16] -> String
-valueOrPointer (1,value) _ = (intPrint value)
+valueOrPointer (1,value) _ = (intPrint (fromIntegral value))
 valueOrPointer (3,pointer) mem = (stringPrint pointer mem)
 
 
