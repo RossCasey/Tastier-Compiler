@@ -59,8 +59,8 @@ sublist (array,address,length,list) = let elem = array ! address
                                       in sublist (array, newAd, newLn, newLs)
 --}
 
-subArray :: Int -> Int -> Array -> Array
-subArray i j a = listArray (0,j-i) $ map (a!) [i..j]
+subArray :: Int -> Int -> Array -> [a]
+subArray i j a = map (a!) [i..j]
 
 
 debug' m@(Machine rpc rtp rbp imem _ _) = do {
