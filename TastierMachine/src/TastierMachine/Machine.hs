@@ -266,6 +266,20 @@ run = do
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
+        Instructions.WriteMul  -> do
+          let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
+          let args = map (smem!) [1..numArgs]
+          let argsInt = map (fromIntegral) args
+          let typeList = everyEven argsInt
+          let valueList = everyOdd argsInt
+          let tupleList = (makeTuple typeList valueList)
+          let strings = valueOrPointer tupleList (elems dmem)
+          let combStr = show strings
+          let strNoQuotes = filter (\='\"') combStr
+          tell $ [strNoQuotes]
+          put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
+          run
+
 
         Instructions.Leave  -> do
           {-
