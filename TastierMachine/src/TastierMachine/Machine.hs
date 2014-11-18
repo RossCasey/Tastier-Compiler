@@ -211,7 +211,7 @@ run = do
           let addr = ptAddr + 1
           let charArray = ixmap (addr,addr+(length-1)) (\i->i) dmem
           let charList = elems charArray
-          tell $ [(show $ charList]
+          tell $ show $ charList
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
