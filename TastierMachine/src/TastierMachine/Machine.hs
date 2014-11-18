@@ -40,11 +40,41 @@ import Data.Int (Int8, Int16)
 import Data.Char (intToDigit,chr)
 import Numeric (showIntAtBase)
 import Data.Bits (complement)
+import Data.String.Utils
 import Data.Array ((//), (!), Array, elems)
 import Control.Monad.RWS.Lazy (RWS, put, get, ask, tell, local)
 import System.IO.Unsafe (unsafePerformIO)
 import System.IO (hFlush, stdout)
 import Data.List (intersperse)
+
+{--Instructions.WriteStr  -> do
+  let ptAddr = smem ! (rtp-1)
+  let len = dmem ! ptAddr
+  let stAddr = ptAddr + 1
+  let endAddr = stAddr + (len - 1)
+  let valueList = map (dmem!) [stAddr..endAddr]
+  let charList = map (chr . fromIntegral) valueList
+  let string = show charList
+  let stringNoQuotes = map (string!!) [1..(fromIntegral len)]
+  tell $ [stringNoQuotes]
+  put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
+  run--}
+
+{-- Int is a pointer to the address in memory --}
+stringPrint :: Int -> Array -> String
+stringPrint addr array = let  pdAddr = addr
+                              len = array ! pdAddr
+                              srAddr = ptAddr + 1
+                              endAddr = stAddr + (len - 1)
+                              valueList = map (array!) [stAddr..endAddr]
+                              charList = map (chr . fromIntegral) valueList
+                              str = show charList
+                              stringNoQuotes = ma (str!!) [1..(fromIntegral len)]
+                          in stringNoQuotes
+
+
+
+
 
 debug' m@(Machine rpc rtp rbp imem _ _) = do {
   putStrLn $
