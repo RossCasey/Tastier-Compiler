@@ -607,7 +607,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     if((type != TastierType.String) && (type != TastierType.Integer)) {
                                       SemErr("unexpected variable type");
                                     }
-                                    program.Add(new Instrunction("", "Const " + (int)type));
+                                    program.Add(new Instruction("", "Const " + (int)type));
                                 .)
   } ';'                         (.
                                     if(!multipleArgs) {
