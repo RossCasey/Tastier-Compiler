@@ -228,7 +228,7 @@ run = do
           {--map (tell $ show) charList--}
 
           let test = [1,2,3,4]
-          tell $ map (show) test
+          tell $ map (show) charList
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
