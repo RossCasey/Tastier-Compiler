@@ -37,7 +37,7 @@
 module TastierMachine.Machine where
 import qualified TastierMachine.Instructions as Instructions
 import Data.Int (Int8, Int16)
-import Data.Char (intToDigit)
+import Data.Char (intToDigit,chr)
 import Numeric (showIntAtBase)
 import Data.Bits (complement)
 import Data.Array ((//), (!), Array, elems, ixmap)
@@ -222,7 +222,8 @@ run = do
           let ptAddr = smem ! (rtp-1)
           let length = dmem ! ptAddr
           let addr = ptAddr + 1
-          let charList = map (dmem!) [addr..(addr + (length - 1))]
+          let valueList = map (dmem!) [addr..(addr + (length - 1))]
+          let charList = map (chr) valueList
           tell $ map (show) charList
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
