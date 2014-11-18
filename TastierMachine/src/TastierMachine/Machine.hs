@@ -274,7 +274,7 @@ run = do
           let valueList = everyOdd argsInt
           let tupleList = (makeTuple typeList valueList)
           let memList = elems dmem
-          let strings = map (\x y -> (valueOrPointer x y)) tupleList memList
+          let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr
           tell $ [strNoQuotes]
