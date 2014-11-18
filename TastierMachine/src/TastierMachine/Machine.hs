@@ -72,7 +72,7 @@ stringPrint addr listA = let ptAddr = addr
                          in stringNoQuotes
 
 intPrint :: Int16 -> String
-intPrint num = (fromIntegral num)
+intPrint num = show (fromIntegral num)
 
 
 
