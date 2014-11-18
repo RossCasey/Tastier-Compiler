@@ -213,7 +213,8 @@ run = do
           let charList = elems charArray
           map (tell $ show) charList
           --}
-          tell $ [show $ smem ! (rtp-1),show $ smem ! (rtp-1)]
+          let test = [1,2,3,4]
+          tell $ map (show) test
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
