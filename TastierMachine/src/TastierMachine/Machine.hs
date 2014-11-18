@@ -79,6 +79,13 @@ everyEven list = let  zeroOthers = zipWith (*) (cycle [1,0]) list
                       removeZeros = filter (/=0) zeroOthers
                  in removeZeros
 
+everyOdd :: (Num a) => (Eq a) => [a] -> [a]
+everyOdd list = let  zeroOthers = zipWith (*) (cycle [0,1]) list
+                     removeZeros = filter (/=0) zeroOthers
+                 in removeZeros
+
+makeTuple :: [a] -> [b] -> [(a,b)]
+makeTuple (x:xs) (y:ys) = (x,y) ++ $ makeTuple xs ys
 
 
 
