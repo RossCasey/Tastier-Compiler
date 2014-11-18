@@ -71,6 +71,8 @@ stringPrint addr listA = let ptAddr = addr
                              stringNoQuotes = map (str!!) [1..len]
                          in stringNoQuotes
 
+intPrint :: Int16 -> String
+intPrint num = (fromIntegral num)
 
 
 
