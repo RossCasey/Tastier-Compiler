@@ -40,7 +40,6 @@ import Data.Int (Int8, Int16)
 import Data.Char (intToDigit,chr)
 import Numeric (showIntAtBase)
 import Data.Bits (complement)
-import Data.String.Utils
 import Data.Array ((//), (!), Array, elems)
 import Control.Monad.RWS.Lazy (RWS, put, get, ask, tell, local)
 import System.IO.Unsafe (unsafePerformIO)
