@@ -613,9 +613,9 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     if(!multipleArgs) {
                                       program.RemoveAt(program.Count()-1);
                                       if (type == TastierType.Integer) {
-                                        program.Add(new Instruction("", "Write";
+                                        program.Add(new Instruction("", "Write"));
                                       } else if (type == TastierType.String) {
-                                        program.Add(new Instruction("", "WriteStr";
+                                        program.Add(new Instruction("", "WriteStr"));
                                       }
                                     } else {
                                       program.Add(new Instruction("", "Const " (numArgs * 2)));
