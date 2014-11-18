@@ -46,19 +46,6 @@ import System.IO.Unsafe (unsafePerformIO)
 import System.IO (hFlush, stdout)
 import Data.List (intersperse)
 
-
-
-
-{--
-sublist :: (Array,Int,Int,[a]) -> (Array,Int,Int,[a])
-sublist (array,address,0,list) = (array,address,0,list)
-sublist (array,address,length,list) = let elem = array ! address
-                                          newAd = address + 1
-                                          newLn = length - 1
-                                          newLs = list ++ elem
-                                      in sublist (array, newAd, newLn, newLs)
---}
-
 debug' m@(Machine rpc rtp rbp imem _ _) = do {
   putStrLn $
     concat $
@@ -220,13 +207,13 @@ run = do
 
         Instructions.WriteStr  -> do
           let ptAddr = smem ! (rtp-1)
-          let length = dmem ! ptAddr
+          let len = dmem ! ptAddr
           let stAddr = ptAddr + 1
-          let endAddr = stAddr + (length - 1)
+          let endAddr = stAddr + (len - 1)
           let valueList = map (dmem!) [stAddr..endAddr]
           let charList = map (chr . fromIntegral) valueList
           let string = show charList
-          let stringNoQuotes = map (string!!) [1..length]
+          let stringNoQuotes = map (string!!) [1..len]
           tell $ [stringNoQuotes]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
