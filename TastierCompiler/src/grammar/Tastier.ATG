@@ -256,8 +256,9 @@ Symbol lookup(Stack<Scope> scopes, string name) {
 /*--------------------------------------------------------------------------*/
 
 CHARACTERS
-letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+  letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   digit = "0123456789".
+  special = " ,.!£$%^&*()-_=+<>?/\#|`~"
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
@@ -266,7 +267,7 @@ letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
 TOKENS
   ident  = letter {letter | digit}.
   number = digit {digit}.
-  string = quote {letter | digit} quote.
+  string = quote {letter | digit | special} quote.
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
