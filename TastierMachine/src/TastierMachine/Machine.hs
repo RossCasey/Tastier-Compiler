@@ -61,14 +61,14 @@ import Data.List (intersperse)
 
 {-- Int is a pointer to the address in memory --}
 stringPrint :: Int -> Array -> String
-stringPrint addr array = let  pdAddr = addr
+stringPrint addr array = let  ptAddr = addr
                               len = array ! pdAddr
-                              srAddr = ptAddr + 1
+                              stAddr = ptAddr + 1
                               endAddr = stAddr + (len - 1)
                               valueList = map (array!) [stAddr..endAddr]
                               charList = map (chr . fromIntegral) valueList
                               str = show charList
-                              stringNoQuotes = ma (str!!) [1..(fromIntegral len)]
+                              stringNoQuotes = map (str!!) [1..(fromIntegral len)]
                           in stringNoQuotes
 
 
