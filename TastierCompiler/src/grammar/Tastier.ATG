@@ -593,7 +593,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
   | String ';'                   (.
                                     program.Add(new Instruction("", "WriteStr"));
                                  .)
-  ).
+  )
 
 | '{' { Stat | VarDecl<external> } '}' .
 
