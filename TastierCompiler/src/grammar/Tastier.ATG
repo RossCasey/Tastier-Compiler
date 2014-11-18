@@ -660,13 +660,7 @@ String
                                   program.Add(new Instruction("", "Const " + stringAddress));
                                 .)
   | Ident<out name>             (.
-                                    bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
-                                    sym = lookup(openScopes, name);
-                                    if (sym == null) {
-                                      sym = _lookup(externalDeclarations, name);
-                                      isExternal = true;
-                                    }
-
+                                    Symbol sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       SemErr("reference to undefined variable " + name);
                                     }
@@ -675,11 +669,14 @@ String
                                         if (sym.Item4 == 0) {
                                           program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
                                         }
-                                        } else {
-                                            int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                            program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
+                                        else {
+                                          int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                          program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
                                         }
-                                      } else SemErr("cannot assign non-string type to string variable");
+                                      }
+                                      else {
+                                        SemErr("cannot assign non-string type to string variable");
+                                      }
                                     }
                                 .)
   ).
