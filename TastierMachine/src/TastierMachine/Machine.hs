@@ -86,6 +86,7 @@ everyOdd list = let  zeroOthers = zipWith (*) (cycle [0,1]) list
 
 makeTuple :: [a] -> [b] -> [(a,b)]
 makeTuple (x:xs) (y:ys) = [(x,y)] ++ (makeTuple xs ys)
+makeTuple (x:[]) (y:[]) = [(x,y)]
 
 
 valueOrPointer :: (Int, Int) -> [Int16] -> String
