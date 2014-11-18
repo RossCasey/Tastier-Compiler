@@ -40,11 +40,11 @@ import Data.Int (Int8, Int16)
 import Data.Char (intToDigit,chr)
 import Numeric (showIntAtBase)
 import Data.Bits (complement)
-import Data.Array ((//), (!), Array, elems, ixmap)
+import Data.Array ((//), (!), Array, elems)
 import Control.Monad.RWS.Lazy (RWS, put, get, ask, tell, local)
 import System.IO.Unsafe (unsafePerformIO)
 import System.IO (hFlush, stdout)
-import Data.List (intersperse)
+import Data.List (intersperse, length)
 
 
 
@@ -226,7 +226,7 @@ run = do
           let valueList = map (dmem!) [stAddr..endAddr]
           let charList = map (chr . fromIntegral) valueList
           let string = show charList
-          let stringNoQuotes = map (charList!!) [1..((Length charList)-2)]
+          let stringNoQuotes = map (charList!!) [1..((length charList)-2)]
           tell $ [stringNoQuotes]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
