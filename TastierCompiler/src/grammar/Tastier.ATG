@@ -349,6 +349,20 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                 .)
   | "true"                      (.  program.Add(new Instruction("", "Const " + 1)); type = TastierType.Boolean; .)
   | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = TastierType.Boolean; .)
+  | string                      (.
+                                    string value = t.val;
+                                    char[] array = value.ToCharArray();
+                                    int stringAddress = nextAddress + memoryAddressOffset;
+                                    program.Add(new Instruction("", "Const " + (array.Count()-2)));
+                                    program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset + 3)));
+                                    nextAddress++;
+                                    for(int i=1; i< array.Count()-1; i++) {
+                                      program.Add(new Instruction("", "Const " + (int)array[i]));
+                                      program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset + 3)));
+                                      nextAddress++;
+                                    }
+                                    program.Add(new Instruction("", "Const " + stringAddress));
+                                  .)
   ).
 
 /*------------------------------------------------------------------------*/
@@ -470,7 +484,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       SemErr("cannot assign to non-variable");
                                     }
                                 .)
-    (Expr<out type> ';'
+    Expr<out type> ';'
                                 (.
                                     if (type != (TastierType)sym.Item3) {
                                       SemErr("incompatible types");
@@ -488,19 +502,6 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
-    | String ';'                (.
-                                    if (TastierType.String != (TastierType)sym.Item3) {
-                                      SemErr("incompatible types");
-                                    }
-                                    if (sym.Item4 == 0) {
-                                        program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
-                                    }
-                                    else {
-                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
-                                    }
-                                .)
-    )
   | '(' ')' ';'                 (.
                                     if ((TastierKind)sym.Item2 != TastierKind.Proc) {
                                       SemErr("object is not a procedure");
@@ -647,44 +648,6 @@ Term<out TastierType type>      (.  TastierType type1; Instruction inst; .)
                                     program.Add(inst);
                                 .)
   }.
-/*------------------------------------------------------------------------*/
-
-String                          (.  Symbol sym; string name; .)
-= ( string                      (.
-                                  string value = t.val;
-                                  char[] array = value.ToCharArray();
-                                  int stringAddress = nextAddress + memoryAddressOffset;
-                                  program.Add(new Instruction("", "Const " + (array.Count()-2)));
-                                  program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset + 3)));
-                                  nextAddress++;
-                                  for(int i=1; i< array.Count()-1; i++) {
-                                    program.Add(new Instruction("", "Const " + (int)array[i]));
-                                    program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset + 3)));
-                                    nextAddress++;
-                                  }
-                                  program.Add(new Instruction("", "Const " + stringAddress));
-                                .)
-  | Ident<out name>             (.
-                                    sym = lookup(openScopes, name);
-                                    if (sym == null) {
-                                      SemErr("reference to undefined variable " + name);
-                                    }
-                                    else {
-                                      if (((TastierKind)sym.Item2 == TastierKind.Var) && ((TastierType)sym.Item3 == TastierType.String)) {
-                                        if (sym.Item4 == 0) {
-                                          program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
-                                        }
-                                        else {
-                                          int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                          program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
-                                        }
-                                      }
-                                      else {
-                                        SemErr("cannot assign non-string type to string variable");
-                                      }
-                                    }
-                                .)
-  ).
 /*------------------------------------------------------------------------*/
 
 Type<out TastierType type>
