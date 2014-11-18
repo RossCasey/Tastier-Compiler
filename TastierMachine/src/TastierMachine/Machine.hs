@@ -220,12 +220,12 @@ run = do
 
         Instructions.WriteStr  -> do
           let ptAddr = smem ! (rtp-1)
-          let length = 4
+          let length = dmem ! ptAddr
           let stAddr = ptAddr + 1
           let endAddr = stAddr + (length - 1)
           let valueList = map (dmem!) [stAddr..endAddr]
           let charList = map (chr . fromIntegral) valueList
-          tell $ map (show) [dmem!999]
+          tell $ map (show) charList
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
