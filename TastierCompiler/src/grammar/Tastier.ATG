@@ -587,7 +587,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                 .)
 
 | "write"
-  Expr<out type> ';'            (.
+  Expr<out type>                 (.
                                     if (type == TastierType.Integer) {
                                       program.Add(new Instruction("", "Write"));
                                     } else if (type == TastierType.String) {
@@ -596,6 +596,10 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       SemErr("unexpected variable type");
                                     }
                                  .)
+  { ',' Expr<out type>          (.
+
+                                .)
+  } ';'
 
 | '{' { Stat | VarDecl<external> } '}' .
 
