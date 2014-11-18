@@ -91,6 +91,7 @@ makeTuple (x:xs) (y:ys) = [(x,y)] ++ (makeTuple xs ys)
 valueOrPointer :: (Int, Int) -> [Int16] -> String
 valueOrPointer (1,value) _ = (intPrint (fromIntegral value))
 valueOrPointer (3,pointer) mem = (stringPrint pointer mem)
+valueOrPointer (a,_) _ = show a
 
 
 
@@ -277,6 +278,8 @@ run = do
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr
+
+
           tell $ [strNoQuotes]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
