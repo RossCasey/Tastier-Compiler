@@ -362,6 +362,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       nextAddress++;
                                     }
                                     program.Add(new Instruction("", "Const " + stringAddress));
+                                    type = TastierType.String;
                                   .)
   ).
 
