@@ -85,7 +85,7 @@ everyOdd list = let  zeroOthers = zipWith (*) (cycle [0,1]) list
                  in removeZeros
 
 makeTuple :: [a] -> [b] -> [(a,b)]
-makeTuple (x:xs) (y:ys) = (x,y) ++ $ makeTuple xs ys
+makeTuple (x:xs) (y:ys) = (x,y) ++ (makeTuple xs ys)
 
 
 
