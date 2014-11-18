@@ -225,7 +225,7 @@ run = do
           let endAddr = stAddr + (length - 1)
           let valueList = map (dmem!) [stAddr..endAddr]
           let charList = map (chr . fromIntegral) valueList
-          tell $ map (show) [length]
+          tell $ map (show) [ptAddr]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
