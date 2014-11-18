@@ -206,12 +206,14 @@ run = do
           run
 
         Instructions.WriteStr  -> do
-          let ptAddr = smem ! (rtp-1)
+          {--let ptAddr = smem ! (rtp-1)
           let length = dmem ! ptAddr
           let addr = ptAddr + 1
           let charArray = ixmap (addr,addr+(length-1)) (\i->i) dmem
           let charList = elems charArray
           map (tell $ show) charList
+          --}
+          tell $ [show $ smem ! (rtp-1)]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
