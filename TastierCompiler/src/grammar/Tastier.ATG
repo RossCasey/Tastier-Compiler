@@ -286,7 +286,7 @@ AddOp<out Instruction inst>
 /*------------------------------------------------------------------------*/
 
 Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
-= SimExpr<out type>
+= (SimExpr<out type>
   [ RelOp<out inst>
     SimExpr<out type1>          (.
                                     if (type != type1) {
@@ -297,8 +297,12 @@ Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
                                       type = TastierType.Boolean;
                                     }
                                 .)
-  ].
-//test
+  ]
+  | String ';'                  (.
+                                    type = TastierType.String;
+                                .)
+  ).
+
 /*------------------------------------------------------------------------*/
 
 Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
