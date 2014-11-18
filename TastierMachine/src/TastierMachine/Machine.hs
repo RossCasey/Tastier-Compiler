@@ -74,7 +74,7 @@ stringPrint addr listA = let ptAddr = addr
 intPrint :: Int16 -> String
 intPrint num = show (fromIntegral num)
 
-everyEven :: [a] -> [a]
+everyEven :: (Num a) => [a] -> [a]
 everyEven list = let  zeroOthers = zipWith (*) (cycle [1,0]) list
                       removeZeros = filter (/=0) zeroOthers
                  in removeZeros
