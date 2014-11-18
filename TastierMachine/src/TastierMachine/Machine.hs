@@ -88,6 +88,11 @@ makeTuple :: [a] -> [b] -> [(a,b)]
 makeTuple (x:xs) (y:ys) = [(x,y)] ++ (makeTuple xs ys)
 
 
+valueOrPointer :: (Int, Int) -> [Int16] -> String
+valueOrPointer (1,value) _ = (intPrint value)
+valueOrPointer (3,pointer) mem = (stringPrint pointer mem)
+
+
 
 debug' m@(Machine rpc rtp rbp imem _ _) = do {
   putStrLn $
