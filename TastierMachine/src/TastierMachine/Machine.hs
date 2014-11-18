@@ -223,7 +223,7 @@ run = do
           let length = dmem ! ptAddr
           let addr = ptAddr + 1
           let valueList = map (dmem!) [addr..(addr + (length - 1))]
-          let charList = map (chr) valueList
+          let charList = map (chr . fromIntegral) valueList
           tell $ map (show) charList
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
