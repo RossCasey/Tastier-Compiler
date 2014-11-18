@@ -49,7 +49,7 @@ import Data.List (intersperse)
 
 
 
-
+{--
 sublist :: (Array,Int,Int,[a]) -> (Array,Int,Int,[a])
 sublist (array,address,0,list) = (array,address,0,list)
 sublist (array,address,length,list) = let elem = array ! address
@@ -57,6 +57,10 @@ sublist (array,address,length,list) = let elem = array ! address
                                           newLn = length - 1
                                           newLs = list ++ elem
                                       in sublist (array, newAd, newLn, newLs)
+--}
+
+subArray :: Int -> Int -> Array -> Array
+subArray i j a = listArray (0,j-i) $ map (a!) [i..j]
 
 
 debug' m@(Machine rpc rtp rbp imem _ _) = do {
