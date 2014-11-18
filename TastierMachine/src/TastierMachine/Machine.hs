@@ -225,12 +225,10 @@ run = do
           let charArray = ixmap (addr,addr+(length-1)) (\i->i) dmem
           let charList = elems charArray
 
-          where
-
           {--map (tell $ show) charList--}
 
           let test = [1,2,3,4]
-          tell $ map (show) charArray
+          tell $ map (show) test
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
