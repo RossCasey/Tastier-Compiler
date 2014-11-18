@@ -68,7 +68,7 @@ stringPrint addr _ _ array = let  ptAddr = addr
                                   valueList = map (array!) [stAddr..endAddr]
                                   charList = map (chr . fromIntegral) valueList
                                   str = show charList
-                                 stringNoQuotes = map (str!!) [1..(fromIntegral len)]
+                                  stringNoQuotes = map (str!!) [1..(fromIntegral len)]
                              in stringNoQuotes
 
 
