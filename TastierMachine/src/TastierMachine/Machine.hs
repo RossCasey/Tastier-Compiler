@@ -226,7 +226,7 @@ run = do
           let valueList = map (dmem!) [stAddr..endAddr]
           let charList = map (chr . fromIntegral) valueList
           let string = show charList
-          let stringNoQuotes = map (string!!) [1..((length string)-2)]
+          let stringNoQuotes = map (string!!) [1..length]
           tell $ [stringNoQuotes]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
