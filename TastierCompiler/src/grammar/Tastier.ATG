@@ -618,7 +618,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                         program.Add(new Instruction("", "WriteStr"));
                                       }
                                     } else {
-                                      program.Add(new Instruction("", "Const " (numArgs * 2)));
+                                      program.Add(new Instruction("", "Const " + (numArgs * 2)));
                                       program.Add(new Instruction("", "WriteMul"));
                                     }
                                 .)
