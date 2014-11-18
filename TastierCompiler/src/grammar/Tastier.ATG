@@ -654,11 +654,11 @@ String                          (.  Symbol sym; string name; .)
                                   char[] array = value.ToCharArray();
                                   int stringAddress = nextAddress + memoryAddressOffset;
                                   program.Add(new Instruction("", "Const " + (array.Count()-2)));
-                                  program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
+                                  program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset + 3)));
                                   nextAddress++;
                                   for(int i=1; i< array.Count()-1; i++) {
                                     program.Add(new Instruction("", "Const " + (int)array[i]));
-                                    program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset)));
+                                    program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset + 3)));
                                     nextAddress++;
                                   }
                                   program.Add(new Instruction("", "Const " + stringAddress));
