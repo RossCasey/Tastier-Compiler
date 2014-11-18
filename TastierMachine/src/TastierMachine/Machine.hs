@@ -60,9 +60,9 @@ import Data.List (intersperse)
   run--}
 
 {-- Int is a pointer to the address in memory --}
-stringPrint :: Int -> [a] -> String
+stringPrint :: Int -> [Int16] -> String
 stringPrint addr listA = let ptAddr = addr
-                             len = listA ! ptAddr
+                             len = listA !! ptAddr
                              stAddr = ptAddr + 1
                              endAddr = stAddr + (len - 1)
                              valueList = map (listA!!) [stAddr..endAddr]
