@@ -644,7 +644,7 @@ Term<out TastierType type>      (.  TastierType type1; Instruction inst; .)
   }.
 /*------------------------------------------------------------------------*/
 
-String
+String                          (.  Symbol sym; string name; .)
 = ( string                      (.
                                   string value = t.val;
                                   char[] array = value.ToCharArray();
@@ -660,7 +660,7 @@ String
                                   program.Add(new Instruction("", "Const " + stringAddress));
                                 .)
   | Ident<out name>             (.
-                                    Symbol sym = lookup(openScopes, name);
+                                    sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       SemErr("reference to undefined variable " + name);
                                     }
