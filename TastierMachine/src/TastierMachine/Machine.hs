@@ -62,7 +62,7 @@ import Data.List (intersperse)
 {-- Int is a pointer to the address in memory --}
 stringPrint :: Int -> Array -> String
 stringPrint addr array = let  ptAddr = addr
-                              len = array ! pdAddr
+                              len = array ! ptAddr
                               stAddr = ptAddr + 1
                               endAddr = stAddr + (len - 1)
                               valueList = map (array!) [stAddr..endAddr]
