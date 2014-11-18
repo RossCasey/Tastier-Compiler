@@ -211,6 +211,14 @@ run = do
           let addr = ptAddr + 1
           let charArray = ixmap (addr,addr+(length-1)) (\i->i) dmem
           let charList = elems charArray
+
+          where sublist =
+            (array,address,0,list) = (array,address,0,list)
+            (array,address,length,list) = let elem = array ! address
+                                              newAd = address + 1
+                                              newLn = length - 1
+                                              newLs = list ++ elem
+                                          in sublist (array, newAd, newLn, newLs)
           {--map (tell $ show) charList--}
 
           let test = [1,2,3,4]
