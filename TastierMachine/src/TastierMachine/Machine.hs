@@ -44,7 +44,7 @@ import Data.Array ((//), (!), Array, elems)
 import Control.Monad.RWS.Lazy (RWS, put, get, ask, tell, local)
 import System.IO.Unsafe (unsafePerformIO)
 import System.IO (hFlush, stdout)
-import Data.List (intersperse, length)
+import Data.List (intersperse)
 
 
 
