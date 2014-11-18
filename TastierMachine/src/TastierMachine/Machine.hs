@@ -59,10 +59,6 @@ sublist (array,address,length,list) = let elem = array ! address
                                       in sublist (array, newAd, newLn, newLs)
 --}
 
-subArray :: Int -> Int -> Array -> [a]
-subArray i j a = map (a!) [i..j]
-
-
 debug' m@(Machine rpc rtp rbp imem _ _) = do {
   putStrLn $
     concat $
@@ -227,7 +223,7 @@ run = do
           let length = dmem ! ptAddr
           let addr = ptAddr + 1
           let charArray = ixmap (addr,addr+(length-1)) (\i->i) dmem
-          let charList = elems charArray
+          let charList = map (dmem!) [addr..(addr + (length - 1))]
 
           {--map (tell $ show) charList--}
 
