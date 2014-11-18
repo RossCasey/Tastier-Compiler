@@ -258,7 +258,7 @@ Symbol lookup(Stack<Scope> scopes, string name) {
 CHARACTERS
   letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   digit = "0123456789".
-  special = " ,.!£$%^&*()-_=+<>?/\#|`~"
+  special = " ,.!£$%^&*()-_=+<>?/#|`~"
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
