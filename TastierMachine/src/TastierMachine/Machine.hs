@@ -60,7 +60,7 @@ import Data.List (intersperse)
   run--}
 
 {-- Int is a pointer to the address in memory --}
-stringPrint :: Int -> Array -> String
+stringPrint :: Int -> Array -> i -> e -> String
 stringPrint addr _ _ array = let  ptAddr = addr
                                   len = array ! ptAddr
                                   stAddr = ptAddr + 1
