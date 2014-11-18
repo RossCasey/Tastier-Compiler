@@ -205,6 +205,11 @@ run = do
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
+        Instructions.WriteStr  -> do
+          tell $ [show $ smem ! (rtp-1)]
+          put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
+          run
+
         Instructions.Leave  -> do
           {-
             When we're leaving a procedure, we have to reset rbp to the
