@@ -256,7 +256,19 @@ run = do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
           let startArg = (rtp - 2)
           let finishArg = (rtp - (numArgs + 1))
-          let args = map (smem!) [6,7,8,9]
+
+          let p1 = (rtp - 2)
+          let p2 = (rtp - 3)
+          let p3 = (rtp - 4)
+          let p4 = (rtp - 5)
+
+          let v1 = smem ! p1
+          let v2 = smem ! p2
+          let v3 = smem ! p3
+          let v4 = smem ! p4
+
+
+          {--let args = map (smem!) [6,7,8,9]
           let argsInt = map (fromIntegral) args
           let typeList = everyEven argsInt
           let valueList = everyOdd argsInt
@@ -264,10 +276,10 @@ run = do
           let memList = elems dmem
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = show strings
-          let strNoQuotes = filter (/='\"') combStr
+          let strNoQuotes = filter (/='\"') combStr --}
 
 
-          tell $ [show [address,startArg,finishArg]]
+          tell $ [show [v1,v2,v3,v4]]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
