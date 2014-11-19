@@ -252,10 +252,22 @@ run = do
           run
 
         Instructions.WriteMul  -> do
-          let args = map (smem!) [8,7..5]
-          let args1 = [(smem ! 8), (smem ! 7)]
-          tell $ [show args]
-          put $ machine { rpc = rpc + 1, rtp = rtp - (1 + 2) }
+          let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
+          let startArg = (fromIntegral(rtp - 2))
+          let finishArg = (fromIntegral(rtp - (numArgs + 1)))
+          let args = map (dmem!) [startArg,(startArg-1)..finishArg]
+
+          let argsInt = map (fromIntegral) args
+          let typeList = everyEven argsInt
+          let valueList = everyOdd argsInt
+          let tupleList = zip typeList valueList
+          let memList = elems dmem
+          let strings = map (\x -> (valueOrPointer x memList)) tupleList
+          let combStr = show strings
+          let strNoQuotes = filter (/='\"') combStr --}
+          tell $ [show strNoQuotes]
+          put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
+          run
 
         Instructions.Leave  -> do
           {-
