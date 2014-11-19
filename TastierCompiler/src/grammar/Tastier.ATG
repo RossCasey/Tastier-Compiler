@@ -364,7 +364,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress)));
+                                    program.Add(new Instruction("","Const " + stringAddress));
                                     type = TastierType.String;
                                   .)
   ).
@@ -664,11 +664,7 @@ Tastier                         (.  string name; bool external = false; .)
                                         int oldAddress = Convert.ToInt32(inst.Item2);
                                         String newInst = "StoG " + (oldAddress + memoryAddressOffset);
                                         program[index] = new Instruction("", newInst);
-                                      } else if(inst.Item1 == "StrReplaceAddr") {     //returning pointer
-                                        int oldAddress = Convert.ToInt32(inst.Item2);
-                                        String newInst = "Const " + (oldAddress);
-                                        program[index] = new Instruction("", newInst);
-                                      }
+                                      } 
                                       index++;
                                     }
                                     header.AddRange(program);
