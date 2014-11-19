@@ -364,7 +364,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("StrReplace",Convert.ToString(stringAddress)));
+                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress)));
                                     type = TastierType.String;
                                   .)
   ).
@@ -664,6 +664,10 @@ Tastier                         (.  string name; bool external = false; .)
                                         int oldAddress = Convert.ToInt32(inst.Item2);
                                         String newInst = "StoG " + (oldAddress + memoryAddressOffset);
                                         program[index] = new Instruction("", newInst);
+                                      } else if(inst.Item1 == "StrReplaceAddr") {     //returning pointer
+                                        int oldAddress = Convert.ToInt32(inst.Item2);
+                                        String newInst = "Const " + (oldAddress + memoryAddressOffset);
+                                        program[index] = new Instruction("", newInst);
                                       }
                                       index++;
                                     }
@@ -747,7 +751,7 @@ ConstDecl                       (.
                                     if(type != TastierType.Boolean) {
                                       SemErr("cannot assign boolean value to non-boolean constant");
                                     }
-                                    program.Add(new Instruction("", "Const " + 1));
+                                    program.Add(new Instruction("", "Const " + 0));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
   ) ';'                         (.
