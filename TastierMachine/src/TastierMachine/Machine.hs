@@ -265,7 +265,7 @@ run = do
           let memList = elems dmem
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = intercalate "" strings
-          let strNoQuotes = filter (/='\"') combStr --}
+          let betterString = filter (/='"') combStr
           tell $ [betterString]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
