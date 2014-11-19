@@ -34,7 +34,7 @@ main = do
   if length args == 2 then do
     assemblerFile' <- B.readFile (args !! 0)
 
-    let assemblerFile = "Call 0 ConstDecl\nCall 0 Main\nJmp $END\n" `B.append` assemblerFile'
+    let assemblerFile = "Call 0 _ConstDecl\nCall 0 Main\nJmp $END\n" `B.append` assemblerFile'
                         `B.append` "\n$END: Halt\n"
 
     let chunks = filter ignoreLinePredicate $
