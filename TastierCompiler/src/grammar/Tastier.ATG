@@ -601,7 +601,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     numArgs = 1;
                                     multipleArgs = false;
                                  .)
-  { "€~]" Expr<out type>          (.
+  { ',' Expr<out type>          (.
                                     multipleArgs = true;
                                     numArgs++;
                                     if((type != TastierType.String) && (type != TastierType.Integer)) {
