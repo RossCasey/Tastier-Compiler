@@ -257,10 +257,10 @@ run = do
           let startArg = (rtp - 2)
           let finishArg = (rtp - (numArgs + 1))
 
-          let p1 = (rtp - 2)
-          let p2 = (rtp - 3)
-          let p3 = (rtp - 4)
-          let p4 = (rtp - 5)
+          let p1 = (rtp - 1)
+          let p2 = (rtp - 2)
+          let p3 = (rtp - 3)
+          let p4 = (rtp - 4)
 
           let v1 = smem ! p1
           let v2 = smem ! p2
