@@ -266,7 +266,7 @@ run = do
           let strNoQuotes = filter (/='\"') combStr
 
 
-          tell $ [show args]
+          tell $ [show $ smem ! 8]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
