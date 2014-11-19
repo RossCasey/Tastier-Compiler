@@ -274,7 +274,7 @@ run = do
           let betterString = map (filter (/='"')) strings
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr --}
-          tell $ [show conStr]
+          tell $ [conStr]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
