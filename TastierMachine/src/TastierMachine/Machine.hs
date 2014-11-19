@@ -44,7 +44,7 @@ import Data.Array ((//), (!), Array, elems)
 import Control.Monad.RWS.Lazy (RWS, put, get, ask, tell, local)
 import System.IO.Unsafe (unsafePerformIO)
 import System.IO (hFlush, stdout)
-import Data.List (intersperse)
+import Data.List (intersperse, intercalate)
 
 {-- Int is a pointer to the address in memory --}
 stringPrint :: Int -> [Int16] -> String
