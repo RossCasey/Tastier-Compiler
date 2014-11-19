@@ -440,7 +440,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("","Const " + stringAddress));
+                                    program.Add(new Instruction("","Const " + stringAddress+3));
                                     type = TastierType.String;
                                   .)
   ).
