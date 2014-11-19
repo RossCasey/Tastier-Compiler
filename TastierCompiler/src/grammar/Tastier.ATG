@@ -357,14 +357,14 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                     char[] array = value.ToCharArray();
                                     int stringAddress = nextAddress + memoryAddressOffset;
                                     program.Add(new Instruction("", "Const " + (array.Count()-2)));
-                                    program.Add(new Instruction("StrReplace",(nextAddress + 3)));
+                                    program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
                                     nextAddress++;
                                     for(int i=1; i< array.Count()-1; i++) {
                                       program.Add(new Instruction("", "Const " + (int)array[i]));
-                                      program.Add(new Instruction("StrReplace",(nextAddress + 3)));
+                                      program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("StrReplace",stringAddress));
+                                    program.Add(new Instruction("StrReplace",Convert.ToString(stringAddress)));
                                     type = TastierType.String;
                                   .)
   ).
