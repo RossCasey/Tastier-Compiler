@@ -79,7 +79,7 @@ valueOrPointer (a,_) _ = show a
 
 
 removeEscapes :: String -> String
-removeEscapes str = filter . flip notElem "\"\"
+removeEscapes str = filter . flip notElem "\"\\"
 
 
 
