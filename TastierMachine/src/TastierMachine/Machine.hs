@@ -246,7 +246,7 @@ run = do
           run
 
         Instructions.WriteStr  -> do
-          let ptAddr = smem ! (rtp-1)
+          let ptAddr = fromIntegral $ smem ! (rtp-1)
           let memList = elems dmem
           let str = (stringPrint ptAddr memList)
           let strNoQuotes = filter (/='"') str
