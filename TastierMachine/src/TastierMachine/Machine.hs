@@ -264,7 +264,7 @@ run = do
           let strNoQuotes = filter (/='\"') combStr
 
 
-          tell $ [show $ tupleList !! 0]
+          tell $ [show typeList]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
