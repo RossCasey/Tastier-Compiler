@@ -271,10 +271,10 @@ run = do
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
 
           let conStr = foldl (++) strings
-          let betterString = map (filter (/='"')) strings
+          let betterString = show (map (filter (/='"')) conStr)
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr --}
-          tell $ [conStr]
+          tell $ [show betterString]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
