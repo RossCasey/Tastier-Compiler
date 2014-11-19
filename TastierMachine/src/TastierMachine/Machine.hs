@@ -256,8 +256,8 @@ run = do
           let startArg = (fromIntegral(rtp - 2))
           let finishArg = (fromIntegral(rtp - (numArgs + 1)))
           let args = map (smem!) [startArg,(startArg-1)..finishArg]
-
           let argsInt = map (fromIntegral) args
+
           let typeList = everyEven argsInt
           let valueList = everyOdd argsInt
           let tupleList = zip typeList valueList
