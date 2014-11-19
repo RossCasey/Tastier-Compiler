@@ -265,7 +265,7 @@ run = do
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr --}
-          tell $ [show argsInt]
+          tell $ [show args]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
