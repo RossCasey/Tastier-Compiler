@@ -431,16 +431,16 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                     program.Add(new Instruction("", "Const " + (array.Count()-2)));
 
                                     //temporary instruction with a relative address, this will be replaced later
-                                    program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
+                                    program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress)));
                                     nextAddress++;
                                     //store values into memory
                                     for(int i=1; i< array.Count()-1; i++) {
                                       program.Add(new Instruction("", "Const " + (int)array[i]));
                                       //temporary instruction with a relative address, this will be replaced later
-                                      program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
+                                      program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress)));
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("","Const " + stringAddress+3));
+                                    program.Add(new Instruction("","Const " + stringAddress));
                                     type = TastierType.String;
                                   .)
   ).
