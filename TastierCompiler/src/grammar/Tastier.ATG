@@ -666,7 +666,7 @@ Tastier                         (.  string name; bool external = false; .)
                                         program[index] = new Instruction("", newInst);
                                       } else if(inst.Item1 == "StrReplaceAddr") {     //returning pointer
                                         int oldAddress = Convert.ToInt32(inst.Item2);
-                                        String newInst = "Const " + (oldAddress + memoryAddressOffset);
+                                        String newInst = "Const " + (oldAddress);
                                         program[index] = new Instruction("", newInst);
                                       }
                                       index++;
