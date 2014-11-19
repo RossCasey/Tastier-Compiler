@@ -252,6 +252,7 @@ run = do
           run
 
         Instructions.WriteMul  -> do
+          let address = rtp-1
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
           let startArg = (rtp - 2)
           let finishArg = (rtp - (numArgs + 1))
@@ -266,7 +267,7 @@ run = do
           let strNoQuotes = filter (/='\"') combStr
 
 
-          tell $ [show [startArg,finishArg]]
+          tell $ [show [address,startArg,finishArg]]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
