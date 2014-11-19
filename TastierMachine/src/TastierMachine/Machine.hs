@@ -257,21 +257,14 @@ run = do
 
         Instructions.WriteMul  -> do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
-          let startArg = (fromIntegral(rtp - 2))
-          let finishArg = (fromIntegral(rtp - (numArgs + 1)))
-          let args = map (smem!) [startArg,(startArg-1)..finishArg]
-          let argsInt = map (fromIntegral) args
-          let typeList = everyEven argsInt
-          let valueList = everyOdd argsInt
+          let args = map (fromIntegral $ smem!) [(fromIntegral(rtp - 2)),((fromIntegral(rtp - 2))-1)..(fromIntegral(rtp - (numArgs + 1)))]
+          let typeList = everyEven args
+          let valueList = everyOdd args
           let revTupleList = zip typeList valueList
           let tupleList = reverse revTupleList
           let memList = elems dmem
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
-
           let combStr = intercalate "" strings
-          let betterString = filter (/='"') combStr
-
-
           let strNoQuotes = filter (/='\"') combStr --}
           tell $ [betterString]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
