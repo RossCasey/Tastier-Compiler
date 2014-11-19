@@ -433,6 +433,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
 
                                     //temporary instruction with a relative address, this will be replaced later
                                     program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress+3)));
+                                    Console.WriteLine(nextAddress+3);
                                     nextAddress++;
                                     //store values into memory
                                     for(int i=1; i< array.Count()-1; i++) {
