@@ -256,6 +256,9 @@ run = do
           let startArg = (rtp - 2)
           let finishArg = (rtp - (numArgs + 1))
           let args = map (smem!) [8..5]
+
+
+          {--
           let argsInt = map (fromIntegral) args
           let typeList = everyEven argsInt
           let valueList = everyOdd argsInt
@@ -264,9 +267,9 @@ run = do
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr --}
+          --}
 
-
-          tell $ [show args]
+          tell $ [show $ smem ! 8]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
