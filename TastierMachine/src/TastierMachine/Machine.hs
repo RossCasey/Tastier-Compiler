@@ -253,7 +253,7 @@ run = do
 
         Instructions.WriteMul  -> do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
-          let args = map (smem!) [1..numArgs]
+          let args = map (smem!) [(rtp-2)..(rtp-numArgs)]
           let argsInt = map (fromIntegral) args
           let typeList = everyEven argsInt
           let valueList = everyOdd argsInt
