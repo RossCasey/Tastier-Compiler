@@ -253,9 +253,9 @@ run = do
 
         Instructions.WriteMul  -> do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
-          let startArg = (rtp - 2)
-          let finishArg = (rtp - (numArgs + 1))
-          let args = map (smem!) [startArg..finishArg]
+          let startArg = (fromIntegral(rtp - 2))
+          let finishArg = (fromIntegral(rtp - (numArgs + 1)))
+          let args = map (smem !) [startArg..finishArg]
           let args1 = [1,2,3]
           let args2 = [(smem ! 8), (smem ! 7), (smem ! 6), (smem ! 5)]
 
@@ -270,7 +270,7 @@ run = do
           let strNoQuotes = filter (/='\"') combStr --}
           --}
 
-          tell $ [show args2]
+          tell $ [show args]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
