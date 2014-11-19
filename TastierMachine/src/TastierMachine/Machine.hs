@@ -260,12 +260,12 @@ run = do
           let typeList = everyEven argsInt
           let valueList = everyOdd argsInt
           let tupleList = zip typeList valueList
-
           let memList = elems dmem
+
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr --}
-          tell $ [show tupleList]
+          tell $ [show strings]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
