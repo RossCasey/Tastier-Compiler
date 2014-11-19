@@ -46,19 +46,6 @@ import System.IO.Unsafe (unsafePerformIO)
 import System.IO (hFlush, stdout)
 import Data.List (intersperse)
 
-{--Instructions.WriteStr  -> do
-  let ptAddr = smem ! (rtp-1)
-  let len = dmem ! ptAddr
-  let stAddr = ptAddr + 1
-  let endAddr = stAddr + (len - 1)
-  let valueList = map (dmem!) [stAddr..endAddr]
-  let charList = map (chr . fromIntegral) valueList
-  let string = show charList
-  let stringNoQuotes = map (string!!) [1..(fromIntegral len)]
-  tell $ [stringNoQuotes]
-  put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
-  run--}
-
 {-- Int is a pointer to the address in memory --}
 stringPrint :: Int -> [Int16] -> String
 stringPrint addr listA = let ptAddr = addr
@@ -83,11 +70,6 @@ everyOdd :: (Num a) => (Eq a) => [a] -> [a]
 everyOdd list = let  zeroOthers = zipWith (*) (cycle [0,1]) list
                      removeZeros = filter (/=0) zeroOthers
                  in removeZeros
-
-makeTuple :: [a] -> [b] -> [(a,b)]
-makeTuple (x:xs) (y:ys) = [(x,y)] ++ (makeTuple xs ys)
-makeTuple [] [] = []
-makeTuple _ _ = []
 
 
 valueOrPointer :: (Int, Int) -> [Int16] -> String
@@ -275,7 +257,7 @@ run = do
           let argsInt = map (fromIntegral) args
           let typeList = everyEven argsInt
           let valueList = everyOdd argsInt
-          let tupleList = (makeTuple typeList valueList)
+          let tupleList = zip typeList valueList
           let memList = elems dmem
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = show strings
