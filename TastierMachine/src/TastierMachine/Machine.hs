@@ -250,7 +250,7 @@ run = do
           let memList = elems dmem
           let str = (stringPrint ptAddr memList)
           let strNoQuotes = filter (/='"') str
-          tell $ [stringNoQuotes]
+          tell $ [strNoQuotes]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
