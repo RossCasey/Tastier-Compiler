@@ -270,7 +270,7 @@ run = do
           let memList = elems dmem
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
 
-          let combStr = show strings
+          let combStr = intercalate strings
           let betterString = filter (/='"') combStr
 
 
