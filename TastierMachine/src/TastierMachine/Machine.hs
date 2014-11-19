@@ -248,7 +248,6 @@ run = do
         Instructions.WriteStr  -> do
           let ptAddr = smem ! (rtp-1)
           let len = dmem ! ptAddr
-          tell $ [show len]
           let stAddr = ptAddr + 1
           let endAddr = stAddr + (len - 1)
           let valueList = map (dmem!) [stAddr..endAddr]
