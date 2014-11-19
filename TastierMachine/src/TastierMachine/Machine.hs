@@ -281,7 +281,7 @@ run = do
           {-- Combine string list into string --}
           let combStr = intercalate "" strings
 
-          {-- Remove quotes from string }
+          {-- Remove quotes from string --}
           let betterString = filter (/='"') combStr
           tell $ [betterString]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
