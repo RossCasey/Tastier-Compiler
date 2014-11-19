@@ -260,7 +260,7 @@ run = do
           let args1 = [1,2,3]
           let args2 = [(smem ! 8), (smem ! 7), (smem ! 6), (smem ! 5)]
 
-          {--
+
           let argsInt = map (fromIntegral) args
           let typeList = everyEven argsInt
           let valueList = everyOdd argsInt
@@ -269,7 +269,7 @@ run = do
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr --}
-          --}
+          
 
           tell $ [show args]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
