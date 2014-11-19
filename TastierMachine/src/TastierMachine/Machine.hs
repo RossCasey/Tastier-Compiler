@@ -252,8 +252,9 @@ run = do
           run
 
         Instructions.WriteMul  -> do
-          let args = map (dmem!) [8..5]
-          tell $ [show args]
+          let args = map (smem!) [8..5]
+          let args1 = [(smem ! 8), (smem ! 7)]
+          tell $ [show args1]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + 2) }
 
         Instructions.Leave  -> do
