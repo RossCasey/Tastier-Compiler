@@ -255,7 +255,7 @@ run = do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
           let startArg = (fromIntegral(rtp - 2))
           let finishArg = (fromIntegral(rtp - (numArgs + 1)))
-          let args = map (dmem!) [startArg,(startArg-1)..finishArg]
+          let args = map (smem!) [startArg,(startArg-1)..finishArg]
 
           let argsInt = map (fromIntegral) args
           let typeList = everyEven argsInt
