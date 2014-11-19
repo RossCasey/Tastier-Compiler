@@ -251,7 +251,7 @@ run = do
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
-{--
+        {--
         Instructions.WriteMul  -> do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
           let startArg = (fromIntegral(rtp - 2))
@@ -269,12 +269,12 @@ run = do
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr --}
-          
+
 
           tell $ [show args]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
---}
+        --}
 
         Instructions.WriteMul  -> do
           let args = map (smem!) [8..5]
