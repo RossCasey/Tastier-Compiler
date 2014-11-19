@@ -270,7 +270,7 @@ run = do
           let memList = elems dmem
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
 
-          let betterString = map (removeEscapes) strings
+          let betterString = map (filter (/='"')) strings
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr --}
           tell $ [show betterString]
