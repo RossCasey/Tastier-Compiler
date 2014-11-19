@@ -65,6 +65,10 @@ COMPILER Tastier
     String        //new string type
   };
 
+  /*
+    new kind for constants. This stops us from re-assigning a constant as
+    only Variable Kinds can be reassigned.
+  */
   enum TastierKind : int {  // kinds of symbol
     Var,
     Proc,
@@ -180,6 +184,18 @@ Scope externalDeclarations = new Scope();
 Program program = new Program();
 Program header = new Program();
 
+/*
+  Instuctions that are not inside a function in the assmebly language do not
+  get executed. This means that even thought the constants are outside of the
+  functions, they must be placed within a function in order to be executed.
+
+  The boolean below "constantsDeclared" keeps track of whether any constants have
+  been declared. If they have then we need to create a function to place them in.
+  If not we need to insert a empty function that has no operations as the machine
+  calls ConstDecl as the first function to execute before calling Main. The
+  ConstDecl function is then called, which will allocate and assign the constants
+  and then Main is called, starting the program.
+*/
 bool constantsDeclared = false;
 
 Stack<string> openProcedureDeclarations = new Stack<string>();
@@ -309,7 +325,7 @@ Symbol lookup(Stack<Scope> scopes, string name) {
 CHARACTERS
   letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   digit = "0123456789".
-  special = " ,.!£$%^&*()-_=+<>?/#|`~:;".
+  special = " ,.!£$%^&*()-_=+<>?/#|`~:;".         //special characters for strings
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
@@ -318,7 +334,7 @@ CHARACTERS
 TOKENS
   ident  = letter {letter | digit}.
   number = digit {digit}.
-  string = quote {letter | digit | special} quote.
+  string = quote {letter | digit | special} quote.  //new string
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -401,14 +417,26 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
   | "true"                      (.  program.Add(new Instruction("", "Const " + 1)); type = TastierType.Boolean; .)
   | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = TastierType.Boolean; .)
   | string                      (.
+                                    /*
+                                      Strings are stored in data memeory. The string is stored
+                                      as its length followed by a sequence of values.
+                                      The values are stored in memory by first placing them on
+                                      the stack and then using StoG to store them in data memory.
+                                      This is done for the length and every value in the string.
+                                    */
                                     string value = t.val;
                                     char[] array = value.ToCharArray();
-                                    int stringAddress = nextAddress + memoryAddressOffset;
+                                    int stringAddress = nextAddress;
+                                    //store string length in memory
                                     program.Add(new Instruction("", "Const " + (array.Count()-2)));
+
+                                    //temporary instruction with a relative address, this will be replaced later
                                     program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
                                     nextAddress++;
+                                    //store values into memory
                                     for(int i=1; i< array.Count()-1; i++) {
                                       program.Add(new Instruction("", "Const " + (int)array[i]));
+                                      //temporary instruction with a relative address, this will be replaced later
                                       program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
                                       nextAddress++;
                                     }
@@ -493,9 +521,9 @@ RelOp<out Instruction inst>
   ( "="
   | '<'                         (.  inst = new Instruction("", "Lss"); .)
   | '>'                         (.  inst = new Instruction("", "Gtr"); .)
-  | "!="                        (.  inst = new Instruction("", "NtEqu"); .)
-  | "<="                        (.  inst = new Instruction("", "LssEq"); .)
-  | ">="                        (.  inst = new Instruction("", "GtrEq"); .)
+  | "!="                        (.  inst = new Instruction("", "NtEqu"); .)   //new not equal operator
+  | "<="                        (.  inst = new Instruction("", "LssEq"); .)   //new less than or equal to operator
+  | ">="                        (.  inst = new Instruction("", "GtrEq"); .)   //new greater than or equal to operator
   ).
 
 /*------------------------------------------------------------------------*/
@@ -637,9 +665,27 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
 
 | "write"
   Expr<out type>                 (.
+                                    /*
+                                      There are 3 types of write instructions.
+                                        1) Write: outputs value on top of stack
+                                        2) WriteStr: outputs the string pointed to by the value
+                                           on top of the stack.
+                                        3) WriteMul: Takes multiple args and outputs them as a
+                                           single string. In order to do this WriteMul must know
+                                           whether the value is a value or a pointer. This is
+                                           done by placing the type of the argument on the stack
+                                           in front of the value/pointer. The number of arguments
+                                           is then placed on the stack.
+
+                                        A better explantion of these instructions
+                                        is contained in TastierMachine/TastierMachine/Instructions.hs
+                                    */
+
                                     if (type == TastierType.Integer) {
+                                      //needed for WriteMul
                                       program.Add(new Instruction("", "Const " + (int)type));
                                     } else if (type == TastierType.String) {
+                                      //needed for WriteMul
                                       program.Add(new Instruction("", "Const " + (int)type));
                                     } else {
                                       SemErr("unexpected variable type");
@@ -651,10 +697,12 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     if((type != TastierType.String) && (type != TastierType.Integer)) {
                                       SemErr("unexpected variable type");
                                     }
+                                    //needed for WriteMul
                                     program.Add(new Instruction("", "Const " + (int)type));
                                 .)
   } ';'                         (.
                                     if(numArgs == 1) {
+                                      //no need for WriteMul so we can remove type placed on stack
                                       program.RemoveAt(program.Count()-1);
                                       if (type == TastierType.Integer) {
                                         program.Add(new Instruction("", "Write"));
@@ -711,6 +759,16 @@ Tastier                         (.  string name; bool external = false; .)
                                       }
                                       index++;
                                     }
+
+                                    /*
+                                      Need to add empty function if constants are not declared
+                                      as ConstDecl is the first function called by machine.
+                                    */
+                                    if(!constantsDeclared) {
+                                      header.Add(new Instruction("ConstDecl", "Enter 0"));
+                                      header.Add(new Instruction("","Leave"));
+                                      header.Add(new Instruction("","Ret"));
+                                    }
                                     header.AddRange(program);
                                     openScopes.Pop();
                                 .).
@@ -741,10 +799,18 @@ Type<out TastierType type>
 ConstDecl                       (.
                                     string name; TastierType type; Scope currentScope = openScopes.Peek();
                                     Symbol sym;
+
                                     if(!constantsDeclared) {
                                       program.Add(new Instruction("ConstDecl", "Enter 0"));
                                       constantsDeclared = true;
                                     } else {
+                                      /*
+                                        We cannot know ahead of time how many constants are
+                                        declared. So after each constant is declared we add
+                                        "Leave" and "Ret" instructions. So when another constant
+                                        is declared, these must be removed before the rest of
+                                        the instructions are added.
+                                      */
                                       program.RemoveRange(program.Count-2,2);
                                     }
                                 .)
