@@ -78,6 +78,10 @@ valueOrPointer (3,pointer) mem = (stringPrint pointer mem)
 valueOrPointer (a,_) _ = show a
 
 
+removeEscapes :: String -> String
+removeEscapes str = filter . flip notElem "\"\"
+
+
 
 debug' m@(Machine rpc rtp rbp imem _ _) = do {
   putStrLn $
@@ -262,6 +266,8 @@ run = do
           let tupleList = zip typeList valueList
           let memList = elems dmem
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
+
+          let betterString = map (removeEscapes) strings
           let combStr = show strings
           let strNoQuotes = filter (/='\"') combStr --}
           tell $ [show combStr]
