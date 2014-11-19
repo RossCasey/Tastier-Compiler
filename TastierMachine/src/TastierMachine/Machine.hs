@@ -257,6 +257,7 @@ run = do
           let finishArg = (rtp - (numArgs + 1))
           let args = map (smem!) [startArg..finishArg]
           let args1 = [1,2,3]
+          let args2 = [(smem ! 8), (smem ! 7), (smem ! 6), (smem ! 5)]
 
           {--
           let argsInt = map (fromIntegral) args
@@ -269,7 +270,7 @@ run = do
           let strNoQuotes = filter (/='\"') combStr --}
           --}
 
-          tell $ [show args1]
+          tell $ [show args2]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
