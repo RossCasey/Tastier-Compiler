@@ -742,7 +742,7 @@ ConstDecl                       (.
                                     string name; TastierType type; Scope currentScope = openScopes.Peek();
                                     Symbol sym;
                                     if(!constantsDeclared) {
-                                      program.Add(new Instruction("_ConstDecl", "Enter 0"));
+                                      program.Add(new Instruction("ConstDecl", "Enter 0"));
                                       constantsDeclared = true;
                                     } else {
                                       program.RemoveRange(program.Count-2,2);
