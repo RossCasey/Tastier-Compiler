@@ -1,10 +1,58 @@
 COMPILER Tastier
 
+/*
+  Strings are stored in data memory as a sequence of values. The first value
+  of which is its length. Eg the string "hello" would be stored in memory as:
+    [5][h][e][l][l][o]
+     0  1  2  3  4  5
 
+  where the characters are stored as their integer equivalent.
+
+  A string variable stores a pointer to the start of a string in memory. So
+  a variable assigned to the above example would store the value 0. The string
+  can then be accessed by the machine by reading the value in memory pointed to
+  by the variable and then loaded the next n values in memory where n is the
+  value pointed to by the variable.
+*/
+
+/*
+  The memoryAddressOffset and nextAddress are needed in order to compute where
+  sequential values (in this case strings) can be placed in data memory.
+  Global variables start at address 3 increment so there is no room to place
+  a block of memory that could be used for strings. To fix this problem strings
+  are stored in memory only after all other values have been allocated memory
+  space. This is done by placing temporary instructions into the program when
+  using StoG to store a string memory. These temporary instructions contain
+  relative address which can be used later to calculate its absolute address.
+  The temporary instructions take the from:
+      new Instuction("StrReplace","<relative address>")
+  The nextAddress variable keeps track of the next available address in memory.
+  This value is incremented as new values are stored. This allows for the
+  computation of the temporary, relative address.
+
+  The memoryAddressOffset is incremented every time a global variable is allocated
+  memory. This will allow the parser to go back and insert the absolute addresses later.
+  Once the program has been parsed fully, the parser then needs to go back and edit the
+  address used for strings. It iterates through all instructions and change them to
+      new Instruction("", "Const (<relative address> + memoryAddressOffset)")
+
+  This allows for the allocation of as many global variables as necessary and there
+  is no wasted memory as all strings are assigned to the very next addresses in data
+  memory.
+*/
   int memoryAddressOffset = 0;
   int nextAddress = 0;
-  bool multipleArgs = false;
+
+
+
+/*
+  When dealing with write statements with more than 1 argument it is necessary to
+  know the number of arguments that were passed to the write statement. This variable
+  allows us to keep track of the number of arguments in the write statement.
+*/
   int numArgs = 0;
+
+
 
 /*
   First, let's declare all the types we're going to use.
@@ -14,7 +62,7 @@ COMPILER Tastier
     Undefined,
     Integer,
     Boolean,
-    String
+    String        //new string type
   };
 
   enum TastierKind : int {  // kinds of symbol
@@ -396,7 +444,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     program.Add(new Instruction("", "Enter 0"));
                                     enterInstLocation = program.Count - 1;
                                     if((name == "Main") && (constantsDeclared)) {
-                                      program.Add(new Instruction("","Call 1 ConstDecl"));
+                                      \\program.Add(new Instruction("","Call 1 ConstDecl"));
                                     } else if(name=="ConstDecl") {
                                       SemErr("ConstDecl is a protected procedure name. Please rename your procedure.");
                                     }
@@ -599,10 +647,8 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       SemErr("unexpected variable type");
                                     }
                                     numArgs = 1;
-                                    multipleArgs = false;
                                  .)
   { ',' Expr<out type>          (.
-                                    multipleArgs = true;
                                     numArgs++;
                                     if((type != TastierType.String) && (type != TastierType.Integer)) {
                                       SemErr("unexpected variable type");
@@ -610,7 +656,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     program.Add(new Instruction("", "Const " + (int)type));
                                 .)
   } ';'                         (.
-                                    if(!multipleArgs) {
+                                    if(numArgs > 1) {
                                       program.RemoveAt(program.Count()-1);
                                       if (type == TastierType.Integer) {
                                         program.Add(new Instruction("", "Write"));
