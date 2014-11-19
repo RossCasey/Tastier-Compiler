@@ -266,7 +266,8 @@ run = do
           let argsInt = map (fromIntegral) args
           let typeList = everyEven argsInt
           let valueList = everyOdd argsInt
-          let tupleList = zip typeList valueList
+          let revTupleList = zip typeList valueList
+          let tupleList = reverse revTupleList
           let memList = elems dmem
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
 
