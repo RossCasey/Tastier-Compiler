@@ -61,29 +61,23 @@ stringPrint addr listA = let ptAddr = addr
 intPrint :: Int -> String
 intPrint num = show (fromIntegral num)
 
+{-- Returns every second element, starting with the first element --}
 everyEven :: (Num a) => (Eq a) => [a] -> [a]
 everyEven list = let  zeroOthers = zipWith (*) (cycle [1,0]) list
                       removeZeros = filter (/=0) zeroOthers
                  in removeZeros
 
+{-- Returns every second element, starting with the second element --}
 everyOdd :: (Num a) => (Eq a) => [a] -> [a]
 everyOdd list = let  zeroOthers = zipWith (*) (cycle [0,1]) list
                      removeZeros = filter (/=0) zeroOthers
                  in removeZeros
 
-
+{-- Calls the relevant print depending on whether arg is string or int --}
 valueOrPointer :: (Int, Int) -> [Int16] -> String
 valueOrPointer (1,value) _ = (intPrint (fromIntegral value))
 valueOrPointer (3,pointer) mem = (stringPrint pointer mem)
-valueOrPointer (a,_) _ = show a
-
-
-remove :: String -> String -> String
-remove = filter . flip notElem
-
-removeEscapes :: String -> String
-removeEscapes str = remove "\"\\" str
-
+valueOrPointer (_,_) _ = error "Invalid argument for write statement"
 
 
 debug' m@(Machine rpc rtp rbp imem _ _) = do {
@@ -245,10 +239,18 @@ run = do
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
 
+
         Instructions.WriteStr  -> do
+          {-- Get pointer from stack --}
           let ptAddr = fromIntegral $ smem ! (rtp-1)
+
+          {-- Convert data memory to list --}
           let memList = elems dmem
+
+          {-- Get output string --}
           let str = (stringPrint ptAddr memList)
+
+          {-- Remove quotes from string --}
           let strNoQuotes = filter (/='"') str
           tell $ [strNoQuotes]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
@@ -256,15 +258,30 @@ run = do
 
 
         Instructions.WriteMul  -> do
+          {-- Get the number of arguments involved in the print statement --}
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
+
+          {-- Get a list of the arguments from the stack --}
           let args = map (fromIntegral . (smem!)) [(fromIntegral(rtp - 2)),((fromIntegral(rtp - 2))-1)..(fromIntegral(rtp - (numArgs + 1)))]
+
+          {-- Split list into type list and value list --}
           let typeList = everyEven args
           let valueList = everyOdd args
+
+          {-- Combine list into (type,value) tuple --}
           let revTupleList = zip typeList valueList
           let tupleList = reverse revTupleList
+
+          {-- Convert data memory to list --}
           let memList = elems dmem
+
+          {-- Get output string for each argument --}
           let strings = map (\x -> (valueOrPointer x memList)) tupleList
+
+          {-- Combine string list into string --}
           let combStr = intercalate "" strings
+
+          {-- Remove quotes from string }
           let betterString = filter (/='"') combStr
           tell $ [betterString]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
