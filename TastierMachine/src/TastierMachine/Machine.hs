@@ -247,16 +247,13 @@ run = do
 
         Instructions.WriteStr  -> do
           let ptAddr = smem ! (rtp-1)
-          let len = dmem ! ptAddr
-          let stAddr = ptAddr + 1
-          let endAddr = stAddr + (len - 1)
-          let valueList = map (dmem!) [stAddr..endAddr]
-          let charList = map (chr . fromIntegral) valueList
-          let string = show charList
-          let stringNoQuotes = map (string!!) [1..(fromIntegral len)]
+          let memList = elems dmem
+          let str = (stringPrint ptAddr memList)
+          let strNoQuotes = filter (/='"') str
           tell $ [stringNoQuotes]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1 }
           run
+
 
         Instructions.WriteMul  -> do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
