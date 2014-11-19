@@ -254,7 +254,7 @@ run = do
         Instructions.WriteMul  -> do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
           let startArg = (rtp - 2)
-          let finishArg = (stp - (numArgs - 1))
+          let finishArg = (rtp - (numArgs - 1))
           let args = map (smem!) [(rtp-2)..(rtp-numArgs-)]
           let argsInt = map (fromIntegral) args
           let typeList = everyEven argsInt
@@ -266,7 +266,7 @@ run = do
           let strNoQuotes = filter (/='\"') combStr
 
 
-          tell $ [show args]
+          tell $ [show [startArg, finishArg]]
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
