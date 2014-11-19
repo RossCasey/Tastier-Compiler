@@ -275,7 +275,7 @@ run = do
 
 
           let strNoQuotes = filter (/='\"') combStr --}
-          tell $ [show betterString]
+          tell $ betterString
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
