@@ -255,7 +255,7 @@ run = do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
           let startArg = (fromIntegral(rtp - 2))
           let finishArg = (fromIntegral(rtp - (numArgs + 1)))
-          let args = map (smem !) [startArg..finishArg]
+          let args = map (dmem!) [startArg..finishArg]
           let args1 = [1,2,3]
           let args2 = [(smem ! 8), (smem ! 7), (smem ! 6), (smem ! 5)]
 
