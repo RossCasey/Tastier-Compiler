@@ -1,7 +1,7 @@
 COMPILER Tastier
 
 
-  int memoryAddressOffset = 1000;
+  int memoryAddressOffset = 0;
   int nextAddress = 0;
   bool multipleArgs = false;
   int numArgs = 0;
@@ -357,14 +357,14 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                     char[] array = value.ToCharArray();
                                     int stringAddress = nextAddress + memoryAddressOffset;
                                     program.Add(new Instruction("", "Const " + (array.Count()-2)));
-                                    program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset + 3)));
+                                    program.Add(new Instruction("StrReplace",(nextAddress + 3)));
                                     nextAddress++;
                                     for(int i=1; i< array.Count()-1; i++) {
                                       program.Add(new Instruction("", "Const " + (int)array[i]));
-                                      program.Add(new Instruction("", "StoG " + (nextAddress + memoryAddressOffset + 3)));
+                                      program.Add(new Instruction("StrReplace",(nextAddress + 3)));
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("", "Const " + stringAddress));
+                                    program.Add(new Instruction("StrReplace",stringAddress));
                                     type = TastierType.String;
                                   .)
   ).
@@ -657,6 +657,16 @@ Tastier                         (.  string name; bool external = false; .)
                                         SemErr("external item " + s.Item1 + " has no defined type");
                                       }
                                     }
+                                    //replace temporary memory address with real ones
+                                    int index = 0;
+                                    foreach (Instruction inst in program) {
+                                      index++;
+                                      if(inst.Item1 == "StrReplace") {
+                                        int oldAddress = Convert.ToInt32(inst.Item2);
+                                        String newInst = "StoG " + (oldAddress + memoryAddressOffset);
+                                        program[index] = new Instruction("", newInst);
+                                      }
+                                    }
                                     header.AddRange(program);
                                     openScopes.Pop();
                                 .).
@@ -697,7 +707,12 @@ ConstDecl                       (.
 = "const"
   Type<out type>
   Ident<out name>               (.
-                                    sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                    int memLocation = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                    sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, memLocation);
+                                    //if global variable, we need to increment memoryOffset
+                                    if((openScopes.Count()-1 == 0)) {
+                                      memoryAddressOffset++;
+                                    }
                                     currentScope.Push(sym);
                                 .)
   ":="
@@ -750,14 +765,24 @@ VarDecl<bool external>          (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const) ));
+                                      int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address);
+                                      //if the address is global then we need to increment the memory offset
+                                      if((openScopes.Count-1)==0) {
+                                        memoryAddressOffset++;
+                                      }
                                     }
                                 .)
   { ',' Ident<out name>         (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const) ));
+                                      int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address);
+                                      //if the address is global then we need to increment the memory offset
+                                      if((openScopes.Count-1)==0) {
+                                        memoryAddressOffset++;
+                                      }
                                     }
                                 .)
   } ';'.
