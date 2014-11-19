@@ -257,7 +257,7 @@ run = do
 
         Instructions.WriteMul  -> do
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
-          let args = map (fromIntegral . smem!) [(fromIntegral(rtp - 2)),((fromIntegral(rtp - 2))-1)..(fromIntegral(rtp - (numArgs + 1)))]
+          let args = map (fromIntegral . (smem!)) [(fromIntegral(rtp - 2)),((fromIntegral(rtp - 2))-1)..(fromIntegral(rtp - (numArgs + 1)))]
           let typeList = everyEven args
           let valueList = everyOdd args
           let revTupleList = zip typeList valueList
