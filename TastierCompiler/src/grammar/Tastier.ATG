@@ -364,7 +364,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress + 3)));
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress)));
+                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
                                     type = TastierType.String;
                                   .)
   ).
