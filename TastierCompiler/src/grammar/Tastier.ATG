@@ -444,7 +444,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     program.Add(new Instruction("", "Enter 0"));
                                     enterInstLocation = program.Count - 1;
                                     if((name == "Main") && (constantsDeclared)) {
-                                      \\program.Add(new Instruction("","Call 1 ConstDecl"));
+                                      //program.Add(new Instruction("","Call 1 ConstDecl"));
                                     } else if(name=="ConstDecl") {
                                       SemErr("ConstDecl is a protected procedure name. Please rename your procedure.");
                                     }
