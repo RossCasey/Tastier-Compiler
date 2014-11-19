@@ -78,8 +78,11 @@ valueOrPointer (3,pointer) mem = (stringPrint pointer mem)
 valueOrPointer (a,_) _ = show a
 
 
+remove :: String -> String -> String
+remove filter . flip notElem
+
 removeEscapes :: String -> String
-removeEscapes str = filter . flip notElem "\"\\"
+removeEscapes str = remove "\"\\" str
 
 
 
