@@ -664,7 +664,7 @@ Tastier                         (.  string name; bool external = false; .)
                                         int oldAddress = Convert.ToInt32(inst.Item2);
                                         String newInst = "StoG " + (oldAddress + memoryAddressOffset);
                                         program[index] = new Instruction("", newInst);
-                                      } 
+                                      }
                                       index++;
                                     }
                                     header.AddRange(program);
@@ -716,41 +716,13 @@ ConstDecl                       (.
                                     currentScope.Push(sym);
                                 .)
   ":="
-  ( number                      (.
-                                    if (type != TastierType.Integer) {
-                                      SemErr("cannot assign integer value to non-integer constant");
+  Expr<out type>                (.
+                                    if (type != (TastierType)sym.Item3) {
+                                      SemErr("incompatible types");
                                     }
-                                    n = Convert.ToInt32(t.val);
-                                    program.Add(new Instruction("", "Const " + n));
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
-  | '-'
-    number                      (.
-                                    if (type != TastierType.Integer) {
-                                      SemErr("cannot assign integer value to non-integer constant");
-                                    }
-                                    n = Convert.ToInt32(t.val);
-                                    program.Add(new Instruction("", "Const " + n));
-                                    program.Add(new Instruction("", "Neg"));
-                                    program.Add(new Instruction("", "Const 1"));
-                                    program.Add(new Instruction("", "Add"));
-                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
-                                .)
-  | "true"                      (.
-                                    if(type != TastierType.Boolean) {
-                                      SemErr("cannot assign boolean value to non-boolean constant");
-                                    }
-                                    program.Add(new Instruction("", "Const " + 1));
-                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
-                                .)
-  | "false"                     (.
-                                    if(type != TastierType.Boolean) {
-                                      SemErr("cannot assign boolean value to non-boolean constant");
-                                    }
-                                    program.Add(new Instruction("", "Const " + 0));
-                                    program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
-                                .)
-  ) ';'                         (.
+   ';'                         (.
                                     program.Add(new Instruction("", "Leave"));
                                     program.Add(new Instruction("", "Ret"));
                                 .).
