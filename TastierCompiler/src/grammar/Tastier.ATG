@@ -759,7 +759,7 @@ Tastier                         (.  string name; bool external = false; .)
                                         int oldAddress = Convert.ToInt32(inst.Item2);
                                         String newInst = "StoG " + (oldAddress + memoryAddressOffset);
                                         program[index] = new Instruction("", newInst);
-                                      } else if(inst.Item2 == "StrReplaceAddr") {
+                                      } else if(inst.Item1 == "StrReplaceAddr") {
                                         int oldAddress = Convert.ToInt32(inst.Item2);
                                         String newInst = "Const " + (oldAddress + memoryAddressOffset + 1);
                                         program[index] = new Instruction("", newInst);
