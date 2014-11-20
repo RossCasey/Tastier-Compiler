@@ -443,7 +443,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       Console.WriteLine(nextAddress+3);
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("StrReplaceAddr","Const " + stringAddress));
+                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress)));
                                     type = TastierType.String;
                                   .)
   ).
