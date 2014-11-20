@@ -1,5 +1,7 @@
 COMPILER Tastier
 
+//Ross Casey - 12301716
+
 /*
   Strings are stored in data memory as a sequence of values. The first value
   of which is its length. Eg the string "hello" would be stored in memory as:
@@ -439,7 +441,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
                                       program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress+3)));
                                       nextAddress++;
                                     }
-                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress)));
+                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
                                     type = TastierType.String;
                                   .)
   ).
