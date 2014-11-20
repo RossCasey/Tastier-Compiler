@@ -48,7 +48,7 @@ import Data.List (intersperse, intercalate)
 
 {-- Int is a pointer to the address in memory --}
 stringPrint :: Int -> [Int16] -> String
-stringPrint addr listA = let ptAddr = addr - 3
+stringPrint addr listA = let ptAddr = addr - 3  {-Load instructions subtract 3 -}
                              len = fromIntegral $ listA !! ptAddr
                              stAddr = ptAddr + 1
                              endAddr = stAddr + (len - 1)
