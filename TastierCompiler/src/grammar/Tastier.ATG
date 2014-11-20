@@ -829,6 +829,7 @@ ConstDecl                       (.
                                     //if global variable, we need to increment memoryOffset
                                     if((openScopes.Count()-1 == 0)) {
                                       memoryAddressOffset++;
+                                      Console.WriteLine(name);
                                     }
                                     currentScope.Push(sym);
                                 .)
@@ -858,6 +859,7 @@ VarDecl<bool external>          (.
                                       currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
                                       //if the address is global then we need to increment the memory offset
                                       if((openScopes.Count-1)==0) {
+                                        Console.WriteLine(name);
                                         memoryAddressOffset++;
                                       }
                                     }
@@ -871,6 +873,7 @@ VarDecl<bool external>          (.
                                       //if the address is global then we need to increment the memory offset
                                       if((openScopes.Count-1)==0) {
                                         memoryAddressOffset++;
+                                        Console.WriteLine(name);
                                       }
                                     }
                                 .)
