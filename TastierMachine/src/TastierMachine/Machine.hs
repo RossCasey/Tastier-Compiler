@@ -257,6 +257,17 @@ run = do
           run
 
 
+
+        {-
+          This function takes a number of arguments on the stack in the following format:
+          Stack: <top> [2][1][intValue][3][pointer to string]
+          where:
+                  - 2 is the number of arguments passed to the write function
+                  - 1 is the type of intValue (1 = integer, 3 = string)
+                  - 3 is the type of pointer to string
+
+          The function will print all the arguments passed to it on the stack on a single line. 
+        -}
         Instructions.WriteMul  -> do
           {-- Get the number of arguments involved in the print statement --}
           let numArgs = (fromIntegral(smem ! (rtp-1))) * 2
