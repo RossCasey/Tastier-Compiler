@@ -705,6 +705,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
   Ident<out name>
   ":="
   Expr<out type>                (.
+                                    incrementer = new Program(); 
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -722,12 +723,12 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                         incrementer.Add(new Instruction("", "StoG " + sym.Item1));
                                         // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
                                       } else {
-                                        intermenter.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                        incrementer.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                       }
                                     }
                                     else {
                                       int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                      intermenter.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                      incrementer.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
   ')'        (.
