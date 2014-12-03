@@ -587,8 +587,8 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                     if (type != TastierType.Boolean) {
                                       SemErr("Boolean expression expected in conditional assignment");
                                     }
-                                    program.Add(new Instruction(,"Const 1"));
-                                    program.Add(new Instruction(,"Equ"));
+                                    program.Add(new Instruction("","Const 1"));
+                                    program.Add(new Instruction("","Equ"));
                                     openLabels.Push(generateLabel());
                                     program.Add(new Instruction("", "FJmp " + openLabels.Peek()));
                                 .)
