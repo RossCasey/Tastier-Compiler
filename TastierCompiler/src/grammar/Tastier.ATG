@@ -673,6 +673,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
       Stat                      (.  program.Add(new Instruction("", "Jmp " + loopStartLabel));
                                     program.Add(new Instruction(openLabels.Pop(), "Nop")); // put the loop end label here
                                 .)
+                                
 | "while"                       (.  string loopStartLabel = generateLabel();
                                     openLabels.Push(generateLabel()); //second label is for the loop end
                                     program.Add(new Instruction(loopStartLabel, "Nop"));
