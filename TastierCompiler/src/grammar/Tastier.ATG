@@ -594,7 +594,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                 .)
      Expr<out type1>             (.
                                     if(type1 != (TastierType)sym.Item3) {
-                                      SemErr("Mismatched types in true value for conditional assignment: Expected " + (TastierType)sym.Item + " but got " + type1);
+                                      SemErr("Mismatched types in true value for conditional assignment: Expected " + (TastierType)sym.Item3 + " but got " + type1);
                                     }
                                  .)
      ':'                         (.
@@ -604,6 +604,9 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                     program.Add(startOfElse);
                                  .)
      Expr<out type2>             (.
+                                    if(type2 != (TastierType)sym.Item3) {
+                                      SemErr("Mismatched types in true value for conditional assignment: Expected " + (TastierType)sym.Item3 + " but got " + type2);
+                                    }
                                     program.Add(new Instruction(openLabels.Pop(), "Nop"));
                                  .)
      ';'                         (.
