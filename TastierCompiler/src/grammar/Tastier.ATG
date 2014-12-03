@@ -660,6 +660,19 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
         Stat
       ]                         (.  program.Add(new Instruction(openLabels.Pop(), "Nop")); .)
 
+| "for"                       (.  string loopStartLabel = generateLabel();
+                                    openLabels.Push(generateLabel()); //second label is for the loop end
+                                    program.Add(new Instruction(loopStartLabel, "Nop"));
+                                .)
+  '(' Expr<out type> ')'        (.
+                                    if ((TastierType)type != TastierType.Boolean) {
+                                      SemErr("boolean type expected");
+                                    }
+                                    program.Add(new Instruction("", "FJmp " + openLabels.Peek())); // jump to the loop end label if condition is false
+                                .)
+      Stat                      (.  program.Add(new Instruction("", "Jmp " + loopStartLabel));
+                                    program.Add(new Instruction(openLabels.Pop(), "Nop")); // put the loop end label here
+                                .)
 | "while"                       (.  string loopStartLabel = generateLabel();
                                     openLabels.Push(generateLabel()); //second label is for the loop end
                                     program.Add(new Instruction(loopStartLabel, "Nop"));
