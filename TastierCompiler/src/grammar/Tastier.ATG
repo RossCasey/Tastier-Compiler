@@ -705,7 +705,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
   Ident<out name>
   ":="
   Expr<out type>                (.
-                                    incrementer = new Program(); 
+                                    incrementer = new Program();
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -731,10 +731,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                       incrementer.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
-  ')'        (.
-
-                                    program.Add(new Instruction("", "FJmp " + openLabels.Peek())); // jump to the loop end label if condition is false
-                                .)
+  ')'                           
       Stat                      (.
                                     program.AddRange(incrementer);
                                     program.Add(new Instruction("", "Jmp " + loopStartLabel));
