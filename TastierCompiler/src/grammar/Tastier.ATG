@@ -563,7 +563,7 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       SemErr("cannot assign to non-variable");
                                     }
                                 .)
-    Expr<out type> 
+    Expr<out type>
 
     (';'
                                 (.
@@ -583,19 +583,44 @@ Stat                            (.  TastierType type; string name; Symbol sym; b
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
-    |'?'			(.
+    |'?'                        (.
+                                    if (type != TastierType.Boolean) {
+                                      SemErr("Boolean expression expected in conditional assignment");
+                                    }
+                                    program.Add(new Instruction(,"Const 1"));
+                                    program.Add(new Instruction(,"Equ"));
+                                    openLabels.Push(generateLabel());
+                                    program.Add(new Instruction("", "FJmp " + openLabels.Peek()));
+                                .)
+     Expr<out type1>             (.
+                                    if(type1 != (TastierType)sym.Item3)) {
+                                      SemError("Mismatched types in true value for conditional assignment: Expected " + (TastierType)sym.Item + " but got " + type1);
+                                    }
+                                 .)
+     ':'                         (.
+                                    Instruction startOfElse = new Instruction(openLabels.Pop(), "Nop");
+                                    openLabels.Push(generateLabel());
+                                    program.Add(new Instruction("", "Jmp " + openLabels.Peek()));
+                                    program.Add(startOfElse);
+                                 .)
+     Expr<out type2>             (.
+                                    program.Add(new Instruction(openLabels.Pop(), "Nop"));
+                                 .)
+     ';'                         (.
+                                    if (sym.Item4 == 0) {
+                                      if (isExternal) {
+                                        program.Add(new Instruction("", "StoG " + sym.Item1));
+                                        // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
+                                      } else {
+                                        program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                      }
+                                    }
+                                    else {
+                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                    }
+                                 .)
 
-				.)
-    Expr<out type> 		(.
-
-				.)
-    ':'				(.
-
-				.)
-    Expr<out type> ';'		(.
-
-				.) 
-  
     )
   | '(' ')' ';'                 (.
                                     if ((TastierKind)sym.Item2 != TastierKind.Proc) {
