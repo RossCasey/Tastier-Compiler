@@ -716,7 +716,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     incrementer.AddRange(program.GetRange(startOfIncrement,program.Count() - startOfIncrement - 1));
 
                                     int testIndex = 0;
-                                    foreach (Instruction inst in incrementer) {
+                                    foreach (Instruction inst in program) {
                                       Instruction testInst = incrementer.ElementAt(testIndex);
                                       Console.WriteLine(testInst.Item1 + " " + testInst.Item2);
                                       testIndex++;
