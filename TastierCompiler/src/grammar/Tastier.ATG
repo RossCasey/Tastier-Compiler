@@ -714,6 +714,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
 
                                     incrementer.AddRange(program.GetRange(startOfIncrement,program.Count() - startOfIncrement ));
+                                    program.RemoveRange(startOfIncrement,program.Count() - startOfIncrement);
 
                                     int testIndex = 0;
                                     foreach (Instruction inst in program) {
@@ -722,9 +723,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       testIndex++;
                                     }
 
-
-                                    program.RemoveRange(startOfIncrement,program.Count() - startOfIncrement);
-
+                                    Console.WriteLine("\n\n");
                                     sym = lookup(openScopes, name1);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name1);
