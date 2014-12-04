@@ -541,8 +541,39 @@ SimExpr<out TastierType type>   (.  TastierType type1; Instruction inst; .)
   }.
 
 /*------------------------------------------------------------------------*/
+Assignment<out TastierType type>(. TasterType type1; TastierType type2; .)
 
-Stat                            (.  TastierType type; TastierType type1; TastierType type2; string name; string name1; Symbol sym; bool external = false; bool isExternal = false; Program incrementer; .)
+=
+  Expr<out type>
+  [
+  '?'                           (.
+                                    if (type != TastierType.Boolean) {
+                                      SemErr("Boolean expression expected in conditional assignment");
+                                    }
+                                    program.Add(new Instruction("","Const 1"));
+                                    program.Add(new Instruction("","Equ"));
+                                    openLabels.Push(generateLabel());
+                                    program.Add(new Instruction("", "FJmp " + openLabels.Peek()));
+                                .)
+  Expr<out type1>
+  ':'                           (.
+                                    Instruction startOfElse = new Instruction(openLabels.Pop(), "Nop");
+                                    openLabels.Push(generateLabel());
+                                    program.Add(new Instruction("", "Jmp " + openLabels.Peek()));
+                                    program.Add(startOfElse);
+                                .)
+  Expr<out type2>               (.
+                                    if(type2 != type1) {
+                                      SemErr("Types mismatch in conditional assignment");
+                                    }
+                                    type = type2;
+                                    program.Add(new Instruction(openLabels.Pop(), "Nop"));
+                                .)
+  ].
+
+/*------------------------------------------------------------------------*/
+
+Stat                            (.  TastierType type; string name; string name1; Symbol sym; bool external = false; bool isExternal = false; Program incrementer; .)
 
 = Ident<out name>               (.
                                     sym = lookup(openScopes, name);
@@ -554,7 +585,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                       SemErr("reference to undefined variable " + name);
                                     }
                                 .)
-  ( ":="                        (.
+  (":="                          (.
                                     //error if user tries to reassign constant
                                     if ((TastierKind)sym.Item2 == TastierKind.Const) {
                                       SemErr("cannot re-assign a constant");
@@ -563,13 +594,12 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                       SemErr("cannot assign to non-variable");
                                     }
                                 .)
-    Expr<out type>
-
-    (';'
-                                (.
-                                    if (type != (TastierType)sym.Item3) {
-                                      SemErr("incompatible types");
+   Assignment<out type>         (.
+                                    if(type != (TastierType)sym.Item3) {
+                                      SemErr("Type of identifer and type of expression do not match");
                                     }
+                                .)
+   ';'                          (.
                                     if (sym.Item4 == 0) {
                                       if (isExternal) {
                                         program.Add(new Instruction("", "StoG " + sym.Item1));
@@ -583,48 +613,6 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
-    |'?'                        (.
-                                    if (type != TastierType.Boolean) {
-                                      SemErr("Boolean expression expected in conditional assignment");
-                                    }
-                                    program.Add(new Instruction("","Const 1"));
-                                    program.Add(new Instruction("","Equ"));
-                                    openLabels.Push(generateLabel());
-                                    program.Add(new Instruction("", "FJmp " + openLabels.Peek()));
-                                .)
-     Expr<out type1>             (.
-                                    if(type1 != (TastierType)sym.Item3) {
-                                      SemErr("Mismatched types in true value for conditional assignment: Expected " + (TastierType)sym.Item3 + " but got " + type1);
-                                    }
-                                 .)
-     ':'                         (.
-                                    Instruction startOfElse = new Instruction(openLabels.Pop(), "Nop");
-                                    openLabels.Push(generateLabel());
-                                    program.Add(new Instruction("", "Jmp " + openLabels.Peek()));
-                                    program.Add(startOfElse);
-                                 .)
-     Expr<out type2>             (.
-                                    if(type2 != (TastierType)sym.Item3) {
-                                      SemErr("Mismatched types in true value for conditional assignment: Expected " + (TastierType)sym.Item3 + " but got " + type2);
-                                    }
-                                    program.Add(new Instruction(openLabels.Pop(), "Nop"));
-                                 .)
-     ';'                         (.
-                                    if (sym.Item4 == 0) {
-                                      if (isExternal) {
-                                        program.Add(new Instruction("", "StoG " + sym.Item1));
-                                        // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
-                                      } else {
-                                        program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
-                                      }
-                                    }
-                                    else {
-                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
-                                    }
-                                 .)
-
-    )
   | '(' ')' ';'                 (.
                                     if ((TastierKind)sym.Item2 != TastierKind.Proc) {
                                       SemErr("object is not a procedure");
