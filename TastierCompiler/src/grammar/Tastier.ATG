@@ -739,34 +739,21 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
                                       incrementer.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
-                                    foreach (Instruction inst in incrementer) {
-                                      Console.WriteLine(inst.Item1 + " " + inst.Item2);
-                                    }
-                                    Console.WriteLine("\n\n\n");
                                 .)
   ')'
       Stat                      (.
-                                    foreach (Instruction inst in incrementer) {
-                                      Console.WriteLine(inst.Item1 + " " + inst.Item2);
-                                    }
-
-
-
                                     foundForLoopIncrement = false;
                                     index = incrementer.Count() - 1;
                                     while(!foundForLoopIncrement) {
-
                                       Instruction inst = incrementer.ElementAt(index);
-                                      Console.WriteLine(inst.Item1 + " " + inst.Item2);
                                       if(inst.Item1 == "ForLoopMarker") {
                                         foundForLoopIncrement = true;
                                         startOfIncrement = index;
                                       }
                                       index--;
-
                                     }
                                     Console.WriteLine("Got Here");
-                                    program.AddRange(incrementer.GetRange(startOfIncrement,incrementer.Count() - startOfIncrement));
+                                    program.AddRange(incrementer.GetRange(startOfIncrement + 1,incrementer.Count() - startOfIncrement));
                                     incrementer.RemoveRange(startOfIncrement,incrementer.Count() - startOfIncrement);
                                     program.Add(new Instruction("", "Jmp " + loopStartLabel));
                                     program.Add(new Instruction(openLabels.Pop(), "Nop")); // put the loop end label here
