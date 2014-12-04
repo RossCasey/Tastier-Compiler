@@ -664,7 +664,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
   '('
   [Ident<out name>
   ":="
-  Expr<out type>]                (.
+  Expr<out type>                (.
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -690,6 +690,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
+  ]
   ';'                           (.
                                     string loopStartLabel = generateLabel();
                                     openLabels.Push(generateLabel()); //second label is for the loop end
