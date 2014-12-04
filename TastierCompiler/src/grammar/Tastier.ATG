@@ -701,7 +701,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   Assignment<out type2>          (.
                                     incrementer = new Program();
                                     bool foundForLoopIncrement = false;
-                                    int startOfIncrement;
+                                    int startOfIncrement = -1;
                                     int index = 0;
                                     while(!foundForLoopIncrement) {
                                       Instruction inst = program.ElementAt(index);
@@ -752,7 +752,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       index--;
                                     }
                                     program.AddRange(incrementer.GetRange(startOfIncrement,incrementer.Count() - startOfIncrement));
-                                    incrementer.RemoveRange(tartOfIncrement,incrementer.Count() - startOfIncrement);
+                                    incrementer.RemoveRange(startOfIncrement,incrementer.Count() - startOfIncrement);
                                     program.Add(new Instruction("", "Jmp " + loopStartLabel));
                                     program.Add(new Instruction(openLabels.Pop(), "Nop")); // put the loop end label here
                                 .)
