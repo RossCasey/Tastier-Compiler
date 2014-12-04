@@ -699,6 +699,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   Ident<out name1>
   ":="
   Assignment<out type2>          (.
+
                                     incrementer = new Program();
                                     bool foundForLoopIncrement = false;
                                     int startOfIncrement = -1;
@@ -742,6 +743,13 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   ')'
       Stat                      (.
+                                    int testIndex = 0;
+                                    foreach (Instruction inst in incrementer) {
+                                      Instrunction testInst = incrementer.ElementAt(testIndex);
+                                      Console.WriteLine(testInst.Item1 + " " + testInst.Item2);
+                                    }
+
+
 
                                     foundForLoopIncrement = false;
                                     index = incrementer.Count() - 1;
