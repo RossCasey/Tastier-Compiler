@@ -715,15 +715,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
                                     incrementer.AddRange(program.GetRange(startOfIncrement,program.Count() - startOfIncrement ));
                                     program.RemoveRange(startOfIncrement,program.Count() - startOfIncrement);
-
-                                    int testIndex = 0;
-                                    foreach (Instruction inst in program) {
-                                      Instruction testInst = program.ElementAt(testIndex);
-                                      Console.WriteLine(testInst.Item1 + " " + testInst.Item2);
-                                      testIndex++;
-                                    }
-
-                                    Console.WriteLine("\n\n");
                                     sym = lookup(openScopes, name1);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name1);
@@ -751,11 +742,8 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   ')'
       Stat                      (.
-                                    testIndex = 0;
                                     foreach (Instruction inst in incrementer) {
-                                      Instruction testInst = incrementer.ElementAt(testIndex);
-                                      Console.WriteLine(testInst.Item1 + " " + testInst.Item2);
-                                      testIndex++;
+                                      Console.WriteLine(inst.Item1 + " " + inst.Item2);
                                     }
 
 
