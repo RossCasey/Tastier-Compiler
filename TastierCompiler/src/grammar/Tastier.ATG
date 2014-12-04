@@ -748,7 +748,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     while(!foundForLoopIncrement) {
 
                                       Instruction inst = program.ElementAt(index);
-                                      Console.WriteLine(inst.Item1);
+                                      Console.WriteLine(inst.Item1 + " " + inst.Item2);
                                       if(inst.Item1 == "ForLoopMarker") {
                                         foundForLoopIncrement = true;
                                         startOfIncrement = index;
