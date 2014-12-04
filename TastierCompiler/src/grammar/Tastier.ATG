@@ -739,6 +739,10 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
                                       incrementer.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
+                                    foreach (Instruction inst in incrementer) {
+                                      Console.WriteLine(inst.Item1 + " " + inst.Item2);
+                                    }
+                                    Console.WriteLine("\n\n\n");
                                 .)
   ')'
       Stat                      (.
