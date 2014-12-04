@@ -704,7 +704,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
   ';'
   Ident<out name>
   ":="
-  Expr<out type>                (.
+  Expr<out type2>                (.
                                     incrementer = new Program();
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
@@ -715,7 +715,7 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                       SemErr("reference to undefined variable " + name);
                                     }
 
-                                    if (type != (TastierType)sym.Item3) {
+                                    if (type2 != (TastierType)sym.Item3) {
                                       SemErr("incompatible types");
                                     }
                                     if (sym.Item4 == 0) {
