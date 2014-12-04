@@ -746,13 +746,15 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     foundForLoopIncrement = false;
                                     index = incrementer.Count() - 1;
                                     while(!foundForLoopIncrement) {
+
                                       Instruction inst = program.ElementAt(index);
+                                      Console.WriteLine(inst.Item1);
                                       if(inst.Item1 == "ForLoopMarker") {
                                         foundForLoopIncrement = true;
                                         startOfIncrement = index;
                                       }
                                       index--;
-                                      Console.WriteLine("Failed when index was " + index);
+
                                     }
                                     program.AddRange(incrementer.GetRange(startOfIncrement,incrementer.Count() - startOfIncrement));
                                     incrementer.RemoveRange(startOfIncrement,incrementer.Count() - startOfIncrement);
