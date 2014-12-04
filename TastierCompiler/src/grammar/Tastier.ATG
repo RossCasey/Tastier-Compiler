@@ -745,8 +745,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
       Stat                      (.
                                     int testIndex = 0;
                                     foreach (Instruction inst in incrementer) {
-                                      Instrunction testInst = incrementer.ElementAt(testIndex);
+                                      Instruction testInst = incrementer.ElementAt(testIndex);
                                       Console.WriteLine(testInst.Item1 + " " + testInst.Item2);
+                                      testIndex++;
                                     }
 
 
