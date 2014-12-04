@@ -712,8 +712,8 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       index++;
                                     }
 
-                                    incrementer.AddRange(program.GetRange(startOfIncrement,program.Count() - startOfIncrement + 1));
-                                    program.RemoveRange(startOfIncrement,program.Count() - startOfIncrement + 1);
+                                    incrementer.AddRange(program.GetRange(startOfIncrement,program.Count() - startOfIncrement - 1));
+                                    program.RemoveRange(startOfIncrement,program.Count() - startOfIncrement - 1);
 
                                     sym = lookup(openScopes, name1);
                                     if (sym == null) {
