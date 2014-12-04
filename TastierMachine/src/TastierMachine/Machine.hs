@@ -63,15 +63,13 @@ intPrint num = show (fromIntegral num)
 
 {-- Returns every second element, starting with the first element --}
 everyEven :: (Num a) => (Eq a) => [a] -> [a]
-everyEven list = let  zeroOthers = zipWith (*) (cycle [1,0]) list
-                      removeZeros = filter (/=0) zeroOthers
-                 in removeZeros
+everyEven list = case drop 1 list of
+                  (x:xs) -> x : everyEven xs
+                  [] -> []
 
 {-- Returns every second element, starting with the second element --}
 everyOdd :: (Num a) => (Eq a) => [a] -> [a]
-everyOdd list = let  zeroOthers = zipWith (*) (cycle [0,1]) list
-                     removeZeros = filter (/=0) zeroOthers
-                 in removeZeros
+everyOdd (x:xs) = (everyEven (x:(x:xs)))
 
 {-- Calls the relevant print depending on whether arg is string or int --}
 valueOrPointer :: (Int, Int) -> [Int16] -> String
@@ -266,7 +264,7 @@ run = do
                   - 1 is the type of intValue (1 = integer, 3 = string)
                   - 3 is the type of pointer to string
 
-          The function will print all the arguments passed to it on the stack on a single line. 
+          The function will print all the arguments passed to it on the stack on a single line.
         -}
         Instructions.WriteMul  -> do
           {-- Get the number of arguments involved in the print statement --}
@@ -276,8 +274,8 @@ run = do
           let args = map (fromIntegral . (smem!)) [(fromIntegral(rtp - 2)),((fromIntegral(rtp - 2))-1)..(fromIntegral(rtp - (numArgs + 1)))]
 
           {-- Split list into type list and value list --}
-          let typeList = everyEven args
-          let valueList = everyOdd args
+          let typeList = everyOdd args
+          let valueList = everyEven args
 
           {-- Combine list into (type,value) tuple --}
           let revTupleList = zip typeList valueList

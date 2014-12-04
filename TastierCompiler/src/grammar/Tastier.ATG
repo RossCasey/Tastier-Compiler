@@ -752,7 +752,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       }
                                       index--;
                                     }
-                                    Console.WriteLine("Got Here");
                                     program.AddRange(incrementer.GetRange(startOfIncrement + 1,incrementer.Count() - startOfIncrement - 1));
                                     incrementer.RemoveRange(startOfIncrement,incrementer.Count() - startOfIncrement);
                                     program.Add(new Instruction("", "Jmp " + loopStartLabel));
