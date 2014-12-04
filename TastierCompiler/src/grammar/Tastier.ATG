@@ -693,7 +693,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   ';'
   Ident<out name1>
   ":="
-  Assignment<out type2          (.
+  Assignment<out type2>          (.
                                     incrementer = new Program();
                                     sym = lookup(openScopes, name1);
                                     if (sym == null) {
