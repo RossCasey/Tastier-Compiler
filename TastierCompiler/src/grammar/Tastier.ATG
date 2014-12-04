@@ -742,7 +742,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   ')'
       Stat                      (.
                                     foundForLoopIncrement = false;
-                                    startOfIncrement;
                                     index = incrementer.Count() - 1;
                                     while(!foundForLoopIncrement) {
                                       Instruction inst = program.ElementAt(index);
