@@ -652,7 +652,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   '('
   [Ident<out name>
   ":="
-  Expr<out type>                (.
+  Assignment<out type>            (.
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -693,7 +693,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   ';'
   Ident<out name1>
   ":="
-  Expr<out type2>                (.
+  Assignment<out type2          (.
                                     incrementer = new Program();
                                     sym = lookup(openScopes, name1);
                                     if (sym == null) {
