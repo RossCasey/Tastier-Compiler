@@ -690,31 +690,11 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                     program.Add(new Instruction("", "FJmp " + openLabels.Peek())); // jump to the loop end label if condition is false
                                 .)
-  ';'                           (.
-                                    //This label is added so that all code added between this point
-                                    //and the end of the for loop declaration can be moved to the end
-                                    //of the loop
-                                    program.Add(new Instruction("ForLoopMarker",""));
-                                .)
+  ';''
   Ident<out name1>
   ":="
   Assignment<out type2>          (.
-
                                     incrementer = new Program();
-                                    bool foundForLoopIncrement = false;
-                                    int startOfIncrement = -1;
-                                    int index = 0;
-                                    while(!foundForLoopIncrement) {
-                                      Instruction inst = program.ElementAt(index);
-                                      if(inst.Item1 == "ForLoopMarker") {
-                                        foundForLoopIncrement = true;
-                                        startOfIncrement = index;
-                                      }
-                                      index++;
-                                    }
-
-                                    incrementer.AddRange(program.GetRange(startOfIncrement,program.Count() - startOfIncrement ));
-                                    program.RemoveRange(startOfIncrement,program.Count() - startOfIncrement);
                                     sym = lookup(openScopes, name1);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name1);
@@ -742,18 +722,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   ')'
       Stat                      (.
-                                    foundForLoopIncrement = false;
-                                    index = incrementer.Count() - 1;
-                                    while(!foundForLoopIncrement) {
-                                      Instruction inst = incrementer.ElementAt(index);
-                                      if(inst.Item1 == "ForLoopMarker") {
-                                        foundForLoopIncrement = true;
-                                        startOfIncrement = index;
-                                      }
-                                      index--;
-                                    }
-                                    program.AddRange(incrementer.GetRange(startOfIncrement + 1,incrementer.Count() - startOfIncrement - 1));
-                                    incrementer.RemoveRange(startOfIncrement,incrementer.Count() - startOfIncrement);
+                                    program.AddRange(incrementer);
                                     program.Add(new Instruction("", "Jmp " + loopStartLabel));
                                     program.Add(new Instruction(openLabels.Pop(), "Nop")); // put the loop end label here
                                 .)
