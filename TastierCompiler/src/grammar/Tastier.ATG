@@ -711,7 +711,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       }
                                       index++;
                                     }
-                                    Console.WriteLine("Got to here");
+
                                     incrementer.AddRange(program.GetRange(startOfIncrement,program.Count() - startOfIncrement));
                                     program.RemoveRange(startOfIncrement,program.Count() - startOfIncrement);
 
@@ -742,6 +742,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   ')'
       Stat                      (.
+                                    Console.WriteLine("Got to here");
                                     foundForLoopIncrement = false;
                                     index = incrementer.Count() - 1;
                                     while(!foundForLoopIncrement) {
