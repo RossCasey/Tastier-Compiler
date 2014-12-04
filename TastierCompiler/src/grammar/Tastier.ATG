@@ -573,7 +573,7 @@ Assignment<out TastierType type>(. TasterType type1; TastierType type2; .)
 
 /*------------------------------------------------------------------------*/
 
-Stat                            (.  TastierType type; string name; string name1; Symbol sym; bool external = false; bool isExternal = false; Program incrementer; .)
+Stat                            (.  TastierType type;TasterType type1; TastierType type2; string name; string name1; Symbol sym; bool external = false; bool isExternal = false; Program incrementer; .)
 
 = Ident<out name>               (.
                                     sym = lookup(openScopes, name);
