@@ -711,7 +711,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       }
                                       index++;
                                     }
-                                    Consolse.WriteLine("Got to here")
+                                    Consolse.WriteLine("Got to here");
                                     incrementer.AddRange(program.GetRange(startOfIncrement,program.Count() - startOfIncrement));
                                     program.RemoveRange(startOfIncrement,program.Count() - startOfIncrement);
 
