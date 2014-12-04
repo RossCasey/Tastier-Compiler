@@ -741,9 +741,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   ')'
       Stat                      (.
-                                    bool foundForLoopIncrement = false;
-                                    int startOfIncrement;
-                                    int index = incrementer.Count() - 1;
+                                    foundForLoopIncrement = false;
+                                    startOfIncrement;
+                                    index = incrementer.Count() - 1;
                                     while(!foundForLoopIncrement) {
                                       Instruction inst = program.ElementAt(index);
                                       if(inst.Item1 == "ForLoopMarker") {
