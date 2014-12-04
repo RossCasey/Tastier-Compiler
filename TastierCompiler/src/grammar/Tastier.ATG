@@ -742,7 +742,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   ')'
       Stat                      (.
-                                    Console.WriteLine("Got to here");
+
                                     foundForLoopIncrement = false;
                                     index = incrementer.Count() - 1;
                                     while(!foundForLoopIncrement) {
@@ -753,6 +753,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       }
                                       index--;
                                     }
+                                    Console.WriteLine("Got to here");
                                     program.AddRange(incrementer.GetRange(startOfIncrement,incrementer.Count() - startOfIncrement));
                                     incrementer.RemoveRange(startOfIncrement,incrementer.Count() - startOfIncrement);
                                     program.Add(new Instruction("", "Jmp " + loopStartLabel));
