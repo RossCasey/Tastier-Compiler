@@ -542,7 +542,7 @@ SimExpr<out TastierType type>   (.  TastierType type1; Instruction inst; .)
 
 /*------------------------------------------------------------------------*/
 
-Stat                            (.  TastierType type; TastierType type1; TastierType type2; string name; Symbol sym; bool external = false; bool isExternal = false; Program incrementer; .)
+Stat                            (.  TastierType type; TastierType type1; TastierType type2; string name; string name2 Symbol sym; bool external = false; bool isExternal = false; Program incrementer; .)
 
 = Ident<out name>               (.
                                     sym = lookup(openScopes, name);
@@ -702,17 +702,17 @@ Stat                            (.  TastierType type; TastierType type1; Tastier
                                     program.Add(new Instruction("", "FJmp " + openLabels.Peek())); // jump to the loop end label if condition is false
                                 .)
   ';'
-  Ident<out name>
+  Ident<out name1>
   ":="
   Expr<out type2>                (.
                                     incrementer = new Program();
-                                    sym = lookup(openScopes, name);
+                                    sym = lookup(openScopes, name1);
                                     if (sym == null) {
-                                      sym = _lookup(externalDeclarations, name);
+                                      sym = _lookup(externalDeclarations, name1);
                                       isExternal = true;
                                     }
                                     if (sym == null) {
-                                      SemErr("reference to undefined variable " + name);
+                                      SemErr("reference to undefined variable " + name1);
                                     }
 
                                     if (type2 != (TastierType)sym.Item3) {
