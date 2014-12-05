@@ -541,17 +541,28 @@ SimExpr<out TastierType type>   (.  TastierType type1; Instruction inst; .)
   }.
 
 /*------------------------------------------------------------------------*/
+/*I created a production for assignment that has an optional conditional part.
+  This means that where ever a normal assignment is used, a conditional
+  assignment can also be used. This prevents a lot of code repetition
+  in places like the for loop.
+*/
 Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
 
 =
   Expr<out type>
   [
   '?'                           (.
+                                    /* The conditional assignment statement is converted into an
+                                       if-else structure in the assembly. This allows us to add
+                                       conditional assignment to the language without altering the
+                                       virtual machine.
+                                    */
                                     if (type != TastierType.Boolean) {
                                       SemErr("Boolean expression expected in conditional assignment");
                                     }
                                     program.Add(new Instruction("","Const 1"));
                                     program.Add(new Instruction("","Equ"));
+                                    //start of if
                                     openLabels.Push(generateLabel());
                                     program.Add(new Instruction("", "FJmp " + openLabels.Peek()));
                                 .)
@@ -559,14 +570,20 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
   ':'                           (.
                                     Instruction startOfElse = new Instruction(openLabels.Pop(), "Nop");
                                     openLabels.Push(generateLabel());
+                                    //jump over else
                                     program.Add(new Instruction("", "Jmp " + openLabels.Peek()));
+                                    //add label to allow jumping to else
                                     program.Add(startOfElse);
                                 .)
   Expr<out type2>               (.
+                                    //check that the type of expression 1 is the same as expression 2
                                     if(type2 != type1) {
                                       SemErr("Types mismatch in conditional assignment");
                                     }
+                                    //set type of assignment
                                     type = type2;
+
+                                    //end if-else
                                     program.Add(new Instruction(openLabels.Pop(), "Nop"));
                                 .)
   ].
@@ -595,6 +612,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                 .)
    Assignment<out type>         (.
+                                    //check type of assignment and type of identifier are the same
                                     if(type != (TastierType)sym.Item3) {
                                       SemErr("Type of identifer and type of expression do not match");
                                     }
@@ -653,6 +671,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   [Ident<out name>
   ":="
   Assignment<out type>            (.
+                                    //optional assignment statement at start of for loop
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -680,11 +699,13 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   ]
   ';'                           (.
+                                    //create label that program can jump back to
                                     string loopStartLabel = generateLabel();
                                     openLabels.Push(generateLabel()); //second label is for the loop end
                                     program.Add(new Instruction(loopStartLabel, "Nop"));
                                 .)
   Expr<out type1>               (.
+                                    //add condition check to the loop, the expression must be boolean
                                     if(type1 != TastierType.Boolean) {
                                       SemErr("For loop condition must be type boolean ");
                                     }
@@ -694,6 +715,25 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   Ident<out name1>
   ":="
   Assignment<out type2>          (.
+                                    /* The last part of the for loop updates the loop variable
+                                       The variable cannot be updated at the start of the loop
+                                       because then the value of the variable will be incorrect
+                                       during the loop.
+
+                                       The assignment production computes the new value for the
+                                       variable and leaves it on the stack. Rather than moving the
+                                       instruction for the increment part to the end of the loop,
+                                       which is complicated, I leave the new value of the variable
+                                       on the stack (it shouldn't be used by anything else) and
+                                       delay the storing of the new value into the memory location
+                                       for the variable. The accomplishes the same thing as putting
+                                       the increment instructions at the end of the loop but it keeps
+                                       things much simpler
+                                    */
+
+                                    /* only the instruction for storing the new value of the loop variable are delayed
+                                       this instruction is temporarily stored in "incrementer", where it will be retrieved
+                                    */ later
                                     incrementer = new Program();
                                     sym = lookup(openScopes, name1);
                                     if (sym == null) {
@@ -722,9 +762,14 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   ')'
       Stat                      (.
-                                    program.AddRange(incrementer);
+                                    //we now store the new value of the loop variable into its memory location, updating it
+                                    rogram.AddRange(incrementer);
+
+                                    //jump back to the start of the loop
                                     program.Add(new Instruction("", "Jmp " + loopStartLabel));
-                                    program.Add(new Instruction(openLabels.Pop(), "Nop")); // put the loop end label here
+
+                                    // put the loop end label here
+                                    program.Add(new Instruction(openLabels.Pop(), "Nop"));
                                 .)
 
 | "while"                       (.  string loopStartLabel = generateLabel();
