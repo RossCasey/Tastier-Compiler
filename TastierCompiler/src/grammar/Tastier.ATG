@@ -672,6 +672,10 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   ":="
   Assignment<out type>            (.
                                     //optional assignment statement at start of for loop
+
+                                    //This is placed before the loop begins as it only need to
+                                    //happen once.
+                                    
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
