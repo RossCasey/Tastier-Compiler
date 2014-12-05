@@ -675,7 +675,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
                                     //This is placed before the loop begins as it only need to
                                     //happen once.
-                                    
+
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -730,9 +730,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                        which is complicated, I leave the new value of the variable
                                        on the stack (it shouldn't be used by anything else) and
                                        delay the storing of the new value into the memory location
-                                       for the variable. The accomplishes the same thing as putting
-                                       the increment instructions at the end of the loop but it keeps
-                                       things much simpler
+                                       for the variable until the end of the loop . This accomplishes
+                                       the same thing as putting the increment instructions at the
+                                       end of the loop but it keeps things much simpler
                                     */
 
                                     /* only the instruction for storing the new value of the loop variable are delayed
