@@ -767,7 +767,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   ')'
       Stat                      (.
                                     //we now store the new value of the loop variable into its memory location, updating it
-                                    rogram.AddRange(incrementer);
+                                    program.AddRange(incrementer);
 
                                     //jump back to the start of the loop
                                     program.Add(new Instruction("", "Jmp " + loopStartLabel));
