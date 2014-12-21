@@ -752,7 +752,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     //add marker to know when to insert jump instruction
                                     cases.Add(new Instruction("nextLabelMarker",""));
                                   .)
-    ':' [Stat]
+    ':' {Stat}
     [ "break" ';'                 (.
                                       program.Add(new Instruction("","Jmp " + endLabel));
                                   .)
@@ -767,7 +767,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       //keep label later for use in case part of switch
                                       caseLabels.Enqueue(newCaseLabel);
                                   .)
-    [Stat]
+    {Stat}
   ]
   '}'                             (.
                                       //end of switch statement
