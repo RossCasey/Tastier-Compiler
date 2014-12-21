@@ -707,7 +707,10 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       size++;
                                     }
                                     if ((TastierType)type != TastierType.Integer) {
-                                      SemErr("integer type expected");
+                                      SemErr("integer or string type expected");
+                                    }
+                                    if ((TastierType)type != TastierType.String) {
+                                      SemErr("integer or string type expected");
                                     }
                                     string endLabel = generateLabel();
                                 .)
