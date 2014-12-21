@@ -865,7 +865,8 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
                                     /* only the instruction for storing the new value of the loop variable are delayed
                                        this instruction is temporarily stored in "incrementer", where it will be retrieved
-                                    */ later
+                                       later
+                                    */
                                     incrementer = new Program();
                                     sym = lookup(openScopes, name1);
                                     if (sym == null) {
