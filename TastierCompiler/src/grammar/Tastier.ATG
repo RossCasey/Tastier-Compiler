@@ -776,9 +776,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       Program fullCases = new Program();
 
                                       string nextCaseLabel;
-                                      foreach (Instruction inst in cases) {
-                                        if(inst.Item1 != "nextLabelMarker") {
-                                          fullCases.Add(inst);
+                                      foreach (Instruction ins in cases) {
+                                        if(ins.Item1 != "nextLabelMarker") {
+                                          fullCases.Add(ins);
                                         } else {
                                           fullCases.Add(new Instruction("", "Equ"));
                                           nextCaseLabel = generateLabel();
