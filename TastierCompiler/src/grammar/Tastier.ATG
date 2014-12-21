@@ -665,6 +665,134 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
       [ "else"
         Stat
       ]                         (.  program.Add(new Instruction(openLabels.Pop(), "Nop")); .)
+| "switch"                      (.  Program cases = new Program();
+                                    //create a new list of instructions to store case statements that will be
+                                    //added before the switch structure.
+
+                                    Program switchParameter = new Program();
+                                    //create a new list of instructions that places the value upon which the
+                                    //switch is acting back on the top of the stack
+
+                                    program.Add(new Instruction("casesMarker",""));
+                                    //create a marker in order to insert the cases statements
+
+                                    Queue<string> caseLabels = new Queue<string>();
+                                    //create queue to store the labels for the cases
+
+                                    bool isDefault = false;
+                                    //there is no need for an additional branch always if there is a default
+                                    //this allows that additional branch always to be left out
+                                .)
+  '('                           (.
+                                    //place a label here as a marker so that the instructions to place
+                                    //the switch value back on the top of the stack can be found
+                                    program.Add(new Instruction("switchValueMarker",""));
+                                .)
+  Expr<out type> ')' '{'        (.
+                                    int index = program.Length() - 1;
+                                    int size = 0;
+                                    bool markerFound = false;
+                                    Instruction inst;
+                                    while(!markerFound) {
+                                      inst = program.ElementAt(index);
+                                      if(inst.Item1 == "switchValueMarker") {
+                                        markerFound = true;
+                                        //store switch value
+                                        switchParameter.AddRange(program.GetRange(index + 1,size));
+                                        //delete marker from instructions list
+                                        program.RemoveRange(index,size+1);
+                                        //delete instructions from program, will be used in case statements
+                                      }
+                                      index--;
+                                      size++;
+                                    }
+                                    if ((TastierType)type != TastierType.Integer) {
+                                      SemErr("integer type expected");
+                                    }
+                                    string endLabel = generateLabel();
+                                .)
+  {
+    "case"                      (.
+                                    //place switch value onto top of stack
+                                    cases.AddRange(switchParameter);
+                                    string newCaseLabel = generateLabel();
+                                    program.Add(new Instruction(newCaseLabel,"Nop"));
+
+                                    //keep label later for use in case part of switch
+                                    caseLabels.Enqueue(newCaseLabel);
+
+                                    //place marker for case value in program
+                                    //this will be used to move the instructions
+                                    //necessary to place the case value on the stack
+                                    //into the cases list of instructions
+                                    program.Add(new Instruction("caseMarker",""));
+
+                                .)
+    Expr<out type1>             (.
+                                    if(type != type1) {
+                                      SemErr("Type of case statement does not match type of switch statement");
+                                    }
+                                    index = program.Length() - 1;
+                                    size = 0;
+                                    markerFound = false;
+                                    while(!markerFound) {
+                                      inst = program.ElementAt(index);
+                                      if(inst.Item1 == "caseMarker") {
+                                        markerFound = true;
+                                        //store case value
+                                        cases.AddRange(program.GetRange(index + 1,size));
+                                        //delete marker from instructions list
+                                        program.RemoveRange(index,size+1);
+                                        //delete instructions from program, will be used in case statements
+                                      }
+                                      index--;
+                                      size++;
+                                    }
+
+                                    //add marker to know when to insert jump instruction
+                                    cases.Add(new Instruction("nextLabelMarker",""));
+                                  .)
+    ':' [Stat]
+    [ "break" ';'                 (.
+                                      program.Add(new Instruction("","Jmp " + endLabel));
+                                  .)
+    ]
+  }
+  [
+    "default" ':'                 (.
+                                      isDefault = true;
+                                      string newCaseLabel = generateLabel();
+                                      program.Add(new Instruction(newCaseLabel,"Nop"));
+
+                                      //keep label later for use in case part of switch
+                                      caseLabels.Enqueue(newCaseLabel);
+                                  .)
+    [Stat]
+  ]
+  '}'                             (.
+                                      //end of switch statement
+                                      program.Add(new Instruction(endLabel, "Nop"));
+
+                                      Program fullCases = new Program();
+
+                                      string nextCaseLabel;
+                                      foreach (Instruction inst in cases) {
+                                        if(inst.Item1 != "nextLabelMarker") {
+                                          fullCases.Add(inst);
+                                        } else {
+                                          fullCases.Add(new Instruction("", "Equ"));
+                                          nextCaseLabel = generateLabel();
+                                          fullCases.Add(new Instruction("", "FJmp " + nextCaseLabel));
+                                          fullCases.Add(new Instruction("", "Jmp " + caseLabels.Dequeue));
+                                          fullCases.Add(new Instruction(nextCaseLabel, "Nop"));
+                                        }
+                                      }
+                                      if(isDefault) {
+                                        fullCases.Add(new Instruction("","Jmp " + caseLabels.Dequeue));
+                                      } else {
+                                        fullCases.Add(new Instruction("","Jmp " + endLabel));
+                                      }
+                                  .)
 
 | "for"
   '('
