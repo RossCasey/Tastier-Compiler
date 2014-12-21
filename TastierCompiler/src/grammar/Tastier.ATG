@@ -792,6 +792,28 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       } else {
                                         fullCases.Add(new Instruction("","Jmp " + endLabel));
                                       }
+
+                                      Program tmp = new Program();
+                                      //inserting cases part before case statements
+                                      index = program.Count() - 1;
+                                      size = 0;
+                                      markerFound = false;
+                                      while(!markerFound) {
+                                        inst = program.ElementAt(index);
+                                        if(inst.Item1 == "casesMarker") {
+                                          markerFound = true;
+                                          //store case value
+                                          tmp.AddRange(program.GetRange(index + 1,size));
+                                          //delete marker from instructions list
+                                          program.RemoveRange(index,size+1);
+                                          //delete instructions from program, will be used in case statements
+                                        }
+                                        index--;
+                                        size++;
+                                      }
+
+                                      program.AddRange(fullCases);
+                                      program.AddRange(tmp);
                                   .)
 
 | "for"
