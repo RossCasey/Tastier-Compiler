@@ -689,7 +689,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     program.Add(new Instruction("switchValueMarker",""));
                                 .)
   Expr<out type> ')' '{'        (.
-                                    int index = program.Length() - 1;
+                                    int index = program.Count() - 1;
                                     int size = 0;
                                     bool markerFound = false;
                                     Instruction inst;
@@ -732,7 +732,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(type != type1) {
                                       SemErr("Type of case statement does not match type of switch statement");
                                     }
-                                    index = program.Length() - 1;
+                                    index = program.Count() - 1;
                                     size = 0;
                                     markerFound = false;
                                     while(!markerFound) {
@@ -783,12 +783,12 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                           fullCases.Add(new Instruction("", "Equ"));
                                           nextCaseLabel = generateLabel();
                                           fullCases.Add(new Instruction("", "FJmp " + nextCaseLabel));
-                                          fullCases.Add(new Instruction("", "Jmp " + caseLabels.Dequeue));
+                                          fullCases.Add(new Instruction("", "Jmp " + caseLabels.Dequeue()));
                                           fullCases.Add(new Instruction(nextCaseLabel, "Nop"));
                                         }
                                       }
                                       if(isDefault) {
-                                        fullCases.Add(new Instruction("","Jmp " + caseLabels.Dequeue));
+                                        fullCases.Add(new Instruction("","Jmp " + caseLabels.Dequeue()));
                                       } else {
                                         fullCases.Add(new Instruction("","Jmp " + endLabel));
                                       }
