@@ -341,6 +341,15 @@ Symbol lookup(Stack<Scope> scopes, string name) {
   return null; // if the name wasn't found in any open scopes.
 }
 
+int recordLookup(string name) {
+  forech (RecordIndex rec in recordList) {
+    if (rec.Item1 == name) {
+      return rec.Item2;
+    }
+  }
+  return -1;
+}
+
 /*
   You may notice that when we use a LoadG or StoG instruction, we add 3 to
   the address of the item being loaded or stored. This is because the
@@ -1211,10 +1220,11 @@ RecordDecl<bool external>       (.
 /*------------------------------------------------------------------------*/
 
 VarDecl<bool external>          (.
-                                    string name; TastierType type; Scope currentScope = openScopes.Peek();
+                                    string name; TastierType type; Scope currentScope = openScopes.Peek(); int recordIndex;
+                                    string typeName; string varName;
                                 .)
-= Type<out type>
-  Ident<out name>               (.
+= (Type<out type>
+   Ident<out name>               (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
@@ -1226,7 +1236,7 @@ VarDecl<bool external>          (.
                                       }
                                     }
                                 .)
-  { ',' Ident<out name>         (.
+   { ',' Ident<out name>         (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
@@ -1238,7 +1248,44 @@ VarDecl<bool external>          (.
                                       }
                                     }
                                 .)
-  } ';'.
+  } ';'
+  | "record"
+    Ident<out typeName>         (.
+                                    recordIndex = lookupRecord(typeName);
+                                    if(recordIndex == -1) {
+                                      SemErr("Record " + typeName + " has not been declared");
+                                    }
+                                .)
+    Ident<out varName>          (.
+                                    //create new instance of record in current scope
+                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
+
+                                    foreach(Symbol sym in recordVariables.ElementAt(recordIndex)) {
+                                      int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                      string newName = varName + "." + sym.Item1;
+                                      currentScope.Push(new Symbol(newName, sym.Item2, sym.Item3, openScopes.Count-1, address));
+                                      //if the address is global then we need to increment the memory offset
+                                      if((openScopes.Count-1)==0) {
+                                        memoryAddressOffset++;
+                                      }
+                                    }
+                                .)
+    { ',' Ident<out varName>    (.
+                                    //create new instance of record in current scope
+                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
+
+                                    foreach(Symbol sym in recordVariables.ElementAt(recordIndex)) {
+                                      int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                      string newName = varName + "." + sym.Item1;
+                                      currentScope.Push(new Symbol(newName, sym.Item2, sym.Item3, openScopes.Count-1, address));
+                                      //if the address is global then we need to increment the memory offset
+                                      if((openScopes.Count-1)==0) {
+                                        memoryAddressOffset++;
+                                      }
+                                    }
+                                .)
+  } ';'
+  ).
 
 ExternDecl                      (.  string name; bool external = true; Scope currentScope = openScopes.Peek(); int count = currentScope.Count; .)
 = "external"
