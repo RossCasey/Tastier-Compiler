@@ -1238,12 +1238,12 @@ RecordDecl                      (.
                                     sym = currentScope.Pop();
                                     recordVariables.ElementAt(type).Add(sym);
                                 .)
-  { ';' VarDecl<external>       (.
+  { VarDecl<external>       (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
                                     recordVariables.ElementAt(type).Add(sym);
                                 .)
-  } ';' '}'.
+  } '}'.
 
 /*------------------------------------------------------------------------*/
 
