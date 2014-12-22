@@ -1195,7 +1195,8 @@ ConstDecl                       (.
 RecordDecl                      (.
                                     bool external = false; string typeName; int type; Scope currentScope = openScopes.Peek(); Symbol sym;
                                 .)
-= "record"
+= "create"
+  "record"
   Ident<out typeName>     (.
                                     //Adding new record type to list and giving it its own list of variables
                                     type = recordsDefined;
@@ -1255,7 +1256,7 @@ VarDecl<bool external>          (.
                                       SemErr("Record " + typeName + " has not been declared");
                                     }
                                 .)
-    Ident<out varName>    (.
+    Ident<out varName>          (.
                                     //create new instance of record in current scope
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
 
