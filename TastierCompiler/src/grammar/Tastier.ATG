@@ -463,6 +463,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; string name2
                                         }
                                       } else SemErr("Variable, Constant or Record Expected");
                                     }
+                                .)    
     {
       dot                       (.
                                     if(sym.Item2 != (int)TastierKind.Record) {
