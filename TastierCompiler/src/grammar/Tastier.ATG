@@ -1254,7 +1254,7 @@ RecordDecl                      (.
   } '}'                         (.
                                     //remove "RecordMarker" from symbol stack
                                     currentScope.Pop();
-                                .)
+                                .).
 
 /*------------------------------------------------------------------------*/
 
