@@ -1200,7 +1200,7 @@ RecordDecl<bool external>       (.
                                     type = recordsDefined;
                                     recordList.Add(new RecordIndex(typeName,type));
                                     recordsDefined++;
-                                    recordVariables.Add(new List<RecordVariable>());
+                                    recordVariables.Add(new List<Symbol>());
                                 .)
   '{'
   VarDecl<external>             (.
@@ -1251,7 +1251,7 @@ VarDecl<bool external>          (.
   } ';'
   | "record"
     Ident<out typeName>         (.
-                                    recordIndex = lookupRecord(typeName);
+                                    recordIndex = recordLookup(typeName);
                                     if(recordIndex == -1) {
                                       SemErr("Record " + typeName + " has not been declared");
                                     }
