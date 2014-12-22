@@ -1213,7 +1213,7 @@ RecordDecl                      (.
                                     sym = currentScope.Pop();
                                     recordVariables.ElementAt(type).Add(sym);
                                 .)
-  } }'.
+  } '}'.
 
 /*------------------------------------------------------------------------*/
 
