@@ -396,7 +396,8 @@ CHARACTERS
   dot = '.'.
 
 TOKENS
-  ident  = letter {letter | digit} {dot letter {letter | digit}}.
+  access = dot.
+  ident  = letter {letter | digit}.
   number = digit {digit}.
   string = quote {letter | digit | special} quote.  //new string
 
@@ -465,9 +466,9 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; string name2
                                     }
                                 .)
     {
-      dot                       (.
+      access                    (.
                                     if(sym.Item2 != (int)TastierKind.Record) {
-                                      SemErr("The dot operator can only be used for record reference variables");
+                                      SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
                                 .)
       Ident<out name2>          (.
@@ -499,7 +500,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; string name2
                                     }
                                 .)
     }
-    
+
   | number                      (.
                                     n = Convert.ToInt32(t.val);
                                     program.Add(new Instruction("", "Const " + n));
