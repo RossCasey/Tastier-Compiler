@@ -1298,6 +1298,8 @@ VarDecl<bool external>          (.
                                     //create new instance of record in current scope
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
 
+
+                                    Console.WriteLine("Record: " + varName);
                                     //get all sub symbols for the current record
                                     List<Symbol> subSymbols = getAllSubRecordSymbols(varName,recordIndex);
                                     foreach(Symbol sym in subSymbols) {
@@ -1307,7 +1309,9 @@ VarDecl<bool external>          (.
                                       if((openScopes.Count-1)==0) {
                                         memoryAddressOffset++;
                                       }
+                                      Console.WriteLine(sym.Item1);
                                     }
+                                    Console.WriteLine("\n\n\n");
                                 .)
     { ',' Ident<out varName>    (.
                                     if(varName.Contains('.')) {
