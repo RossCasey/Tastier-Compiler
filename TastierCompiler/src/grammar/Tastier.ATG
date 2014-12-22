@@ -323,9 +323,11 @@ List<Symbol> getAllSubRecordSymbols(string recordName, int recordType) {
       subSymbols.Add(new Symbol(newName,sym.Item2,sym.Item3,sym.Item4,sym.Item5));
     }
   }
+  Console.WriteLine(recordName + ":");
   foreach(Symbol s in subSymbols) {
     Console.WriteLine(s.Item1);
   }
+  Console.WriteLine("\n\n\n");
   return subSymbols;
 }
 
