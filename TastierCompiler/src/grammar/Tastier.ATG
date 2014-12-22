@@ -285,6 +285,21 @@ string generateLabel() {
   put the label in, and pop it off the stack.
 */
 
+
+
+using RecordPointer = System.Tuple<string, int>;
+
+
+
+
+
+
+
+
+
+
+
+
 Symbol _lookup(Scope scope, string name) {
   foreach (Symbol s in scope) {
       if (s.Item1 == name) {
