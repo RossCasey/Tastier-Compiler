@@ -476,7 +476,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; string name2
                                     program.RemoveAt(program.Count() - 1);
 
 
-                                    sym = recordVariableLookup(type,name2);
+                                    sym = recordVariableLookup((int)type,name2);
                                     if(sym == null) {
                                       SemErr(name2 + " is not defined in record " + name);
                                     } else {
