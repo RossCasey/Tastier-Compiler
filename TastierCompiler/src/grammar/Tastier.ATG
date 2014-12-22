@@ -1192,7 +1192,7 @@ ConstDecl                       (.
 
 /*------------------------------------------------------------------------*/
 RecordDecl                      (.
-                                    bool external; string typeName; int type; Scope currentScope = openScopes.Peek(); Symbol sym;
+                                    bool external = false; string typeName; int type; Scope currentScope = openScopes.Peek(); Symbol sym;
                                 .)
 = "record"
   Ident<out typeName>           (.
