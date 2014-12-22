@@ -1182,12 +1182,6 @@ ConstDecl                       (.
                                 .).
 
 /*------------------------------------------------------------------------*/
-RecordList recordList = new RecordList();
-RecordVariables recordVariables = new RecordVariables();
-
-//keeps track of the next available index number for records
-int recordsDefined = 0;
-
 RecordDecl<bool external>       (.
                                     string typeName; int type; TastierType varType; string varName; Scope currentScope = openScopes.Peek(); Symbol sym;
                                 .)
