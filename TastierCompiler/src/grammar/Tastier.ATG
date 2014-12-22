@@ -1294,7 +1294,7 @@ RecordDecl                      (.
                                     while(sym.Item1 != "RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
                                       sym = currentScope.Pop();
-                                      sym.Item5 = offset;
+                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
                                       offset++;
                                     }
                                     //place marker back on stack
@@ -1308,7 +1308,7 @@ RecordDecl                      (.
                                     while(sym.Item1 != "RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
                                       sym = currentScope.Pop();
-                                      sym.Item5 = offset;
+                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
                                       offset++;
                                     }
                                     //place marker back on stack
