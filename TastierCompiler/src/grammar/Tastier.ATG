@@ -1232,7 +1232,7 @@ RecordDecl                      (.
                                     recordList.Add(new RecordIndex(typeName,type));
                                     recordsDefined++;
                                     recordVariables.Add(new List<Symbol>());
-                                    currentScope.Push(new Symbol("RecordMarker",-1,-1,-1,-1));
+                                    //currentScope.Push(new Symbol("RecordMarker",-1,-1,-1,-1));
                                 .)
   '{'
   VarDecl<external>             (.
