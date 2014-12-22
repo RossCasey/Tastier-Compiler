@@ -74,7 +74,8 @@ COMPILER Tastier
   enum TastierKind : int {  // kinds of symbol
     Var,
     Proc,
-    Const
+    Const,
+    Record
   };
 
 /*
@@ -289,9 +290,18 @@ string generateLabel() {
 //This tuple is declared in Parser.frame for the same reason that Instruction,Symbol etc. are.
 //using RecordPointer = System.Tuple<string, int>;
 
+//stores the name of a record and the index of its list of variables in recordVariables
 class RecordList : List<RecordIndex> {}
-class RecordVariables : List<List<RecordVariable>> {}
 
+//stores the lists of variables for each record
+class RecordVariables : List<List<Symbol>> {}
+
+
+RecordList recordList = new RecordList();
+RecordVariables recordVariables = new RecordVariables();
+
+//keeps track of the next available index number for records
+int recordsDefined = 0;
 
 
 
@@ -438,7 +448,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; .)
   | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = TastierType.Boolean; .)
   | string                      (.
                                     /*
-                                      Strings are stored in data memeory. The string is stored
+                                      Strings are stored in data memory. The string is stored
                                       as its length followed by a sequence of values.
                                       The values are stored in memory by first placing them on
                                       the stack and then using StoG to store them in data memory.
@@ -1170,6 +1180,39 @@ ConstDecl                       (.
                                     program.Add(new Instruction("", "Leave"));
                                     program.Add(new Instruction("", "Ret"));
                                 .).
+
+/*------------------------------------------------------------------------*/
+RecordList recordList = new RecordList();
+RecordVariables recordVariables = new RecordVariables();
+
+//keeps track of the next available index number for records
+int recordsDefined = 0;
+
+RecordDecl<bool external>       (.
+                                    string typeName; int type; TastierType varType; string varName; Scope currentScope = openScopes.Peek(); Symbol sym;
+                                .)
+= "record"
+  Ident<out typeName>           (.
+                                    //Adding new record type to list and giving it its own list of variables
+                                    type = recordsDefined;
+                                    recordList.Add(new RecordIndex(typeName,type));
+                                    recordsDefined++;
+                                    recordVariables.Add(new List<RecordVariable>());
+                                .)
+  '{'
+  VarDecl<external>             (.
+                                    //Remove symbol from global symbol table and add it to symbol table for record
+                                    sym = currentScope.ElementAt(currentScope.Count()-1);
+                                    currentScope.RemoveAt(currentScope.Count()-1);
+                                    recordVariables.ElementAt(type).Add(sym);
+                                .)
+  { ';' VarDecl<external>       (.
+                                    //Remove symbol from global symbol table and add it to symbol table for record
+                                    sym = currentScope.ElementAt(currentScope.Count()-1);
+                                    currentScope.RemoveAt(currentScope.Count()-1);
+                                    recordVariables.ElementAt(type).Add(sym);
+                                .)
+  } ';' '}'.
 
 /*------------------------------------------------------------------------*/
 
