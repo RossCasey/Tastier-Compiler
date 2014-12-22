@@ -342,7 +342,7 @@ Symbol lookup(Stack<Scope> scopes, string name) {
 }
 
 int recordLookup(string name) {
-  forech (RecordIndex rec in recordList) {
+  foreach (RecordIndex rec in recordList) {
     if (rec.Item1 == name) {
       return rec.Item2;
     }
