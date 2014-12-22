@@ -1192,7 +1192,7 @@ ConstDecl                       (.
 
 /*------------------------------------------------------------------------*/
 RecordDecl<bool external>       (.
-                                    string typeName; int type; TastierType varType; string varName; Scope currentScope = openScopes.Peek(); Symbol sym;
+                                    string typeName; int type; Scope currentScope = openScopes.Peek(); Symbol sym;
                                 .)
 = "record"
   Ident<out typeName>           (.
