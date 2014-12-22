@@ -1250,8 +1250,8 @@ RecordDecl                      (.
                                     sym = currentScope.Pop();
                                     Console.WriteLine(sym.Item1);
                                     while(sym.Item1 != "RecordMarker") {
+                                      Console.WriteLine(currentScope.Count());
                                       sym = currentScope.Pop();
-                                      Console.WriteLine("Got here 2");
                                       recordVariables.ElementAt(type).Add(sym);
                                     }
                                     Console.WriteLine("Got here 3");
