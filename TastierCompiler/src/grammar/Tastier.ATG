@@ -314,12 +314,13 @@ List<Symbol> getAllSubRecordSymbols(string recordName, int recordType) {
   List <Symbol> subRecordSymbols = new List<Symbol>();
   foreach(Symbol sym in recordVariables.ElementAt(recordType)) {
     if(sym.Item2 == (int)TastierKind.Record) {
-      Console.WriteLine(recordName + " calling " + sym.Item1);
+      /*Console.WriteLine(recordName + " calling " + sym.Item1);
       List <Symbol> recordSymbols = getAllSubRecordSymbols(sym.Item1, sym.Item3);
       foreach(Symbol s in recordSymbols) {
         string newName = recordName + "." + s.Item1;
         subRecordSymbols.Add(new Symbol(newName,s.Item2,s.Item3,s.Item4,s.Item5));
       }
+      */
     }
     else {
       string newName = recordName + "." + sym.Item1;
