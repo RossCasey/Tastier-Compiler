@@ -1251,9 +1251,10 @@ RecordDecl                      (.
                                     Console.WriteLine(sym.Item1);
                                     while(sym.Item1 != "RecordMarker") {
                                       sym = currentScope.Pop();
+                                      Console.WriteLine("Got here 2");
                                       recordVariables.ElementAt(type).Add(sym);
                                     }
-                                    Console.WriteLine("Got here 2");
+                                    Console.WriteLine("Got here 3");
                                 .)
   } '}'                         (.
                                     //remove "RecordMarker" from symbol stack
