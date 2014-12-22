@@ -441,7 +441,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; string recor
     [
       '.'
       Ident<out recordVar>      (.
-                                    sym = lookup(openScopes, (name + "." + recordVar);
+                                    sym = lookup(openScopes, (name + "." + recordVar));
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
                                       isExternal = true;
