@@ -1317,7 +1317,7 @@ VarDecl<bool external>          (.
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
 
                                     //get all sub symbols for the current record
-                                    List<Symbol> subSymbols = getAllSubRecordSymbols(varName,recordIndex);
+                                    subSymbols = getAllSubRecordSymbols(varName,recordIndex);
                                     foreach(Symbol sym in subSymbols) {
                                       int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                       currentScope.Push(new Symbol(sym.Item1, sym.Item2, sym.Item3, openScopes.Count-1, address));
