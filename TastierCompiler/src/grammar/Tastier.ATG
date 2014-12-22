@@ -327,15 +327,18 @@ List<Symbol> getAllSubRecordSymbols(string recordName, int recordType) {
     }
   }
 
-  subSymbols.AddRange(subRecordSymbols);
-
+  Console.WriteLine("SubSymbols:");
   foreach(Symbol s in subSymbols) {
     Console.WriteLine(s.Item1);
   }
   Console.WriteLine("\n");
-  foreach(Symbol s in recordVariables.ElementAt(recordType)) {
+
+  Console.WriteLine("SubRecordSymbols:");
+  foreach(Symbol s in subRecordSymbols) {
     Console.WriteLine(s.Item1);
   }
+  Console.WriteLine("\n");
+
   Console.WriteLine("\n\n\n");
   return subSymbols;
 }
