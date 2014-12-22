@@ -1074,7 +1074,7 @@ Tastier                         (.  string name; bool external = false; .)
                                     openScopes.Push(new Scope());
                                 .)
   '{'
-  { ConstDecl | RecordDecl }{ VarDecl<external> | ProcDecl | ExternDecl }
+  { ConstDecl | RecordDecl<external> }{ VarDecl<external> | ProcDecl | ExternDecl }
   '}'                           (.
                                     if (openScopes.Peek().Count == 0) {
                                       Warn("Warning: Program " + name + " is empty ");
