@@ -1312,17 +1312,19 @@ VarDecl<bool external>          (.
                                     //create new instance of record in current scope
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
 
-
+                                    Console.WriteLine("Record: " + varName);
                                     //get all sub symbols for the current record
                                     List<Symbol> subSymbols = getAllSubRecordSymbols(varName,recordIndex);
                                     foreach(Symbol sym in subSymbols) {
                                       int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                      Console.WriteLine(sym.Item1);
                                       currentScope.Push(new Symbol(sym.Item1, sym.Item2, sym.Item3, openScopes.Count-1, address));
                                       //if the address is global then we need to increment the memory offset
                                       if((openScopes.Count-1)==0) {
                                         memoryAddressOffset++;
                                       }
                                     }
+                                    Console.WriteLine("\n\n")''
                                 .)
     { ',' Ident<out varName>    (.
                                     if(varName.Contains('.')) {
