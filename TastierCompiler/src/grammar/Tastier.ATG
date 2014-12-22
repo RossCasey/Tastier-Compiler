@@ -373,7 +373,7 @@ CHARACTERS
 
 TOKENS
   ident  = letter {letter | digit}.
-  identRead = ident {dot ident}
+  identRead = letter {letter | digit} {dot letter {letter | digit} }.
   number = digit {digit}.
   string = quote {letter | digit | special} quote.  //new string
 
