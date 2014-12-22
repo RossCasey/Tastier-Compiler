@@ -502,6 +502,9 @@ MulOp<out Instruction inst>
 ProcDecl                        (.  string name; string label; Scope currentScope = openScopes.Peek(); int enterInstLocation = 0; bool external = false; .)
 = "void"
   Ident<out name>         (.
+                                    if(name.Contains('.')) {
+                                      SemErr("Character \'.\' character be used in identifer");
+                                    }
                                     currentScope.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, openScopes.Count, -1));
                                     openScopes.Push(new Scope());
                                     currentScope = openScopes.Peek();
@@ -1071,8 +1074,11 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
 Tastier                         (.  string name; bool external = false; .)
 = "program"
-  Ident<out name>         (.
+  Ident<out name>               (.
                                     openScopes.Push(new Scope());
+                                    if(name.Contains('.')) {
+                                      SemErr("Character \'.\' character be used in identifer");
+                                    }
                                 .)
   '{'
   { ConstDecl | RecordDecl }{ VarDecl<external> | ProcDecl | ExternDecl }
@@ -1172,6 +1178,9 @@ ConstDecl                       (.
 = "const"
   Type<out type>
   Ident<out name>         (.
+                                    if(name.Contains('.')) {
+                                      SemErr("Character \'.\' character be used in identifer");
+                                    }
                                     int memLocation = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, memLocation);
                                     //if global variable, we need to increment memoryOffset
@@ -1199,6 +1208,9 @@ RecordDecl                      (.
 = "create"
   "record"
   Ident<out typeName>     (.
+                                    if(typeName.Contains('.')) {
+                                      SemErr("Character \'.\' character be used in identifer");
+                                    }
                                     //Adding new record type to list and giving it its own list of variables
                                     type = recordsDefined;
                                     recordList.Add(new RecordIndex(typeName,type));
@@ -1226,6 +1238,9 @@ VarDecl<bool external>          (.
                                 .)
 = (Type<out type>
    Ident<out name>        (.
+                                    if(name.Contains('.')) {
+                                      SemErr("Character \'.\' character be used in identifer");
+                                    }
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
@@ -1238,6 +1253,9 @@ VarDecl<bool external>          (.
                                     }
                                 .)
    { ',' Ident<out name>  (.
+                                    if(name.Contains('.')) {
+                                      SemErr("Character \'.\' character be used in identifer");
+                                    }
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
@@ -1258,6 +1276,9 @@ VarDecl<bool external>          (.
                                     }
                                 .)
     Ident<out varName>          (.
+                                    if(varName.Contains('.')) {
+                                      SemErr("Character \'.\' character be used in identifer");
+                                    }
                                     //create new instance of record in current scope
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
 
@@ -1272,6 +1293,9 @@ VarDecl<bool external>          (.
                                     }
                                 .)
     { ',' Ident<out varName>    (.
+                                    if(varName.Contains('.')) {
+                                      SemErr("Character \'.\' character be used in identifer");
+                                    }
                                     //create new instance of record in current scope
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
 
@@ -1292,7 +1316,12 @@ ExternDecl                      (.  string name; bool external = true; Scope cur
 = "external"
   ( VarDecl<external>
   | "procedure" Ident<out name> ';'
-                                (.  externalDeclarations.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, 1, -1)); .)
+                                (.
+                                    if(name.Contains('.')) {
+                                      SemErr("Character \'.\' character be used in identifer");
+                                    }
+                                    externalDeclarations.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, 1, -1));
+                                .)
   ) .
 
 END Tastier.
