@@ -309,7 +309,6 @@ int recordsDefined = 0;
 
 
 List<Symbol> getAllSubRecordSymbols(string recordName, int recordType) {
-  Console.WriteLine("")
   List <Symbol> subSymbols = new List<Symbol>();
   foreach(Symbol sym in recordVariables.ElementAt(recordType)) {
     if(sym.Item2 == (int)TastierKind.Record) {
