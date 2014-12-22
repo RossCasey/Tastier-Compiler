@@ -286,8 +286,8 @@ string generateLabel() {
 */
 
 
-
-using RecordPointer = System.Tuple<string, int>;
+//This tuple is declared in Parser.frame for the same reason that Instruction,Symbol etc. are.
+//using RecordPointer = System.Tuple<string, int>;
 
 
 
