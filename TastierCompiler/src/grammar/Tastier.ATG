@@ -1243,15 +1243,17 @@ RecordDecl                      (.
                                       sym = currentScope.Pop();
                                       recordVariables.ElementAt(type).Add(sym);
                                     }
-                                    Console.WriteLine("Got here");
+                                    Console.WriteLine("Got here 1");
                                 .)
   { VarDecl<external>       (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
+                                    Console.WriteLine(sym.Item1);
                                     while(sym.Item1 != "RecordMarker") {
                                       sym = currentScope.Pop();
                                       recordVariables.ElementAt(type).Add(sym);
                                     }
+                                    Console.WriteLine("Got here 2");
                                 .)
   } '}'                         (.
                                     //remove "RecordMarker" from symbol stack
