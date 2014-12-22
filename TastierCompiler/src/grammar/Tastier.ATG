@@ -1087,7 +1087,7 @@ Tastier                         (.  string name; bool external = false; .)
                                       } else if (s.Item2 == (int)TastierKind.Proc) {
                                         header.Add(new Instruction("", ".proc " + s.Item1));
                                       } else {
-                                        if(s.Item2 != TastierKind.Record)
+                                        if(s.Item2 != (int)TastierKind.Record)
                                         SemErr("global item " + s.Item1 + " has no defined type");
                                       }
                                     }
