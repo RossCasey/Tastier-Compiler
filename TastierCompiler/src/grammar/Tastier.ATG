@@ -1239,8 +1239,8 @@ RecordDecl                      (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
                                     while(sym.Item1 != "RecordMarker") {
-                                      sym = currentScope.Pop();
                                       recordVariables.ElementAt(type).Add(sym);
+                                      sym = currentScope.Pop();
                                     }
                                     //place marker back on stack
                                     currentScope.Push(sym);
@@ -1249,8 +1249,8 @@ RecordDecl                      (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
                                     while(sym.Item1 != "RecordMarker") {
-                                      sym = currentScope.Pop();
                                       recordVariables.ElementAt(type).Add(sym);
+                                      sym = currentScope.Pop();
                                     }
                                     //place marker back on stack
                                     currentScope.Push(sym);
