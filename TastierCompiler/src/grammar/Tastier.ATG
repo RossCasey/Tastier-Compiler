@@ -1238,7 +1238,7 @@ RecordDecl                      (.
   VarDecl<external>             (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
-                                    Console.WriteLine(syn.Item1);
+                                    Console.WriteLine(sym.Item1);
                                     while(sym.Item1 != "RecordMarker") {
                                       sym = currentScope.Pop();
                                       recordVariables.ElementAt(type).Add(sym);
