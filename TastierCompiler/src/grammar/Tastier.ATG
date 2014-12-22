@@ -1279,7 +1279,6 @@ RecordDecl                      (.
                                     recordList.Add(new RecordIndex(typeName,type,-1));
                                     recordsDefined++;
                                     recordVariables.Add(new List<Symbol>());
-                                    recordVariables.ElementAt(type).Add()
                                     currentScope.Push(new Symbol("RecordMarker", -1, -1, -1, -1));
                                 .)
   '{'
@@ -1378,10 +1377,10 @@ VarDecl<bool external>          (.
                                 .)
     { ',' Ident<out varName>    (.
                                     //create new instance of record in current scope
-                                    int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                    address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,openScopes.Count-1, address));
 
-                                    int stringAddress = nextAddress;
+                                    stringAddress = nextAddress;
                                     program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress+3)));
                                     nextAddress = nextAddress + recordIndex.Item3;
 
