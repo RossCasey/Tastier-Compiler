@@ -1243,6 +1243,7 @@ RecordDecl                      (.
                                       sym = currentScope.Pop();
                                       recordVariables.ElementAt(type).Add(sym);
                                     }
+                                    Console.WriteLine("Got here");
                                 .)
   { VarDecl<external>       (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
