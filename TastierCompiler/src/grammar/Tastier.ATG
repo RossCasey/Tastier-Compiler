@@ -1205,14 +1205,12 @@ RecordDecl<bool external>       (.
   '{'
   VarDecl<external>             (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
-                                    sym = currentScope.ElementAt(currentScope.Count()-1);
-                                    currentScope.RemoveAt(currentScope.Count()-1);
+                                    sym = currentScope.Pop();
                                     recordVariables.ElementAt(type).Add(sym);
                                 .)
   { ';' VarDecl<external>       (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
-                                    sym = currentScope.ElementAt(currentScope.Count()-1);
-                                    currentScope.RemoveAt(currentScope.Count()-1);
+                                    sym = currentScope.Pop();
                                     recordVariables.ElementAt(type).Add(sym);
                                 .)
   } ';' '}'.
