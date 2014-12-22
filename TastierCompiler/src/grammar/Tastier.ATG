@@ -1232,7 +1232,7 @@ RecordDecl                      (.
                                     recordList.Add(new RecordIndex(typeName,type));
                                     recordsDefined++;
                                     recordVariables.Add(new List<Symbol>());
-                                    //currentScope.Push(new Symbol("RecordMarker",-1,-1,-1,-1));
+                                    currentScope.Push(new Symbol("RecordMarker",-1,-1,-1,-1));
                                 .)
   '{'
   VarDecl<external>             (.
@@ -1242,7 +1242,6 @@ RecordDecl                      (.
                                       sym = currentScope.Pop();
                                       recordVariables.ElementAt(type).Add(sym);
                                     }
-                                    sym = currentScope.Pop();
                                 .)
   { VarDecl<external>       (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
@@ -1251,9 +1250,11 @@ RecordDecl                      (.
                                       sym = currentScope.Pop();
                                       recordVariables.ElementAt(type).Add(sym);
                                     }
-                                    sym = currentScope.Pop();
                                 .)
-  } '}'.
+  } '}'                         (.
+                                    //remove "RecordMarker" from symbol stack
+                                    currentScope.Pop();
+                                .)
 
 /*------------------------------------------------------------------------*/
 
