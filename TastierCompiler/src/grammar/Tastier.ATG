@@ -373,7 +373,6 @@ CHARACTERS
 
 TOKENS
   ident  = letter {letter | digit}.
-  identRead = letter {letter | digit} {dot letter {letter | digit} }.
   number = digit {digit}.
   string = quote {letter | digit | special} quote.  //new string
 
@@ -441,7 +440,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; string recor
                                     }
                                 .)
     [
-      '.'
+      "->"
       Ident<out recordVar>      (.
                                     sym = lookup(openScopes, (name + "." + recordVar));
                                     if (sym == null) {
@@ -518,15 +517,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; string recor
 /*------------------------------------------------------------------------*/
 
 Ident<out string name>
-= identRead                         (.  name = t.val; .).
-
-
-/*------------------------------------------------------------------------*/
-//This is necessary because the program needs to be able to read idents with
-//dots in them (that were created by record declarations) but we do not want
-//the programmer to be able to create variable names with dots in them
-IdentCreate<out string name>
-= ident                             (.  name = t.val; .).
+= ident                         (.  name = t.val; .).
 
 /*------------------------------------------------------------------------*/
 
@@ -540,7 +531,7 @@ MulOp<out Instruction inst>
 
 ProcDecl                        (.  string name; string label; Scope currentScope = openScopes.Peek(); int enterInstLocation = 0; bool external = false; .)
 = "void"
-  IdentCreate<out name>         (.
+  Ident<out name>         (.
                                     currentScope.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, openScopes.Count, -1));
                                     openScopes.Push(new Scope());
                                     currentScope = openScopes.Peek();
@@ -1110,7 +1101,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
 Tastier                         (.  string name; bool external = false; .)
 = "program"
-  IdentCreate<out name>         (.
+  Ident<out name>         (.
                                     openScopes.Push(new Scope());
                                 .)
   '{'
@@ -1209,7 +1200,7 @@ ConstDecl                       (.
                                 .)
 = "const"
   Type<out type>
-  IdentCreate<out name>         (.
+  Ident<out name>         (.
                                     int memLocation = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, memLocation);
                                     //if global variable, we need to increment memoryOffset
@@ -1235,7 +1226,7 @@ RecordDecl                      (.
                                     bool external = false; string typeName; int type; Scope currentScope = openScopes.Peek(); Symbol sym;
                                 .)
 = "record"
-  IdentCreate<out typeName>     (.
+  Ident<out typeName>     (.
                                     //Adding new record type to list and giving it its own list of variables
                                     type = recordsDefined;
                                     recordList.Add(new RecordIndex(typeName,type));
@@ -1262,7 +1253,7 @@ VarDecl<bool external>          (.
                                     string typeName; string varName;
                                 .)
 = (Type<out type>
-   IdentCreate<out name>        (.
+   Ident<out name>        (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
@@ -1274,7 +1265,7 @@ VarDecl<bool external>          (.
                                       }
                                     }
                                 .)
-   { ',' IdentCreate<out name>  (.
+   { ',' Ident<out name>  (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
@@ -1294,7 +1285,7 @@ VarDecl<bool external>          (.
                                       SemErr("Record " + typeName + " has not been declared");
                                     }
                                 .)
-    IdentCreate<out varName>    (.
+    Ident<out varName>    (.
                                     //create new instance of record in current scope
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
 
@@ -1308,7 +1299,7 @@ VarDecl<bool external>          (.
                                       }
                                     }
                                 .)
-    { ',' IdentCreate<out varName>    (.
+    { ',' Ident<out varName>    (.
                                     //create new instance of record in current scope
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
 
