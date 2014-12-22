@@ -309,6 +309,7 @@ int recordsDefined = 0;
 
 
 List<Symbol> getAllSubRecordSymbols(string recordName, int recordType) {
+  Console.WriteLine("")
   List <Symbol> subSymbols = new List<Symbol>();
   foreach(Symbol sym in recordVariables.ElementAt(recordType)) {
     if(sym.Item2 == (int)TastierKind.Record) {
@@ -1232,17 +1233,26 @@ RecordDecl                      (.
                                     recordList.Add(new RecordIndex(typeName,type));
                                     recordsDefined++;
                                     recordVariables.Add(new List<Symbol>());
+                                    currentScope.Push(new Symbol("RecordMarker",-1,-1,-1,-1));
                                 .)
   '{'
   VarDecl<external>             (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
-                                    recordVariables.ElementAt(type).Add(sym);
+                                    while(sym.Item1 != "RecordMarker") {
+                                      sym = currentScope.Pop();
+                                      recordVariables.ElementAt(type).Add(sym);
+                                    }
+                                    currentScope.Pop();
                                 .)
   { VarDecl<external>       (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
-                                    recordVariables.ElementAt(type).Add(sym);
+                                    while(sym.Item1 != "RecordMarker") {
+                                      sym = currentScope.Pop();
+                                      recordVariables.ElementAt(type).Add(sym);
+                                    }
+                                    currentScope.Pop();
                                 .)
   } '}'.
 
@@ -1299,7 +1309,6 @@ VarDecl<bool external>          (.
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex,-1, -1));
 
 
-                                    Console.WriteLine("Record: " + varName);
                                     //get all sub symbols for the current record
                                     List<Symbol> subSymbols = getAllSubRecordSymbols(varName,recordIndex);
                                     foreach(Symbol sym in subSymbols) {
@@ -1309,9 +1318,7 @@ VarDecl<bool external>          (.
                                       if((openScopes.Count-1)==0) {
                                         memoryAddressOffset++;
                                       }
-                                      Console.WriteLine(sym.Item1);
                                     }
-                                    Console.WriteLine("\n\n\n");
                                 .)
     { ',' Ident<out varName>    (.
                                     if(varName.Contains('.')) {
