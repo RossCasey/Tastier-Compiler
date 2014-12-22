@@ -1289,7 +1289,7 @@ RecordDecl                      (.
   VarDecl<external>             (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
-                                    sym.Item5 = offset;
+                                    sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
                                     offset++;
                                     while(sym.Item1 != "RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
@@ -1303,7 +1303,7 @@ RecordDecl                      (.
   { VarDecl<external>       (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
-                                    sym.Item5 = offset;
+                                    sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
                                     offset++;
                                     while(sym.Item1 != "RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
