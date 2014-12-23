@@ -1329,7 +1329,7 @@ RecordDecl                      (.
   "record"
   Ident<out typeName>           (.
                                     string checkNoCollisions = lookupRecordType("",typeName);
-                                    if(checkNoCollision != "") {
+                                    if(checkNoCollisions != "") {
                                       SemErr("A record with this name has already been defined");
                                     }
 
@@ -1343,18 +1343,17 @@ RecordDecl                      (.
 
                                     //need to undo any changes made by variables declared within records
                                     //so backups are created here to undo any changes
+                                    int memoryAddressOffsetBackup = memoryAddressOffset;
                                     int nextAddressBackup = nextAddress;
-                                    RecordTable recordTableBackup = new RecordTable(recordTable);
-                                    Program programBackup = new Program(program);
+                                    RecordTable recordTableBackup = new RecordTable();
+                                    recordTableBackup.AddRange(recordTable);
+                                    Program programBackup = new Program();
+                                    programBackup.AddRange(program);
                                 .)
   '{'
-  VarDecl<external>             (.
-                                  memoryAddressOffset--; //variables only in global memory temporarily
-                                .)
+  VarDecl<external>
   {
-  VarDecl<external>             (.
-                                  memoryAddressOffset--; //variables only in global memory temporarily
-                                .)
+  VarDecl<external>
   }
   '}'                           (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
@@ -1365,7 +1364,6 @@ RecordDecl                      (.
                                       sym = currentScope.Pop();
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
                                     }
-                                    offset--; //don't count marker
 
                                     //stack returns variables in reverse order
                                     recordVariables[type].Reverse();
@@ -1375,6 +1373,7 @@ RecordDecl                      (.
                                     nextAddress = nextAddressBackup;
                                     program = programBackup;
                                     recordTable = recordTableBackup;
+                                    memoryAddressOffset = memoryAddressOffsetBackup;
 
                                     int index = 0;
                                     int size = 0;
