@@ -1417,6 +1417,9 @@ VarDecl<bool external>          (.
                                     //create new instance of record in current scope
                                     int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)TastierType.Record,openScopes.Count-1, address));
+                                    if((openScopes.Count-1)==0) {
+                                      memoryAddressOffset++;
+                                    }
 
                                     addOrReplaceRecord(varName, typeName);
 
@@ -1437,7 +1440,9 @@ VarDecl<bool external>          (.
                                     //create new instance of record in current scope
                                     address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)TastierType.Record ,openScopes.Count-1, address));
-
+                                    if((openScopes.Count-1)==0) {
+                                      memoryAddressOffset++;
+                                    }
                                     addOrReplaceRecord(varName, typeName);
 
                                     stringAddress = nextAddress;
