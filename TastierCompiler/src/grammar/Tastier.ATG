@@ -1421,6 +1421,7 @@ VarDecl<bool external>          (.
                                     addOrReplaceRecord(varName, typeName);
 
                                     int stringAddress = nextAddress;
+                                    Console.WriteLine(nextAddress);
                                     nextAddress = nextAddress + recordType.Item3;
 
                                     //pointer to record in memory, will be replaced with absolute address later
