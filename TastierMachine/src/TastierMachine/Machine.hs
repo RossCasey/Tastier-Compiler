@@ -305,7 +305,9 @@ run = do
 
         Instructions.MemStore  -> do
           let value = (smem ! (rtp - 2))
+          test $ [show value]
           let address = (smem ! (rtp - 1)) - 3
+          test $ [show address]
           put $ machine { rpc = rpc + 1, rtp = rtp - 2,
                           dmem = (dmem // [(address, value)]) }
           tell $ [show $ dmem ! address]
