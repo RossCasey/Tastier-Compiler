@@ -1381,7 +1381,7 @@ VarDecl<bool external>          (.
                                 .)
    { ',' Ident<out name>  (.
                                     //check that there are no name collisions
-                                    Symbol checkNoCollisions = lookup(openScopes,name);
+                                    checkNoCollisions = lookup(openScopes,name);
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + varName + " is already in use");
                                     }
@@ -1427,7 +1427,7 @@ VarDecl<bool external>          (.
                                 .)
     { ',' Ident<out varName>    (.
                                     //check that there are no name collisions
-                                    Symbol checkNoCollisions = lookup(openScopes,varName);
+                                    checkNoCollisions = lookup(openScopes,varName);
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + varName + " is already in use");
                                     }
