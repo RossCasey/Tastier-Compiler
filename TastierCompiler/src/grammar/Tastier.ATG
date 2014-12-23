@@ -382,7 +382,7 @@ Symbol recordVariableLookup(string parent,string recName, string varName) {
   string typeName = lookupRecordType(parent,recName);
 
   Console.WriteLine("RVL: Got Here 1");
-  Console.WriteLine("Performing Lookup on: " + typeName);
+  Console.WriteLine("Performing Lookup on: " + parent + " " + recName + " " + varName;
   RecordType recType = recordLookup(typeName);
   int variableIndex = recType.Item2;
   Console.WriteLine("RVL: Got Here 2");
