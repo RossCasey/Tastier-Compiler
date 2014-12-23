@@ -1351,7 +1351,7 @@ RecordDecl                      (.
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
                                       offset++;
                                     }
-
+                                    offset--; //don't count marker
                                     //now that the size is known we can add an entry to the record types list
                                     recordTypes.Add(new RecordType(typeName,type,offset));
                                 .).
