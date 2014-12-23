@@ -1334,6 +1334,8 @@ RecordDecl                      (.
                                     recordsDefined++;
                                     recordVariables.Add(new List<Symbol>());
                                     currentScope.Push(new Symbol("RecordMarker", -1, -1, -1, -1));
+
+                                    Console.WriteLine("Offset set to 0 for " + typeName);
                                 .)
   '{'
   VarDecl<external>
@@ -1345,13 +1347,16 @@ RecordDecl                      (.
                                     sym = currentScope.Pop();
                                     sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
                                     offset++;
+                                    Console.WriteLine("Offset +1 for " + typeName);
                                     while(sym.Item1 != "RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
                                       sym = currentScope.Pop();
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
                                       offset++;
+                                      Console.WriteLine("Offset +1 for " + typeName);
                                     }
                                     offset--; //don't count marker
+                                    Console.WriteLine("Offset -1 for " + typeName);
                                     //now that the size is known we can add an entry to the record types list
                                     recordTypes.Add(new RecordType(typeName,type,offset));
                                 .).
