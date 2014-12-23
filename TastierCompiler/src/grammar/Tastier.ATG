@@ -755,7 +755,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr("cannot assign to non-variable");
                                     }
                                 .)
-   ( Assignment<out type>         (.
+   Assignment<out type>         (.
                                     //check type of assignment and type of identifier are the same
                                     if(subSym != null) {
                                       if(type != (TastierType)subSym.Item3) {
@@ -797,20 +797,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       program.Add(new Instruction("","Add"));
                                       program.Add(new Instruction("","MemStore"));
                                     }
-                                .)
-    | "new" "record" ';'        (.
-                                  if (sym.Item4 == 0) {
-                                    if (isExternal) {
-                                      program.Add(new Instruction("", "StoG " + sym.Item1));
-                                      // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
-                                    } else {
-                                      program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
-                                    }
-                                  }
-                                  else {
-                                    int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                    program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
-                                  }
                                 .)
   )
   | '(' ')' ';'                 (.
@@ -1484,6 +1470,20 @@ VarDecl<bool external>          (.
 
                                     //pointer to record in memory, will be replaced with absolute address later
                                     program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
+
+                                    if ((openScopes.Count-1) == 0) {
+                                      if (external) {
+                                        program.Add(new Instruction("", "StoG " + varName));
+                                        // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
+                                      } else {
+                                        program.Add(new Instruction("", "StoG " + (address+3)));
+                                      }
+                                    } else {
+                                      //There is no need for a lexical difference here as the record has just been declared
+                                      //in the current scope
+                                      int lexicalLevelDifference = 0;
+                                      program.Add(new Instruction("", "Sto " + 0 + " " + address));
+                                    }
                                 .)
     { ',' Ident<out varName>    (.
                                     //check that there are no name collisions
@@ -1506,6 +1506,21 @@ VarDecl<bool external>          (.
 
                                     //pointer to record in memory, will be replaced with absolute address later
                                     program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
+
+                                    if ((openScopes.Count-1) == 0) {
+                                      if (external) {
+                                        program.Add(new Instruction("", "StoG " + varName));
+                                        // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
+                                      } else {
+                                        program.Add(new Instruction("", "StoG " + (address+3)));
+                                      }
+                                    } else {
+                                      //There is no need for a lexical difference here as the record has just been declared
+                                      //in the current scope
+                                      int lexicalLevelDifference = 0;
+                                      program.Add(new Instruction("", "Sto " + 0 + " " + address));
+                                    }
+
                                 .)
   } ';'
   ).
