@@ -1396,7 +1396,7 @@ RecordDecl                      (.
                                       }
                                       index++;
                                     }
-                                    Console.WriteLine("Got Here 4");
+                                    Console.WriteLine("Got Here 5");
                                     //now that the size is known we can add an entry to the record types list
                                     recordTypes.Add(new RecordType(typeName,type,size));
                                 .).
