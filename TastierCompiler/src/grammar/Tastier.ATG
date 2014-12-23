@@ -316,6 +316,9 @@ int recordsDefined = 0;
 */
 string typeOfLastReferencedRecord;
 
+//This string is set to the name of a record being defined so that the parent of a record within a record is known
+string parentRecord = "";
+
 void addOrReplaceRecord(string parent, string recName, string typeName) {
   int index = 0;
   foreach(RecordTableEntry rec in recordTable) {
@@ -1332,7 +1335,7 @@ RecordDecl                      (.
                                     if(checkNoCollisions != "") {
                                       SemErr("A record with this name has already been defined");
                                     }
-
+                                    parentRecord = typeName;
 
                                     //Adding new record type to list and giving it its own list of variables
                                     type = recordsDefined;
@@ -1345,8 +1348,6 @@ RecordDecl                      (.
                                     //so backups are created here to undo any changes
                                     int memoryAddressOffsetBackup = memoryAddressOffset;
                                     int nextAddressBackup = nextAddress;
-                                    RecordTable recordTableBackup = new RecordTable();
-                                    recordTableBackup.AddRange(recordTable);
                                     Program programBackup = new Program();
                                     programBackup.AddRange(program);
 
@@ -1377,7 +1378,6 @@ RecordDecl                      (.
                                     //undo changes
                                     nextAddress = nextAddressBackup;
                                     program = programBackup;
-                                    recordTable = recordTableBackup;
                                     memoryAddressOffset = memoryAddressOffsetBackup;
 
                                     Console.WriteLine("Got Here 4");
@@ -1389,8 +1389,8 @@ RecordDecl                      (.
                                       if(s.Item3 == (int)TastierType.Record) {
                                         Console.WriteLine("Hello");
                                         foreach(RecordTableEntry rte in recordTable) {
-                                          Console.WriteLine(rte.Item1 + " " + rte.Item2 + " " + rte.Item3)
-;                                        }
+                                          Console.WriteLine(rte.Item1 + " " + rte.Item2 + " " + rte.Item3);
+                                        }
                                         string subRecName = lookupRecordType("",s.Item1);
                                         Console.WriteLine("The return from lookupRecordType is: " + subRecName);
                                         addOrReplaceRecord(typeName,s.Item1,subRecName);
@@ -1406,6 +1406,7 @@ RecordDecl                      (.
                                     Console.WriteLine("Got Here 5");
                                     //now that the size is known we can add an entry to the record types list
                                     recordTypes.Add(new RecordType(typeName,type,size));
+                                    parentRecord = "";
                                 .).
 
 /*------------------------------------------------------------------------*/
@@ -1473,7 +1474,7 @@ VarDecl<bool external>          (.
                                       memoryAddressOffset++;
                                     }
 
-                                    addOrReplaceRecord("",varName, typeName);
+                                    addOrReplaceRecord(parentRecord,varName, typeName);
 
                                     int stringAddress = nextAddress;
                                     nextAddress = nextAddress + recordType.Item3;
@@ -1495,7 +1496,7 @@ VarDecl<bool external>          (.
                                     if((openScopes.Count-1)==0) {
                                       memoryAddressOffset++;
                                     }
-                                    addOrReplaceRecord("",varName, typeName);
+                                    addOrReplaceRecord(parentRecord,varName, typeName);
 
                                     stringAddress = nextAddress;
                                     nextAddress = nextAddress + recordType.Item3;
