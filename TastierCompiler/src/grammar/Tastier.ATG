@@ -1383,7 +1383,7 @@ RecordDecl                      (.
                                         addOrReplaceRecord(typeName,s.Item1,subRecName);
                                         RecordType subRecType = recordLookup(subRecName);
                                         recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
-                                        size = size + subRecType;
+                                        size = size + subRecType.Item3;
                                       } else {
                                         recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
                                         size++;
