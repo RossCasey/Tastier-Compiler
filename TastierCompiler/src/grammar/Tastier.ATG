@@ -484,10 +484,11 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
       Ident<out name>          (.
                                     //allows for records within records
                                     if(subSym != null) {
-                                      parent = sym.Item1;
+                                      parent = lookupRecordType(parent,sym.Item1);
                                       sym = subSym;
                                     }
-                                    subSym = recordVariableLookup(parent,sym.Item1,name);
+                                    string recordType = lookupRecordType(parent,sym.Item1);
+                                    subSym = recordVariableLookup(recordType,sym.Item1,name);
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
@@ -496,7 +497,8 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                 .)
     }                           (.
                                     if(type == TastierType.Record) {
-                                      typeOfLastReferencedRecord = lookupRecordType(sym.Item1,name);
+                                      recordType = lookupRecordType(parent,sym.Item1);
+                                      typeOfLastReferencedRecord = lookupRecordType(recordType,name);
                                     }
                                     if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
                                       if (sym.Item4 == 0) {
@@ -741,7 +743,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
     Ident<out name>            (.
                                     //allows for records within records
                                     if(subSym != null) {
-                                      parent = sym.Item1;
+                                      parent = lookupRecordType(parent,sym.Item1);
                                       sym = subSym;
                                     }
                                     subSym = recordVariableLookup(parent,sym.Item1,name);
@@ -773,7 +775,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       }
                                     }
                                     if(type == TastierType.Record) {
-                                      string recordType = lookupRecordType(sym.Item1,name);
+                                      string recordType = lookupRecordType(parent,name);
                                       if(recordType != typeOfLastReferencedRecord) {
                                         SemErr("Cannot assign record of type " + typeOfLastReferencedRecord +
                                                 " to record reference variable of type " + recordType);
