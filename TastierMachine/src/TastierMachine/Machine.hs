@@ -300,7 +300,7 @@ run = do
           let address = (smem ! (rtp-1))
           let adjustedMemory = address - 3
           let result = dmem ! adjustedMemory
-          tell $ show result
+          tell $ [show result]
           put $ machine { rpc = rpc + 1, rtp = rtp - 1, smem = (smem // [(rtp-1, result)]) }
           run
 
