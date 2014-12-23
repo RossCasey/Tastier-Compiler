@@ -1423,6 +1423,7 @@ VarDecl<bool external>          (.
                                     int stringAddress = nextAddress;
                                     Console.WriteLine(nextAddress);
                                     nextAddress = nextAddress + recordType.Item3;
+                                    Console.WriteLine("Size: " + recordType.Item3);
 
                                     //pointer to record in memory, will be replaced with absolute address later
                                     program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
