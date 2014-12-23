@@ -1421,7 +1421,6 @@ VarDecl<bool external>          (.
                                     addOrReplaceRecord(varName, typeName);
 
                                     int stringAddress = nextAddress;
-                                    program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress+3)));
                                     nextAddress = nextAddress + recordType.Item3;
 
                                     //pointer to record in memory, will be replaced with absolute address later
@@ -1442,7 +1441,6 @@ VarDecl<bool external>          (.
                                     addOrReplaceRecord(varName, typeName);
 
                                     stringAddress = nextAddress;
-                                    program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress+3)));
                                     nextAddress = nextAddress + recordType.Item3;
 
                                     //pointer to record in memory, will be replaced with absolute address later
