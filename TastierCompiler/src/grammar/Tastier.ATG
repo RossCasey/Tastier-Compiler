@@ -1364,6 +1364,7 @@ RecordDecl                      (.
                                     sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
                                     while(sym.Item1 != "RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
+                                      Console.WriteLine("Adding " + sym.Item1 " to " + type)''
                                       sym = currentScope.Pop();
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
                                     }
