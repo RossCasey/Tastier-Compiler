@@ -308,6 +308,7 @@ run = do
           let address = (smem ! (rtp - 1)) - 3
           put $ machine { rpc = rpc + 1, rtp = rtp - 2,
                           dmem = (dmem // [(address, value)]) }
+          tell $ [show $ dmem ! address]
           run
 
         Instructions.Leave  -> do
