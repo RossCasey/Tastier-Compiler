@@ -36,7 +36,7 @@ using StackAddress = System.Tuple<int, int>;
 
 //the tuples below are needed for records, they cannot be declared in Tastier.ATG for the same reasons as the tuples above
 using RecordType = System.Tuple<string,int,int>;
-using RecordTableEntry = System.Tuple<string, string>;
+using RecordTableEntry = System.Tuple<string, string, string>;
 
 
 -->namespace

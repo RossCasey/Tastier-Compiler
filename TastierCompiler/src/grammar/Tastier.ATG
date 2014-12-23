@@ -316,15 +316,15 @@ int recordsDefined = 0;
 */
 string typeOfLastReferencedRecord;
 
-void addOrReplaceRecord(string recName, string typeName) {
+void addOrReplaceRecord(string parent, string recName, string typeName) {
   int index = 0;
   foreach(RecordTableEntry rec in recordTable) {
-    if(rec.Item1 == recName) {
-      recordTable[index] = (new RecordTableEntry(recName,typeName));
+    if((rec.Item1 == parent) && (rec.Item2 == recName)) {
+      recordTable[index] = (new RecordTableEntry(parent,recName,typeName));
     }
     index++;
   }
-  recordTable.Add(new RecordTableEntry(recName,typeName));
+  recordTable.Add(new RecordTableEntry(parent,recName,typeName));
 }
 
 
@@ -365,18 +365,18 @@ RecordType recordLookup(string name) {
   return null;
 }
 
-string lookupRecordType(string recName) {
+string lookupRecordType(string parent,string recName) {
   foreach(RecordTableEntry rec in recordTable) {
-    if(rec.Item1 == recName) {
-      return rec.Item2;
+    if((rec.Item1 == parent) && (rec.Item2 == recName)) {
+      return rec.Item3;
     }
   }
   return "";
 }
 
 
-Symbol recordVariableLookup(string recName, string varName) {
-  string typeName = lookupRecordType(recName);
+Symbol recordVariableLookup(string parent,string recName, string varName) {
+  string typeName = lookupRecordType(parent,recName);
   RecordType recType = recordLookup(typeName);
   int variableIndex = recType.Item2;
 
@@ -484,7 +484,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                 .)
     }                           (.
                                     if(type == TastierType.Record) {
-                                      typeOfLastReferencedRecord = lookupRecordType(name);
+                                      typeOfLastReferencedRecord = lookupRecordType(sym.Item1,name);
                                     }
                                     if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
                                       if (sym.Item4 == 0) {
@@ -760,7 +760,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       }
                                     }
                                     if(type == TastierType.Record) {
-                                      string recordType = lookupRecordType(name);
+                                      string recordType = lookupRecordType(sym.Item1,name);
                                       if(recordType != typeOfLastReferencedRecord) {
                                         SemErr("Cannot assign record of type " + typeOfLastReferencedRecord +
                                                 " to record reference variable of type " + recordType);
@@ -1322,11 +1322,15 @@ ConstDecl                       (.
 /*------------------------------------------------------------------------*/
 RecordDecl                      (.
                                     bool external = false; string typeName; int type; Scope currentScope = openScopes.Peek(); Symbol sym;
-                                    int offset = 0;
                                 .)
 = "create"
   "record"
   Ident<out typeName>           (.
+                                    string checkNoCollisions = lookupRecordType("",typeName);
+                                    if(checkNoCollision != "") {
+                                      SemErr("A record with this name has already been defined");
+                                    }
+
 
                                     //Adding new record type to list and giving it its own list of variables
                                     type = recordsDefined;
@@ -1334,6 +1338,12 @@ RecordDecl                      (.
                                     recordsDefined++;
                                     recordVariables.Add(new List<Symbol>());
                                     currentScope.Push(new Symbol("RecordMarker", -1, -1, -1, -1));
+
+                                    //need to undo any changes made by variables declared within records
+                                    //so backups are created here to undo any changes
+                                    int nextAddressBackup = nextAddress;
+                                    RecordTable recordTableBackup = new RecordTable(recordTable);
+                                    Program programBackup = new Program(program);
                                 .)
   '{'
   VarDecl<external>             (.
@@ -1347,17 +1357,40 @@ RecordDecl                      (.
   '}'                           (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
-                                    sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
-                                    offset++;
+                                    sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
                                     while(sym.Item1 != "RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
                                       sym = currentScope.Pop();
-                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
-                                      offset++;
+                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
                                     }
                                     offset--; //don't count marker
+
+                                    //stack returns variables in reverse order
+                                    recordVariables.ElementAt(type).Reverse;
+
+                                    //undo changes
+                                    nextAddress = nextAddressBackup;
+                                    program = programBackup;
+                                    recordTable = recordTableBackup;
+
+                                    int index = 0;
+                                    int size = 0;
+                                    foreach(Symbol s in recordVariables.ElementAt(type)) {
+                                      if(s.Item3 == (int)TastierType.Record) {
+                                        string subRecName = lookupRecordType("",s.Item1);
+                                        addOrReplaceRecord(typeName,s.Item1,subRecName);
+                                        RecordType subRecType = recordLookup(subRecName);
+                                        recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
+                                        size = size + subRecType;
+                                      } else {
+                                        recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
+                                        size++;
+                                      }
+                                      index++;
+                                    }
+
                                     //now that the size is known we can add an entry to the record types list
-                                    recordTypes.Add(new RecordType(typeName,type,offset));
+                                    recordTypes.Add(new RecordType(typeName,type,size));
                                 .).
 
 /*------------------------------------------------------------------------*/
@@ -1425,7 +1458,7 @@ VarDecl<bool external>          (.
                                       memoryAddressOffset++;
                                     }
 
-                                    addOrReplaceRecord(varName, typeName);
+                                    addOrReplaceRecord("",varName, typeName);
 
                                     int stringAddress = nextAddress;
                                     nextAddress = nextAddress + recordType.Item3;
@@ -1447,7 +1480,7 @@ VarDecl<bool external>          (.
                                     if((openScopes.Count-1)==0) {
                                       memoryAddressOffset++;
                                     }
-                                    addOrReplaceRecord(varName, typeName);
+                                    addOrReplaceRecord("",varName, typeName);
 
                                     stringAddress = nextAddress;
                                     nextAddress = nextAddress + recordType.Item3;
