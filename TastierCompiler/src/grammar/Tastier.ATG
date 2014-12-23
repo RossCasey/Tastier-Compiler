@@ -1349,6 +1349,8 @@ RecordDecl                      (.
                                     recordTableBackup.AddRange(recordTable);
                                     Program programBackup = new Program();
                                     programBackup.AddRange(program);
+
+                                    Console.WriteLine("Got Here 1");
                                 .)
   '{'
   VarDecl<external>
@@ -1356,6 +1358,7 @@ RecordDecl                      (.
   VarDecl<external>
   }
   '}'                           (.
+                                    Console.WriteLine("Got Here 2");
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
                                     sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
@@ -1369,11 +1372,14 @@ RecordDecl                      (.
                                     recordVariables[type].Reverse();
 
 
+                                    Console.WriteLine("Got Here 3");
                                     //undo changes
                                     nextAddress = nextAddressBackup;
                                     program = programBackup;
                                     recordTable = recordTableBackup;
                                     memoryAddressOffset = memoryAddressOffsetBackup;
+
+                                    Console.WriteLine("Got Here 4");
 
                                     int index = 0;
                                     int size = 0;
@@ -1390,7 +1396,7 @@ RecordDecl                      (.
                                       }
                                       index++;
                                     }
-
+                                    Console.WriteLine("Got Here 4");
                                     //now that the size is known we can add an entry to the record types list
                                     recordTypes.Add(new RecordType(typeName,type,size));
                                 .).
