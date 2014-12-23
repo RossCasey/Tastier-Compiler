@@ -381,16 +381,8 @@ string lookupRecordType(string parent,string recName) {
 
 Symbol recordVariableLookup(string parent,string recName, string varName) {
   string typeName = lookupRecordType(parent,recName);
-  Console.WriteLine("Current Record Table:");
-  foreach(RecordTableEntry rec in recordTable) {
-    Console.WriteLine(rec.Item1 + " " + rec.Item2 + " " + rec.Item3);
-  }
-  Console.WriteLine();
-  Console.WriteLine("RVL: Got Here 1");
-  Console.WriteLine("Performing Lookup on: " + parent + " " + recName + " " + varName);
   RecordType recType = recordLookup(typeName);
   int variableIndex = recType.Item2;
-  Console.WriteLine("RVL: Got Here 2");
   foreach(Symbol s in recordVariables.ElementAt(variableIndex)) {
     if(s.Item1 == varName) {
       return s;
@@ -488,7 +480,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       sym = subSym;
                                     }
                                     string recordType = lookupRecordType(parent,sym.Item1);
-                                    subSym = recordVariableLookup(recordType,sym.Item1,name);
+                                    subSym = recordVariableLookup(parent,sym.Item1,name);
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
@@ -1360,8 +1352,6 @@ RecordDecl                      (.
                                     int nextAddressBackup = nextAddress;
                                     Program programBackup = new Program();
                                     programBackup.AddRange(program);
-
-                                    Console.WriteLine("Got Here 1");
                                 .)
   '{'
   VarDecl<external>
@@ -1369,13 +1359,11 @@ RecordDecl                      (.
   VarDecl<external>
   }
   '}'                           (.
-                                    Console.WriteLine("Got Here 2");
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
                                     sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
                                     while(sym.Item1 != "RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
-                                      Console.WriteLine("Adding " + sym.Item1  + " to " + type);
                                       sym = currentScope.Pop();
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
                                     }
@@ -1384,25 +1372,17 @@ RecordDecl                      (.
                                     recordVariables[type].Reverse();
 
 
-                                    Console.WriteLine("Got Here 3");
                                     //undo changes
                                     nextAddress = nextAddressBackup;
                                     program = programBackup;
                                     memoryAddressOffset = memoryAddressOffsetBackup;
 
-                                    Console.WriteLine("Got Here 4");
 
                                     int index = 0;
                                     int size = 0;
                                     foreach(Symbol s in recordVariables.ElementAt(type)) {
-                                      Console.WriteLine(s.Item3);
                                       if(s.Item3 == (int)TastierType.Record) {
-                                        Console.WriteLine("Hello");
-                                        foreach(RecordTableEntry rte in recordTable) {
-                                          Console.WriteLine(rte.Item1 + " " + rte.Item2 + " " + rte.Item3);
-                                        }
                                         string subRecName = lookupRecordType(typeName,s.Item1);
-                                        Console.WriteLine("The return from lookupRecordType is: " + subRecName);
                                         RecordType subRecType = recordLookup(subRecName);
                                         recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
                                         size = size + subRecType.Item3;
@@ -1412,7 +1392,6 @@ RecordDecl                      (.
                                       }
                                       index++;
                                     }
-                                    Console.WriteLine("Got Here 5");
                                     //now that the size is known we can add an entry to the record types list
                                     recordTypes.Add(new RecordType(typeName,type,size));
                                     parentRecord = "";
