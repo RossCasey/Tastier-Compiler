@@ -28,6 +28,8 @@ data Instruction = Add
                  | Write
                  | WriteStr
                  | WriteMul
+                 | MemLoad
+                 | MemStore
                  | Halt
                  | Dup
                  | Nop

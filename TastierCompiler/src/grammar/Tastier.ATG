@@ -64,7 +64,8 @@ COMPILER Tastier
     Undefined,
     Integer,
     Boolean,
-    String        //new string type
+    String,        //new string type
+    Record
   };
 
   /*
@@ -74,8 +75,7 @@ COMPILER Tastier
   enum TastierKind : int {  // kinds of symbol
     Var,
     Proc,
-    Const,
-    Record
+    Const
   };
 
 /*
@@ -291,41 +291,40 @@ string generateLabel() {
 //using RecordPointer = System.Tuple<string, int>;
 
 //stores the name of a record and the index of its list of variables in recordVariables
-class RecordList : List<RecordIndex> {}
+class RecordTypes : List<RecordType> {}
+
+//stores the record type of each declared record reference variable
+class RecordTable : List<RecordTableEntry> {}
 
 //stores the lists of variables for each record
 class RecordVariables : List<List<Symbol>> {}
 
 
-RecordList recordList = new RecordList();
+RecordTypes recordTypes = new RecordTypes();
+RecordTable recordTable = new RecordTable();
 RecordVariables recordVariables = new RecordVariables();
 
-//keeps track of the next available index number for records
+//keeps track of the next available index number for record types
 int recordsDefined = 0;
 
+/*
+  If the programmer wants to assign a record pointer to another record pointer the types of the
+  records need to match. This global variable will be set to the last referenced record in the
+  factor production. This allows for the checking of record types without the need to modify
+  all productions between assignment and factor so that the type of a record is available in the
+  Stat production.
+*/
+string typeOfLastReferencedRecord;
 
-
-
-
-
-List<Symbol> getAllSubRecordSymbols(string recordName, int recordType) {
-  Console.WriteLine(recordName + ":");
-  List <Symbol> subSymbols = new List<Symbol>();
-  foreach(Symbol sym in recordVariables.ElementAt(recordType)) {
-    string newName = recordName + "." + sym.Item1;
-    subSymbols.Add(new Symbol(newName,sym.Item2,sym.Item3,sym.Item4,sym.Item5));
+void addOrReplaceRecord(string recName, string typeName) {
+  int index = 0;
+  foreach(RecordTableEntry rec in recordTable) {
+    if(rec.Item1 == recName) {
+      RecordTableEntry[index] = (new RecordTableEntry(recName,typeName));
+    }
   }
-
-  Console.WriteLine("SubSymbols:");
-  foreach(Symbol s in subSymbols) {
-    Console.WriteLine(s.Item1);
-  }
-
-  Console.WriteLine("\n\n\n");
-  return subSymbols;
+  recordTable.Add(new RecordTableEntry(recName,typeName));
 }
-
-
 
 
 Symbol _lookup(Scope scope, string name) {
@@ -356,8 +355,8 @@ Symbol lookup(Stack<Scope> scopes, string name) {
   return null; // if the name wasn't found in any open scopes.
 }
 
-RecordIndex recordLookup(string name) {
-  foreach (RecordIndex rec in recordList) {
+RecordType recordLookup(string name) {
+  foreach (RecordType rec in recordTypes) {
     if (rec.Item1 == name) {
       return rec;
     }
@@ -365,14 +364,29 @@ RecordIndex recordLookup(string name) {
   return null;
 }
 
-Symbol recordVariableLookup(int type,string name) {
-  foreach(Symbol sym in recordVariables.ElementAt(type)) {
-    if(sym.Item1 == name) {
-      return sym;
+string lookupRecordType(string recName) {
+  foreach(RecordTableEntry rec in recordTable) {
+    if(rec.Item1 == recName) {
+      return rec.Item2;
+    }
+  }
+  return "";
+}
+
+
+Symbol recordVariableLookup(string recName, string varName) {
+  string typeName = lookupRecordType(recName);
+  RecordType recType = recordLookup(typeName);
+  int variableIndex = rec.Item2;
+
+  foreach(Symbol s in recordVariables.ElementAt(variableIndex)) {
+    if(s.Item1 == varName) {
+      return s;
     }
   }
   return null;
 }
+
 
 /*
   You may notice that when we use a LoadG or StoG instruction, we add 3 to
@@ -434,7 +448,7 @@ Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
 
 /*------------------------------------------------------------------------*/
 
-Factor<out TastierType type>    (.  int n; Symbol sym; string name; string name2; .)
+Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym; string name;  .)
 =                               (.  type = TastierType.Undefined; .)
   ( Ident<out name>             (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
@@ -443,67 +457,63 @@ Factor<out TastierType type>    (.  int n; Symbol sym; string name; string name2
                                       sym = _lookup(externalDeclarations, name);
                                       isExternal = true;
                                     }
-
                                     if (sym == null) {
                                       SemErr("reference to undefined variable " + name);
-                                    }
-                                    else {
-                                      if(sym.Item2 != (int)TastierKind.Record) {
-                                        type = (TastierType)sym.Item3;
-                                      }
-                                      if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const) ||
-                                          ((TastierKind)sym.Item2 == TastierKind.Record)) {
-                                        if (sym.Item4 == 0) {
-                                            if (isExternal) {
-                                              program.Add(new Instruction("", "LoadG " + sym.Item1));
-                                              // if the symbol is external, we load it by name. The linker will resolve the name to an address.
-                                            } else {
-                                              program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
-                                            }
-                                        } else {
-                                            int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                            program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
-                                        }
-                                      } else SemErr("Variable, Constant or Record Expected");
+                                    } else {
+                                      type = (TastierType) sym.Item3;
                                     }
                                 .)
     {
       access                    (.
-                                    if(sym.Item2 != (int)TastierKind.Record) {
+                                    if(sym.Item3 != (int)TastierType.Record) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
                                 .)
-      Ident<out name2>          (.
-                                    //remove the last instruction added as it is no longer valid
-                                    program.RemoveAt(program.Count() - 1);
-
-
-                                    sym = recordVariableLookup(sym.Item2,name2);
-                                    if(sym == null) {
+      Ident<out name>          (.
+                                    //allows for records within records
+                                    if(subSym != null) {
+                                      sym = subSym;
+                                    }
+                                    subSym = recordVariableLookup(sym.Item1,name);
+                                    if(subSym == null) {
                                       SemErr(name2 + " is not defined in record " + name);
                                     } else {
-
-                                      name = name2;
-                                      if(sym.Item2 != (int)TastierKind.Record) {
-                                        type = (TastierType)sym.Item3;
-                                      }
-                                      if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const) ||
-                                          ((TastierKind)sym.Item2 == TastierKind.Record)) {
-                                        if (sym.Item4 == 0) {
-                                            if (isExternal) {
-                                              program.Add(new Instruction("", "LoadG " + sym.Item1));
-                                              // if the symbol is external, we load it by name. The linker will resolve the name to an address.
-                                            } else {
-                                              program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
-                                            }
-                                        } else {
-                                            int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                            program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
-                                        }
-                                      } else SemErr("Variable, Constant or Record Expected");
+                                      type = (TastierType)subSym.Item3;
                                     }
                                 .)
-    }
+    }                           (.
+                                    if(type == TastierType.Record) {
+                                      typeOfLastReferencedRecord = lookupRecordType(name);
+                                    }
+                                    if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
+                                      if (sym.Item4 == 0) {
+                                        if (isExternal) {
+                                          program.Add(new Instruction("", "LoadG " + sym.Item1));
+                                          // if the symbol is external, we load it by name. The linker will resolve the name to an address.
+                                        } else {
+                                          program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
+                                        }
+                                      } else {
+                                        int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                        program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
+                                      }
+                                    } else SemErr("Variable, Constant or Record Expected");
+
+                                    if(sym.Item3 == (int)TastierType.Record) {
+                                      //Loads the starting address of the record pointed to by the value on the stack
+                                      program.Add(new Instruction("", "MemLoad"));
+
+                                      //Load the offset for the record variable onto the stack
+                                      program.Add(new Instruction("", "Const " + (sym.Item5+3)));
+
+                                      //Add the base address and the offset
+                                      program.Add(new Instruction("", "Add"));
+
+                                      //The value on the stack is now a pointer to the variable in the record
+                                      //This final memory load places the value pointed to onto the stack
+                                      program.Add(new Instruction("", "MemLoad"));
+                                    }
+                                .)
 
   | number                      (.
                                     n = Convert.ToInt32(t.val);
@@ -567,10 +577,7 @@ MulOp<out Instruction inst>
 
 ProcDecl                        (.  string name; string label; Scope currentScope = openScopes.Peek(); int enterInstLocation = 0; bool external = false; .)
 = "void"
-  Ident<out name>         (.
-                                    if(name.Contains('.')) {
-                                      SemErr("Character \'.\' character be used in identifer");
-                                    }
+  Ident<out name>               (.
                                     currentScope.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, openScopes.Count, -1));
                                     openScopes.Push(new Scope());
                                     currentScope = openScopes.Peek();
@@ -697,7 +704,10 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
 
 /*------------------------------------------------------------------------*/
 
-Stat                            (.  TastierType type;TastierType type1; TastierType type2; string name; string name1; Symbol sym; bool external = false; bool isExternal = false; Program incrementer; .)
+Stat                            (.  TastierType type;TastierType type1; TastierType type2; string name; string name1;
+                                    Symbol sym; Symbol subSym;
+                                    bool external = false; bool isExternal = false; Program incrementer;
+                                .)
 
 = Ident<out name>               (.
                                     sym = lookup(openScopes, name);
@@ -709,6 +719,25 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr("reference to undefined variable " + name);
                                     }
                                 .)
+  {
+    access                      (.
+                                    if(sym.Item3 != (int)TastierType.Record) {
+                                      SemErr("The access operator \'.\' can only be used for record reference variables");
+                                    }
+                                .)
+    Ident<out name1>            (.
+                                    //allows for records within records
+                                    if(subSym != null) {
+                                      sym = subSym;
+                                    }
+                                    subSym = recordVariableLookup(sym.Item1,name);
+                                    if(sym == null) {
+                                      SemErr(name2 + " is not defined in record " + name);
+                                    } else {
+                                      type = (TastierType)subSym.Item3;
+                                    }
+                                .)
+  }
   (":="                          (.
                                     //error if user tries to reassign constant
                                     if ((TastierKind)sym.Item2 == TastierKind.Const) {
@@ -723,19 +752,40 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(type != (TastierType)sym.Item3) {
                                       SemErr("Type of identifer and type of expression do not match");
                                     }
-                                .)
-   ';'                          (.
-                                    if (sym.Item4 == 0) {
-                                      if (isExternal) {
-                                        program.Add(new Instruction("", "StoG " + sym.Item1));
-                                        // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
-                                      } else {
-                                        program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    if(type == TastierType.Record) {
+                                      string recordType = lookupRecordType(name);
+                                      if(recordType != typeOfLastReferencedRecord) {
+                                        SemErr("Cannot assign record of type " + typeOfLastReferencedRecord +
+                                                " to record reference variable of type " + recordType);
                                       }
                                     }
-                                    else {
-                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                .)
+   ';'                          (.
+                                    if(subSym == null) {
+                                      if (sym.Item4 == 0) {
+                                        if (isExternal) {
+                                          program.Add(new Instruction("", "StoG " + sym.Item1));
+                                          // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
+                                        } else {
+                                          if(isRecordVar) {
+                                            program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                          } else {
+                                            program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                          }
+                                        }
+                                      }
+                                      else {
+                                        int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                        program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                      }
+                                    } else {
+
+                                      //calculate address of record variable
+                                      program.Add(new Instruction("","Const " + (sym.Item5+3)));
+                                      program.Add(new Instruction("","MemLoad"));
+                                      program.Add(new Instruction("","Const " + (subSym.Item5+3)));
+                                      program.Add(new Instruction("","Add"));
+                                      program.Add(new Instruction("","MemStore"));
                                     }
                                 .)
   | '(' ')' ';'                 (.
@@ -1274,19 +1324,21 @@ RecordDecl                      (.
                                 .)
 = "create"
   "record"
-  Ident<out typeName>     (.
-                                    if(typeName.Contains('.')) {
-                                      SemErr("Character \'.\' character be used in identifer");
-                                    }
+  Ident<out typeName>           (.
+
                                     //Adding new record type to list and giving it its own list of variables
                                     type = recordsDefined;
-                                    recordList.Add(new RecordIndex(typeName,type,-1));
+
                                     recordsDefined++;
                                     recordVariables.Add(new List<Symbol>());
                                     currentScope.Push(new Symbol("RecordMarker", -1, -1, -1, -1));
                                 .)
   '{'
-  VarDecl<external>             (.
+  VarDecl<external>
+  {
+  VarDecl<external>
+  }
+  '}'                           (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
                                     sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
@@ -1297,42 +1349,25 @@ RecordDecl                      (.
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
                                       offset++;
                                     }
-                                    //place marker back on stack
-                                    currentScope.Push(sym);
-                                .)
-  { VarDecl<external>       (.
-                                    //Remove symbol from global symbol table and add it to symbol table for record
-                                    sym = currentScope.Pop();
-                                    sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
-                                    offset++;
-                                    while(sym.Item1 != "RecordMarker") {
-                                      recordVariables.ElementAt(type).Add(sym);
-                                      sym = currentScope.Pop();
-                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, offset);
-                                      offset++;
-                                    }
-                                    //place marker back on stack
-                                    currentScope.Push(sym);
-                                .)
-  } '}'                         (.
-                                    //remove "RecordMarker" from symbol stack
-                                    currentScope.Pop();
 
-                                    //update size of record
-                                    recordList[type] = new RecordIndex(typeName,type,offset);
+                                    //now that the size is known we can add an entry to the record types list
+                                    recordTypes.Add(new RecordType(typeName,type,offset));
                                 .).
 
 /*------------------------------------------------------------------------*/
 
 VarDecl<bool external>          (.
-                                    string name; TastierType type; Scope currentScope = openScopes.Peek(); RecordIndex recordIndex;
+                                    string name; TastierType type; Scope currentScope = openScopes.Peek(); RecordType recordType;
                                     string typeName; string varName;
                                 .)
 = (Type<out type>
    Ident<out name>        (.
-                                    if(name.Contains('.')) {
-                                      SemErr("Character \'.\' character be used in identifer");
+                                    //check that there are no name collisions
+                                    Symbol checkNoCollisions = lookup(openScopes,name);
+                                    if(checkNoCollisions != null) {
+                                      SemErr("Variable name " + varName + " is already in use");
                                     }
+
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
@@ -1345,9 +1380,12 @@ VarDecl<bool external>          (.
                                     }
                                 .)
    { ',' Ident<out name>  (.
-                                    if(name.Contains('.')) {
-                                      SemErr("Character \'.\' character be used in identifer");
+                                    //check that there are no name collisions
+                                    Symbol checkNoCollisions = lookup(openScopes,name);
+                                    if(checkNoCollisions != null) {
+                                      SemErr("Variable name " + varName + " is already in use");
                                     }
+
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
@@ -1362,31 +1400,48 @@ VarDecl<bool external>          (.
   } ';'
   | "record"
     Ident<out typeName>         (.
-                                    recordIndex = recordLookup(typeName);
-                                    if(recordIndex == null) {
+                                    recordType = recordLookup(typeName);
+                                    if(recordType == null) {
                                       SemErr("Record " + typeName + " has not been declared");
                                     }
                                 .)
     Ident<out varName>          (.
+                                    //check that there are no name collisions
+                                    Symbol checkNoCollisions = lookup(openScopes,varName);
+                                    if(checkNoCollisions != null) {
+                                      SemErr("Variable name " + varName + " is already in use");
+                                    }
+
                                     //create new instance of record in current scope
                                     int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex.Item2,openScopes.Count-1, address));
 
+                                    addOrReplaceRecord(varName, typeName);
+
                                     int stringAddress = nextAddress;
                                     program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress+3)));
-                                    nextAddress = nextAddress + recordIndex.Item3;
+                                    nextAddress = nextAddress + recordType.Item3;
 
                                     //pointer to record in memory, will be replaced with absolute address later
                                     program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
                                 .)
     { ',' Ident<out varName>    (.
+                                    //check that there are no name collisions
+                                    Symbol checkNoCollisions = lookup(openScopes,varName);
+                                    if(checkNoCollisions != null) {
+                                      SemErr("Variable name " + varName + " is already in use");
+                                    }
+
+
                                     //create new instance of record in current scope
                                     address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex.Item2,openScopes.Count-1, address));
 
+                                    addOrReplaceRecord(varName, typeName);
+
                                     stringAddress = nextAddress;
                                     program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress+3)));
-                                    nextAddress = nextAddress + recordIndex.Item3;
+                                    nextAddress = nextAddress + recordType.Item3;
 
                                     //pointer to record in memory, will be replaced with absolute address later
                                     program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
@@ -1399,9 +1454,6 @@ ExternDecl                      (.  string name; bool external = true; Scope cur
   ( VarDecl<external>
   | "procedure" Ident<out name> ';'
                                 (.
-                                    if(name.Contains('.')) {
-                                      SemErr("Character \'.\' character be used in identifer");
-                                    }
                                     externalDeclarations.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, 1, -1));
                                 .)
   ) .

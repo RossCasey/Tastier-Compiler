@@ -296,6 +296,19 @@ run = do
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
+        Instructions.MemLoad  -> do
+          let address = (smem ! (rtp-1)) - 3
+          let result = dmem ! address
+          put $ machine { rpc = rpc + 1, rtp = rtp - 1, smem = (smem // [(rtp-1, result)]) }
+          run
+
+        Instructions.MemStore  -> do
+          let value = (smem ! (rtp - 2))
+          let address = (smem ! (rtp - 1)) - 3
+          put $ machine { rpc = rpc + 1, rtp = rtp - 2,
+                          dmem = (dmem // [(address, value)]) }
+          run
+
         Instructions.Leave  -> do
           {-
             When we're leaving a procedure, we have to reset rbp to the
