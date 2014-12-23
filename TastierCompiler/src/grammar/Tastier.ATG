@@ -320,8 +320,9 @@ void addOrReplaceRecord(string recName, string typeName) {
   int index = 0;
   foreach(RecordTableEntry rec in recordTable) {
     if(rec.Item1 == recName) {
-      RecordTableEntry[index] = (new RecordTableEntry(recName,typeName));
+      recordTable[index] = (new RecordTableEntry(recName,typeName));
     }
+    index++;
   }
   recordTable.Add(new RecordTableEntry(recName,typeName));
 }
