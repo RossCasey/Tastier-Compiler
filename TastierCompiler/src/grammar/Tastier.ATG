@@ -449,7 +449,7 @@ Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
 
 /*------------------------------------------------------------------------*/
 
-Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym; string name;  .)
+Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; string name;  .)
 =                               (.  type = TastierType.Undefined; .)
   ( Ident<out name>             (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
@@ -477,7 +477,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym; string nam
                                     }
                                     subSym = recordVariableLookup(sym.Item1,name);
                                     if(subSym == null) {
-                                      SemErr(name2 + " is not defined in record " + name);
+                                      SemErr(name + " is not defined in referenced record");
                                     } else {
                                       type = (TastierType)subSym.Item3;
                                     }
@@ -706,7 +706,7 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
 /*------------------------------------------------------------------------*/
 
 Stat                            (.  TastierType type;TastierType type1; TastierType type2; string name; string name1;
-                                    Symbol sym; Symbol subSym;
+                                    Symbol sym; Symbol subSym = null;
                                     bool external = false; bool isExternal = false; Program incrementer;
                                 .)
 
@@ -1366,7 +1366,7 @@ VarDecl<bool external>          (.
                                     //check that there are no name collisions
                                     Symbol checkNoCollisions = lookup(openScopes,name);
                                     if(checkNoCollisions != null) {
-                                      SemErr("Variable name " + varName + " is already in use");
+                                      SemErr("Variable name " + name + " is already in use");
                                     }
 
                                     if (external) {
@@ -1384,7 +1384,7 @@ VarDecl<bool external>          (.
                                     //check that there are no name collisions
                                     checkNoCollisions = lookup(openScopes,name);
                                     if(checkNoCollisions != null) {
-                                      SemErr("Variable name " + varName + " is already in use");
+                                      SemErr("Variable name " + name + " is already in use");
                                     }
 
                                     if (external) {
