@@ -378,7 +378,7 @@ string lookupRecordType(string recName) {
 Symbol recordVariableLookup(string recName, string varName) {
   string typeName = lookupRecordType(recName);
   RecordType recType = recordLookup(typeName);
-  int variableIndex = rec.Item2;
+  int variableIndex = recType.Item2;
 
   foreach(Symbol s in recordVariables.ElementAt(variableIndex)) {
     if(s.Item1 == varName) {
