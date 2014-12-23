@@ -1385,8 +1385,9 @@ RecordDecl                      (.
                                     int index = 0;
                                     int size = 0;
                                     foreach(Symbol s in recordVariables.ElementAt(type)) {
-                                      Console.WriteLine((TastierKind)s.Item3);
+                                      Console.WriteLine(s.Item3);
                                       if(s.Item3 == (int)TastierType.Record) {
+                                        Console.WriteLine("Hello");
                                         string subRecName = lookupRecordType("",s.Item1);
                                         addOrReplaceRecord(typeName,s.Item1,subRecName);
                                         RecordType subRecType = recordLookup(subRecName);
