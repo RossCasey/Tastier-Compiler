@@ -726,7 +726,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
                                 .)
-    Ident<out name1>            (.
+    Ident<out name>            (.
                                     //allows for records within records
                                     if(subSym != null) {
                                       sym = subSym;
