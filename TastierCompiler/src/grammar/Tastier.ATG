@@ -750,8 +750,14 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
    Assignment<out type>         (.
                                     //check type of assignment and type of identifier are the same
-                                    if(type != (TastierType)sym.Item3) {
-                                      SemErr("Type of identifer and type of expression do not match");
+                                    if(subSym != null) {
+                                      if(type != (TastierType)subSym.Item3) {
+                                        SemErr("Type of identifer and type of expression do not match");
+                                      }
+                                    } else {
+                                      if(type != (TastierType)sym.Item3) {
+                                        SemErr("Type of identifer and type of expression do not match");
+                                      }
                                     }
                                     if(type == TastierType.Record) {
                                       string recordType = lookupRecordType(name);
