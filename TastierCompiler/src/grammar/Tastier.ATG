@@ -1426,6 +1426,7 @@ VarDecl<bool external>          (.
 
                                     //pointer to record in memory, will be replaced with absolute address later
                                     program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
+                                    Console.WriteLine(Convert.toString(stringAddress+3));
                                 .)
     { ',' Ident<out varName>    (.
                                     //check that there are no name collisions
