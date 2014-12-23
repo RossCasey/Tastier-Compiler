@@ -733,7 +733,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                     subSym = recordVariableLookup(sym.Item1,name);
                                     if(sym == null) {
-                                      SemErr(name2 + " is not defined in record " + name);
+                                      SemErr(name + " is not defined in referenced record");
                                     } else {
                                       type = (TastierType)subSym.Item3;
                                     }
@@ -768,11 +768,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                           program.Add(new Instruction("", "StoG " + sym.Item1));
                                           // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
                                         } else {
-                                          if(isRecordVar) {
-                                            program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
-                                          } else {
-                                            program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
-                                          }
+                                          program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                         }
                                       }
                                       else {
@@ -1210,7 +1206,6 @@ Tastier                         (.  string name; bool external = false; .)
                                       } else if (s.Item2 == (int)TastierKind.Proc) {
                                         header.Add(new Instruction("", ".proc " + s.Item1));
                                       } else {
-                                        if(s.Item2 != (int)TastierKind.Record)
                                         SemErr("global item " + s.Item1 + " has no defined type");
                                       }
                                     }
@@ -1415,7 +1410,7 @@ VarDecl<bool external>          (.
 
                                     //create new instance of record in current scope
                                     int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
-                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex.Item2,openScopes.Count-1, address));
+                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)TastierType.Record,openScopes.Count-1, address));
 
                                     addOrReplaceRecord(varName, typeName);
 
@@ -1436,7 +1431,7 @@ VarDecl<bool external>          (.
 
                                     //create new instance of record in current scope
                                     address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
-                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Record, recordIndex.Item2,openScopes.Count-1, address));
+                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)TastierType.Record ,openScopes.Count-1, address));
 
                                     addOrReplaceRecord(varName, typeName);
 
