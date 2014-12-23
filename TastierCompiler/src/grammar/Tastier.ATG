@@ -1366,7 +1366,8 @@ RecordDecl                      (.
                                     offset--; //don't count marker
 
                                     //stack returns variables in reverse order
-                                    recordVariables.ElementAt(type).Reverse;
+                                    recordVariables[type].Reverse();
+            
 
                                     //undo changes
                                     nextAddress = nextAddressBackup;
