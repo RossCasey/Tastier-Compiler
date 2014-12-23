@@ -380,9 +380,11 @@ string lookupRecordType(string parent,string recName) {
 
 Symbol recordVariableLookup(string parent,string recName, string varName) {
   string typeName = lookupRecordType(parent,recName);
+
+  Console.WriteLine("RVL: Got Here 1");
   RecordType recType = recordLookup(typeName);
   int variableIndex = recType.Item2;
-
+  Console.WriteLine("RVL: Got Here 2");
   foreach(Symbol s in recordVariables.ElementAt(variableIndex)) {
     if(s.Item1 == varName) {
       return s;
