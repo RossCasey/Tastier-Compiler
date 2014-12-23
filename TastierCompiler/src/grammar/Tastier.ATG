@@ -479,7 +479,6 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       parent = lookupRecordType(parent,sym.Item1);
                                       sym = subSym;
                                     }
-                                    string recordType = lookupRecordType(parent,sym.Item1);
                                     subSym = recordVariableLookup(parent,sym.Item1,name);
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
@@ -1481,7 +1480,7 @@ VarDecl<bool external>          (.
                                       //There is no need for a lexical difference here as the record has just been declared
                                       //in the current scope
                                       int lexicalLevelDifference = 0;
-                                      program.Add(new Instruction("", "Sto " + 0 + " " + address));
+                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
                                     }
                                 .)
     { ',' Ident<out varName>    (.
@@ -1517,7 +1516,7 @@ VarDecl<bool external>          (.
                                       //There is no need for a lexical difference here as the record has just been declared
                                       //in the current scope
                                       int lexicalLevelDifference = 0;
-                                      program.Add(new Instruction("", "Sto " + 0 + " " + address));
+                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
                                     }
 
                                 .)
