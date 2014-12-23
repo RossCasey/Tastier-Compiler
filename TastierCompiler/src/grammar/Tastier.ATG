@@ -719,6 +719,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if (sym == null) {
                                       SemErr("reference to undefined variable " + name);
                                     }
+                                    Console.WriteLine("Got Here: Record part of Ident Stat");
                                 .)
   {
     access                      (.
@@ -732,11 +733,12 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       sym = subSym;
                                     }
                                     subSym = recordVariableLookup(sym.Item1,name);
-                                    if(sym == null) {
+                                    if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
                                       type = (TastierType)subSym.Item3;
                                     }
+                                    Console.WriteLine("Got Here: Record Var part of Ident Stat");
                                 .)
   }
   (":="                          (.
@@ -760,8 +762,10 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                                 " to record reference variable of type " + recordType);
                                       }
                                     }
+                                    Console.WriteLine("Got Here: After Assignment");
                                 .)
    ';'                          (.
+                                    Console.WriteLine("Got Here: After SemiColon");
                                     if(subSym == null) {
                                       if (sym.Item4 == 0) {
                                         if (isExternal) {
