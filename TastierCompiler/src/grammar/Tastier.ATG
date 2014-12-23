@@ -378,9 +378,14 @@ string lookupRecordType(string parent,string recName) {
 }
 
 
+
 Symbol recordVariableLookup(string parent,string recName, string varName) {
   string typeName = lookupRecordType(parent,recName);
-
+  Console.WriteLine("Current Record Table:");
+  foreach(RecordTableEntry rec in recordTable) {
+    Console.WriteLine(rec.Item1 + " " + rec.Item2 + " " + rec.Item3);
+  }
+  Console.WriteLine();
   Console.WriteLine("RVL: Got Here 1");
   Console.WriteLine("Performing Lookup on: " + parent + " " + recName + " " + varName);
   RecordType recType = recordLookup(typeName);
