@@ -755,7 +755,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr("cannot assign to non-variable");
                                     }
                                 .)
-   Assignment<out type>         (.
+   ( Assignment<out type>         (.
                                     //check type of assignment and type of identifier are the same
                                     if(subSym != null) {
                                       if(type != (TastierType)subSym.Item3) {
@@ -798,6 +798,21 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       program.Add(new Instruction("","MemStore"));
                                     }
                                 .)
+    | "new" "record" ';'        (.
+                                  if (sym.Item4 == 0) {
+                                    if (isExternal) {
+                                      program.Add(new Instruction("", "StoG " + sym.Item1));
+                                      // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
+                                    } else {
+                                      program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    }
+                                  }
+                                  else {
+                                    int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                    program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                  }
+                                .)
+  )
   | '(' ')' ';'                 (.
                                     if ((TastierKind)sym.Item2 != TastierKind.Proc) {
                                       SemErr("object is not a procedure");
