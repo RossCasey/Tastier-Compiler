@@ -1391,9 +1391,8 @@ RecordDecl                      (.
                                         foreach(RecordTableEntry rte in recordTable) {
                                           Console.WriteLine(rte.Item1 + " " + rte.Item2 + " " + rte.Item3);
                                         }
-                                        string subRecName = lookupRecordType("",s.Item1);
+                                        string subRecName = lookupRecordType(typeName,s.Item1);
                                         Console.WriteLine("The return from lookupRecordType is: " + subRecName);
-                                        addOrReplaceRecord(typeName,s.Item1,subRecName);
                                         RecordType subRecType = recordLookup(subRecName);
                                         recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
                                         size = size + subRecType.Item3;
