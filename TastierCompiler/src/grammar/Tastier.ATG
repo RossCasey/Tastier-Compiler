@@ -497,7 +497,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                 .)
     }                           (.
                                     if(type == TastierType.Record) {
-                                      recordType = lookupRecordType(parent,sym.Item1);
+                                      string recordType = lookupRecordType(parent,sym.Item1);
                                       typeOfLastReferencedRecord = lookupRecordType(recordType,name);
                                     }
                                     if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
