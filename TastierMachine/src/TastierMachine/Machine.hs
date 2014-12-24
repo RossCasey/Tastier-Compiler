@@ -298,14 +298,14 @@ run = do
 
         Instructions.MemLoad  -> do
           let address = (smem ! (rtp-1))
-          let adjustedMemory = address
+          let adjustedMemory = address - 3
           let result = dmem ! adjustedMemory
           put $ machine { rpc = rpc + 1, smem = (smem // [(rtp-1, result)]) }
           run
 
         Instructions.MemStore  -> do
           let value = (smem ! (rtp - 1))
-          let address = (smem ! (rtp - 2))
+          let address = (smem ! (rtp - 2)) - 3
           put $ machine { rpc = rpc + 1, rtp = rtp - 2,
                           dmem = (dmem // [(address, value)]) }
           run
