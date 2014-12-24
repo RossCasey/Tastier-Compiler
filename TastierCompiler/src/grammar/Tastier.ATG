@@ -465,6 +465,19 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       SemErr("reference to undefined variable " + name);
                                     } else {
                                       type = (TastierType) sym.Item3;
+                                      if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
+                                        if (sym.Item4 == 0) {
+                                          if (isExternal) {
+                                            program.Add(new Instruction("", "LoadG " + sym.Item1));
+                                            // if the symbol is external, we load it by name. The linker will resolve the name to an address.
+                                          } else {
+                                            program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
+                                          }
+                                        } else {
+                                          int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                          program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
+                                        }
+                                      } else SemErr("Variable, Constant or Record Expected");
                                     }
                                 .)
     {
@@ -476,14 +489,19 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
       Ident<out name>          (.
                                     //allows for records within records
                                     if(subSym != null) {
+                                      //this will execute every time but the first
                                       parent = lookupRecordType(parent,sym.Item1);
                                       sym = subSym;
+                                    } else {
+                                      program.Add(new Instruction("","MemLoad"));
                                     }
                                     subSym = recordVariableLookup(parent,sym.Item1,name);
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
                                       type = (TastierType)subSym.Item3;
+                                      program.Add(new Instruction("","Const " + (subSym.Item5+3));
+                                      program.Add(new Instruction("","Add"));
                                     }
                                 .)
     }                           (.
@@ -491,33 +509,8 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       string recordType = lookupRecordType(parent,sym.Item1);
                                       typeOfLastReferencedRecord = lookupRecordType(recordType,name);
                                     }
-                                    if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
-                                      if (sym.Item4 == 0) {
-                                        if (isExternal) {
-                                          program.Add(new Instruction("", "LoadG " + sym.Item1));
-                                          // if the symbol is external, we load it by name. The linker will resolve the name to an address.
-                                        } else {
-                                          program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
-                                        }
-                                      } else {
-                                        int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                        program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
-                                      }
-                                    } else SemErr("Variable, Constant or Record Expected");
-
-                                    if(sym.Item3 == (int)TastierType.Record) {
-                                      //Loads the starting address of the record pointed to by the value on the stack
-                                      program.Add(new Instruction("", "MemLoad"));
-
-                                      //Load the offset for the record variable onto the stack
-                                      program.Add(new Instruction("", "Const " + (sym.Item5+3)));
-
-                                      //Add the base address and the offset
-                                      program.Add(new Instruction("", "Add"));
-
-                                      //The value on the stack is now a pointer to the variable in the record
-                                      //This final memory load places the value pointed to onto the stack
-                                      program.Add(new Instruction("", "MemLoad"));
+                                    if(subSym != null) {
+                                      program.Add(new Instruction("","MemLoad"));
                                     }
                                 .)
 
@@ -724,6 +717,12 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if (sym == null) {
                                       SemErr("reference to undefined variable " + name);
                                     }
+
+                                    if(sym.Item3 == (int)TastierType.Record) {
+                                      //if ident is a record then the address of the record variable must be calculated
+                                      program.Add(new Instruction("","Const " + (sym.Item5 + 3)));
+                                      program.Add(new Instruction("","MemLoad"));
+                                    }
                                 .)
   {
     access                      (.
@@ -742,6 +741,8 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
                                       type = (TastierType)subSym.Item3;
+                                      program.Add(new Instruction("","Const " + (subSym.Item5+3)));
+                                      program.Add(new Instruction("","Add"));
                                     }
                                 .)
   }
@@ -788,12 +789,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                       }
                                     } else {
-
-                                      //calculate address of record variable
-                                      program.Add(new Instruction("","Const " + (sym.Item5+3)));
-                                      program.Add(new Instruction("","MemLoad"));
-                                      program.Add(new Instruction("","Const " + (subSym.Item5+3)));
-                                      program.Add(new Instruction("","Add"));
                                       program.Add(new Instruction("","MemStore"));
                                     }
                                 .)

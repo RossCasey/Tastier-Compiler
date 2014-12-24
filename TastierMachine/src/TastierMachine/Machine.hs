@@ -304,8 +304,8 @@ run = do
           run
 
         Instructions.MemStore  -> do
-          let value = (smem ! (rtp - 2))
-          let address = (smem ! (rtp - 1)) - 3
+          let value = (smem ! (rtp - 1))
+          let address = (smem ! (rtp - 2)) - 3
           put $ machine { rpc = rpc + 1, rtp = rtp - 2,
                           dmem = (dmem // [(address, value)]) }
           run
