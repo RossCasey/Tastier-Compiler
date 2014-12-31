@@ -772,6 +772,12 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(type == TastierType.Record) {
                                       string recordType = lookupRecordType(parent,name);
 
+                                      Console.WriteLine("\n");
+                                      foreach(RecordTableEntry rec in recordTable) {
+                                        Console.WriteLine(P: + rec.Item1 + " N: " + rec.Item2 + " T: " + rec.Item3);
+                                      }
+
+
                                       Console.WriteLine("Performing Lookup on: " + parent  + "," + name);
                                       Console.WriteLine("Current Type: " + recordType);
 
