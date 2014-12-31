@@ -497,6 +497,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       sym = subSym;
                                     }
                                     subSym = recordVariableLookup(parent,sym.Item1,name);
+                                    type = (TastierType) subSym.Item3;
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     }
