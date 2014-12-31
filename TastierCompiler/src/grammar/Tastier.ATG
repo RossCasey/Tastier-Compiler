@@ -364,7 +364,7 @@ Symbol lookup(Stack<Scope> scopes, string name) {
 
 RecordType recordLookup(string name) {
   foreach (RecordType rec in recordTypes) {
-    if (rec.Item1 == name) {
+    if (rec.Item1.Equals(name)) {
       return rec;
     }
   }
@@ -373,7 +373,7 @@ RecordType recordLookup(string name) {
 
 string lookupRecordType(string parent,string recName) {
   foreach(RecordTableEntry rec in recordTable) {
-    if((rec.Item1 == parent) && (rec.Item2 == recName)) {
+    if((rec.Item1.Equals(parent)) && (rec.Item2.Equals(recName))) {
       return rec.Item3;
     }
   }
@@ -387,7 +387,7 @@ Symbol recordVariableLookup(string parent,string recName, string varName) {
   RecordType recType = recordLookup(typeName);
   int variableIndex = recType.Item2;
   foreach(Symbol s in recordVariables.ElementAt(variableIndex)) {
-    if(s.Item1 == varName) {
+    if(s.Item1.Equals(varName)) {
       return s;
     }
   }
@@ -777,7 +777,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
 
 
-                                      if(recordType != typeOfLastReferencedRecord) {
+                                      if(!(recordType.Equals(typeOfLastReferencedRecord))) {
                                         SemErr("Cannot assign record of type " + typeOfLastReferencedRecord +
                                                 " to record reference variable of type " + recordType);
                                       }
