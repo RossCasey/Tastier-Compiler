@@ -739,7 +739,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       sym = subSym;
                                       program.Add(new Instruction("","MemLoad"));
                                     }
-                                    subSym = recordVariableLookup(parent,sym.Item1,name);
+                                    subSym = recordVariableLookup(recordType,sym.Item1,name);
                                     recordType = lookupRecordType(recordType,subSym.Item1);
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
