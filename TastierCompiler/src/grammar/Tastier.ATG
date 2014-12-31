@@ -787,8 +787,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                       }
                                     } else {
-                                      program.Add(new Instruction("","Const 3"));
-                                      program.Add(new Instruction("","Add"));
                                       program.Add(new Instruction("","MemStore"));
                                     }
                                 .)
