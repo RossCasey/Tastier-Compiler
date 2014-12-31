@@ -509,6 +509,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       program.Add(new Instruction("","Const " + (sym.Item5 + 3)));
                                     }
                                     if(subSym != null) {
+                                      program.Add(new Instruction("","MemLoad"));
                                       program.Add(new Instruction("","Const " + (subSym.Item5)));
                                       program.Add(new Instruction("","Add"));
                                       program.Add(new Instruction("","MemLoad"));
@@ -792,6 +793,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       }
                                     } else {
                                       program.Add(new Instruction("","Const " + (sym.Item5+3)));
+                                      program.Add(new Instruction("","MemLoad"));
                                       program.Add(new Instruction("","Const " + subSym.Item5));
                                       program.Add(new Instruction("","Add"));
                                       program.Add(new Instruction("","MemStore"));
