@@ -320,13 +320,17 @@ string parentRecord = "";
 
 void addOrReplaceRecord(string parent, string recName, string typeName) {
   int index = 0;
+  bool match = false;
   foreach(RecordTableEntry rec in recordTable) {
     if((rec.Item1 == parent) && (rec.Item2 == recName)) {
       recordTable[index] = (new RecordTableEntry(parent,recName,typeName));
+      match = true;
     }
     index++;
   }
-  recordTable.Add(new RecordTableEntry(parent,recName,typeName));
+  if(!match) {
+    recordTable.Add(new RecordTableEntry(parent,recName,typeName));
+  }
 }
 
 
