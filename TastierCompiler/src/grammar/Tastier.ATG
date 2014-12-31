@@ -707,7 +707,7 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
 /*------------------------------------------------------------------------*/
 
 Stat                            (.  TastierType type;TastierType type1; TastierType type2; string name; string name1;
-                                    Symbol sym; Symbol subSym = null; string recordType = "";
+                                    Symbol sym; Symbol subSym = null; string parent = "";
                                     bool external = false; bool isExternal = false; Program incrementer;
                                 .)
 
@@ -724,7 +724,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(sym.Item3 == (int)TastierType.Record) {
                                       //if ident is a record then the address of the record variable must be calculated
                                       program.Add(new Instruction("","Const " + (sym.Item5 + 3)));
-                                      recordType = lookupRecordType("",name);
                                     }
                                 .)
   {
@@ -736,11 +735,11 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
     Ident<out name>            (.
                                     //allows for records within records
                                     if(subSym != null) {
+                                      parent = lookupRecordType(parent,sym.Item1);
                                       sym = subSym;
                                       program.Add(new Instruction("","MemLoad"));
                                     }
-                                    subSym = recordVariableLookup(recordType,sym.Item1,name);
-                                    recordType = lookupRecordType(recordType,subSym.Item1);
+                                    subSym = recordVariableLookup(parent,sym.Item1,name);
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
@@ -772,16 +771,8 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                     if(type == TastierType.Record) {
                                       //was parent
-                                      //string recordType = lookupRecordType(sym.Item1,name);
-
-                                      //Console.WriteLine("\n");
-                                      //foreach(RecordTableEntry rec in recordTable) {
-                                      //  Console.WriteLine("P: " + rec.Item1 + " N: " + rec.Item2 + " T: " + rec.Item3);
-                                      //}
-
-
-                                      //Console.WriteLine("Performing Lookup on: " + sym.Item1  + "," + name);
-                                      //Console.WriteLine("Current Type: " + recordType);
+                                      string recordType = lookupRecordType(parent,sym.Item1);
+                                      Console.WriteLine(recordType);
 
 
 
