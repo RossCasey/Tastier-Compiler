@@ -768,7 +768,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(type == TastierType.Record) {
                                       string recordType = lookupRecordType(parent,name);
 
-                                      Console.WriteLine("Record Type is: " + recordType);
+                                      Console.WriteLine("Parent,Name: " + parent + " " + name);
 
 
 
