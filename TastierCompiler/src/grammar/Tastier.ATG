@@ -740,7 +740,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       type = (TastierType)subSym.Item3;
                                       program.Add(new Instruction("","Const " + (subSym.Item5+3)));
                                       program.Add(new Instruction("","Add"));
-                                      program.Add(new Instruction(""."MemLoad"));
+                                      program.Add(new Instruction("","MemLoad"));
                                     }
                                 .)
   }
