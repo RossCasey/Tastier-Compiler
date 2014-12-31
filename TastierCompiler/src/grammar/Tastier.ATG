@@ -1363,8 +1363,8 @@ RecordDecl                      (.
                                       */
                                         recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
                                         size++;
-                                      }
-                                      //index++;
+                                      //}
+                                      index++;
                                     }
                                     //now that the size is known we can add an entry to the record types list
                                     recordTypes.Add(new RecordType(typeName,type,size));
