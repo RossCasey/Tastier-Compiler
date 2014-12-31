@@ -1374,6 +1374,10 @@ RecordDecl                      (.
                                         size = size + subRecType.Item3;
                                       } else {
                                       */
+                                      if(s.Item3 == (int)TastierType.Record) {
+                                        string subRecType = lookupRecordType(typeName,s.Item1);
+                                        addOrReplaceRecord(typeName,s.Item1,subRecType);
+                                      }
                                         recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
                                         size++;
                                       //}
