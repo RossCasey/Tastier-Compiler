@@ -507,9 +507,10 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       string recordType = lookupRecordType(parent,sym.Item1);
                                       typeOfLastReferencedRecord = lookupRecordType(recordType,name);
                                     }
-                                    if(subSym != null) {
+                                    /*if(subSym != null) {
                                       program.Add(new Instruction("","MemLoad"));
                                     }
+                                    */
                                 .)
 
   | number                      (.
