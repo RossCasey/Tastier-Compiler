@@ -732,6 +732,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(subSym != null) {
                                       parent = lookupRecordType(parent,sym.Item1);
                                       sym = subSym;
+                                      program.Add(new Instruction("","MemLoad"));
                                     }
                                     subSym = recordVariableLookup(parent,sym.Item1,name);
                                     if(subSym == null) {
@@ -740,7 +741,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       type = (TastierType)subSym.Item3;
                                       program.Add(new Instruction("","Const " + (subSym.Item5)));
                                       program.Add(new Instruction("","Add"));
-                                      program.Add(new Instruction("","MemLoad"));
                                     }
                                 .)
   }
