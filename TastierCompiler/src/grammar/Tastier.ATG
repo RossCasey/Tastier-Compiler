@@ -484,6 +484,10 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     if(sym.Item3 != (int)TastierType.Record) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
+                                    //instruction added by non-access section no longer applicable, remove it
+                                    if(subSym == null) {
+                                      program.RemoveAt(program.Count-1);
+                                    }
                                 .)
       Ident<out name>          (.
                                     //allows for records within records
@@ -495,18 +499,17 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     subSym = recordVariableLookup(parent,sym.Item1,name);
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
-                                    } else {
-                                      type = (TastierType)subSym.Item3;
-                                      program.Add(new Instruction("","Const " + (subSym.Item5)));
-                                      program.Add(new Instruction("","Add"));
                                     }
                                 .)
     }                           (.
                                     if(type == TastierType.Record) {
                                       string recordType = lookupRecordType(parent,sym.Item1);
                                       typeOfLastReferencedRecord = lookupRecordType(recordType,name);
+                                      program.Add(new Instruction("","Const " + (sym.Item5 + 3)));
                                     }
                                     if(subSym != null) {
+                                      program.Add(new Instruction("","Const " + (subSym.Item5)));
+                                      program.Add(new Instruction("","Add"));
                                       program.Add(new Instruction("","MemLoad"));
                                     }
                                 .)
@@ -725,6 +728,10 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(sym.Item3 != (int)TastierType.Record) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
+                                    //remove instruction from non-access section as no longer relevant
+                                    if(subSym == null) {
+                                      program.RemoveAt(program.Count-1);
+                                    }
                                 .)
     Ident<out name>            (.
                                     //allows for records within records
@@ -737,8 +744,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
                                       type = (TastierType)subSym.Item3;
-                                      program.Add(new Instruction("","Const " + (subSym.Item5)));
-                                      program.Add(new Instruction("","Add"));
                                     }
                                 .)
   }
@@ -785,6 +790,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                       }
                                     } else {
+                                      program.Add(new Instruction("","Const " + (sym.Item5+3)));
+                                      program.Add(new Instruction("","Const " + subSym.Item5));
+                                      program.Add(new Instruction("","Add"));
                                       program.Add(new Instruction("","MemStore"));
                                     }
                                 .)
