@@ -772,7 +772,12 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(type == TastierType.Record) {
 
                                       Console.WriteLine("Lookup: " + parent + " " + sym.Item1);
-                                      string recordType = lookupRecordType(parent,sym.Item1);
+                                      string parentRecordType = lookupRecordType(parent,sym.Item1);
+                                      string recordType = lookupRecordType(parentRecordType,subSym.Item1);
+
+
+
+
 
 
                                       Console.WriteLine(typeOfLastReferencedRecord);
