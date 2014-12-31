@@ -508,8 +508,8 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                 .)
     }                           (.
                                     if(type == TastierType.Record) {
-                                      string parentRecordType = lookupRecordType(parent,sym.Item1);
-                                      string recordType = lookupRecordType(parentRecordType, subSym.Item1);
+                                      parent = lookupRecordType(parent,sym.Item1);
+                                      string recordType = lookupRecordType(parent,subSym.Item1);
                                       typeOfLastReferencedRecord = recordType;
                                     }
                                     /*if(subSym != null) {
