@@ -771,7 +771,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                     if(type == TastierType.Record) {
                                       //was parent
-                                      string recordType = lookupRecordType(subSym.Item1,name);
+                                      string recordType = lookupRecordType(sym.Item1,name);
 
                                       Console.WriteLine("\n");
                                       foreach(RecordTableEntry rec in recordTable) {
@@ -779,7 +779,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       }
 
 
-                                      Console.WriteLine("Performing Lookup on: " + parent  + "," + name);
+                                      Console.WriteLine("Performing Lookup on: " + sym.Item1  + "," + name);
                                       Console.WriteLine("Current Type: " + recordType);
 
 
