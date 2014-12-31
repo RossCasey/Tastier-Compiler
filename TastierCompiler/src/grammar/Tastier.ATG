@@ -774,7 +774,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
                                       Console.WriteLine("\n");
                                       foreach(RecordTableEntry rec in recordTable) {
-                                        Console.WriteLine(P: + rec.Item1 + " N: " + rec.Item2 + " T: " + rec.Item3);
+                                        Console.WriteLine("P: " + rec.Item1 + " N: " + rec.Item2 + " T: " + rec.Item3);
                                       }
 
 
