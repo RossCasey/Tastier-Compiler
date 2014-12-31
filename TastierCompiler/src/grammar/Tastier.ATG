@@ -18,7 +18,7 @@ COMPILER Tastier
 */
 
 /*
-  The memoryAddressOffset and nextHeapAddress are needed in order to compute where
+  The  and nextHeapAddress are needed in order to compute where
   sequential values (in this case strings) can be placed in data memory.
   Global variables start at address 3 increment so there is no room to place
   a block of memory that could be used for strings. To fix this problem strings
@@ -32,11 +32,11 @@ COMPILER Tastier
   This value is incremented as new values are stored. This allows for the
   computation of the temporary, relative address.
 
-  The memoryAddressOffset is incremented every time a global variable is allocated
+  The  is incremented every time a global variable is allocated
   memory. This will allow the parser to go back and insert the absolute addresses later.
   Once the program has been parsed fully, the parser then needs to go back and edit the
   address used for strings. It iterates through all instructions and change them to
-      new Instruction("", "Const (<relative address> + memoryAddressOffset)")
+      new Instruction("", "Const (<relative address> +)")
 
   This allows for the allocation of as many global variables as necessary and there
   is no wasted memory as all strings are assigned to the very next addresses in data
@@ -1277,16 +1277,16 @@ ConstDecl                       (.
                                 .)
 = "const"
   Type<out type>
-  Ident<out name>         (.
-                                    if(name.Contains('.')) {
-                                      SemErr("Character \'.\' character be used in identifer");
+  Ident<out name>               (.
+                                    int memLocation;
+                                    //if global variable, need to determine next free heap address and increment heap address counter
+                                    if(openScopes.Count()-1 == 0) {
+                                      memLocation = nextHeapAddress;
+                                      nextHeapAddress++;
+                                    } else {
+                                      memLocation = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     }
-                                    int memLocation = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, memLocation);
-                                    //if global variable, we need to increment memoryOffset
-                                    if((openScopes.Count()-1 == 0)) {
-                                      memoryAddressOffset++;
-                                    }
                                     currentScope.Push(sym);
                                 .)
   ":="
@@ -1323,7 +1323,6 @@ RecordDecl                      (.
 
                                     //need to undo any changes made by variables declared within records
                                     //so backups are created here to undo any changes
-                                    int memoryAddressOffsetBackup = memoryAddressOffset;
                                     int nextHeapAddressBackup = nextHeapAddress;
                                     Program programBackup = new Program();
                                     programBackup.AddRange(program);
@@ -1350,7 +1349,6 @@ RecordDecl                      (.
                                     //undo changes
                                     nextHeapAddress = nextHeapAddressBackup;
                                     program = programBackup;
-                                    memoryAddressOffset = memoryAddressOffsetBackup;
 
 
                                     int index = 0;
@@ -1389,12 +1387,15 @@ VarDecl<bool external>          (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
-                                      int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
-                                      //if the address is global then we need to increment the memory offset
-                                      if((openScopes.Count-1)==0) {
-                                        memoryAddressOffset++;
+                                      int address;
+                                      //if in global scope, need to find next available heap location and increment heap address counter
+                                      if((openScopes.Count-1) == 0) {
+                                        address = nextHeapAddress;
+                                        nextHeapAddress++;
+                                      } else {
+                                        address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                       }
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
                                     }
                                 .)
    { ',' Ident<out name>  (.
@@ -1407,12 +1408,15 @@ VarDecl<bool external>          (.
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
                                     } else {
-                                      int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
-                                      //if the address is global then we need to increment the memory offset
-                                      if((openScopes.Count-1)==0) {
-                                        memoryAddressOffset++;
+                                      int address;
+                                      //if in global scope, need to find next available heap location and increment heap address counter
+                                      if((openScopes.Count-1) == 0) {
+                                        address = nextHeapAddress;
+                                        nextHeapAddress++;
+                                      } else {
+                                        address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                       }
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
                                     }
                                 .)
   } ';'
@@ -1431,11 +1435,15 @@ VarDecl<bool external>          (.
                                     }
 
                                     //create new instance of record in current scope
-                                    int address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
-                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)TastierType.Record,openScopes.Count-1, address));
-                                    if((openScopes.Count-1)==0) {
-                                      memoryAddressOffset++;
+                                    int address;
+                                    //if in global scope, need to find next available heap location and increment heap address counter
+                                    if((openScopes.Count-1) == 0) {
+                                      address = nextHeapAddress;
+                                      nextHeapAddress++;
+                                    } else {
+                                      address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     }
+                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)TastierType.Record,openScopes.Count-1, address));
 
                                     addOrReplaceRecord(parentRecord,varName, typeName);
 
@@ -1468,11 +1476,15 @@ VarDecl<bool external>          (.
 
 
                                     //create new instance of record in current scope
-                                    address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
-                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)TastierType.Record ,openScopes.Count-1, address));
-                                    if((openScopes.Count-1)==0) {
-                                      memoryAddressOffset++;
+                                    //if in global scope, need to find next available heap location and increment heap address counter
+                                    if((openScopes.Count-1) == 0) {
+                                      address = nextHeapAddress;
+                                      nextHeapAddress++;
+                                    } else {
+                                      address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     }
+                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)TastierType.Record ,openScopes.Count-1, address));
+
                                     addOrReplaceRecord(parentRecord,varName, typeName);
 
                                     stringAddress = nextHeapAddress;
