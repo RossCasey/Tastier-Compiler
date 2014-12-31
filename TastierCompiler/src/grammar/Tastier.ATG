@@ -18,7 +18,7 @@ COMPILER Tastier
 */
 
 /*
-  The memoryAddressOffset and nextAddress are needed in order to compute where
+  The memoryAddressOffset and nextHeapAddress are needed in order to compute where
   sequential values (in this case strings) can be placed in data memory.
   Global variables start at address 3 increment so there is no room to place
   a block of memory that could be used for strings. To fix this problem strings
@@ -28,7 +28,7 @@ COMPILER Tastier
   relative address which can be used later to calculate its absolute address.
   The temporary instructions take the from:
       new Instuction("StrReplace","<relative address>")
-  The nextAddress variable keeps track of the next available address in memory.
+  The nextHeapAddress variable keeps track of the next available address in memory.
   This value is incremented as new values are stored. This allows for the
   computation of the temporary, relative address.
 
@@ -42,8 +42,7 @@ COMPILER Tastier
   is no wasted memory as all strings are assigned to the very next addresses in data
   memory.
 */
-  int memoryAddressOffset = 0;
-  int nextAddress = 0;
+  int nextHeapAddress = 0;
 
 
 
@@ -531,7 +530,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
   | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = TastierType.Boolean; .)
   | string                      (.
                                     /*
-                                      Strings are stored in data memory. The string is stored
+                                      Strings are stored in the heap. The string is stored
                                       as its length followed by a sequence of values.
                                       The values are stored in memory by first placing them on
                                       the stack and then using StoG to store them in data memory.
@@ -539,20 +538,20 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     */
                                     string value = t.val;
                                     char[] array = value.ToCharArray();
-                                    int stringAddress = nextAddress;
+                                    int stringAddress = nextHeapAddress;
                                     //store string length in memory
                                     program.Add(new Instruction("", "Const " + (array.Count()-2)));
-                                    //temporary instruction with a relative address, this will be replaced later
-                                    program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress+3)));
-                                    nextAddress++;
+                                    //store start of string in the next available address in heap memory
+                                    program.Add(new Instruction("","StoG " + (stringAddress + 3)));
+                                    nextHeapAddress++;
                                     //store values into memory
                                     for(int i=1; i< array.Count()-1; i++) {
                                       program.Add(new Instruction("", "Const " + (int)array[i]));
-                                      //temporary instruction with a relative address, this will be replaced later
-                                      program.Add(new Instruction("StrReplace",Convert.ToString(nextAddress+3)));
-                                      nextAddress++;
+                                      //store each digit into memory
+                                      program.Add(new Instruction("","StoG " + (nextHeapAddress+3)));
+                                      nextHeapAddress++;
                                     }
-                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
+                                    program.Add(new Instruction("","Const " + (stringAddress + 3)));
                                     type = TastierType.String;
                                   .)
   ).
@@ -1222,21 +1221,6 @@ Tastier                         (.  string name; bool external = false; .)
                                         SemErr("external item " + s.Item1 + " has no defined type");
                                       }
                                     }
-                                    //replace temporary memory address with real ones
-                                    int index = 0;
-                                    foreach (Instruction inst in program) {
-                                      if(inst.Item1 == "StrReplace") {
-                                        int oldAddress = Convert.ToInt32(inst.Item2);
-                                        String newInst = "StoG " + (oldAddress + memoryAddressOffset);
-                                        program[index] = new Instruction("", newInst);
-                                      } else if(inst.Item1 == "StrReplaceAddr") {
-                                        int oldAddress = Convert.ToInt32(inst.Item2);
-                                        String newInst = "Const " + (oldAddress + memoryAddressOffset);
-                                        program[index] = new Instruction("", newInst);
-                                      }
-                                      index++;
-                                    }
-
                                     /*
                                       Need to add empty function if constants are not declared
                                       as ConstDecl is the first function called by machine.
@@ -1340,7 +1324,7 @@ RecordDecl                      (.
                                     //need to undo any changes made by variables declared within records
                                     //so backups are created here to undo any changes
                                     int memoryAddressOffsetBackup = memoryAddressOffset;
-                                    int nextAddressBackup = nextAddress;
+                                    int nextHeapAddressBackup = nextHeapAddress;
                                     Program programBackup = new Program();
                                     programBackup.AddRange(program);
                                 .)
@@ -1364,7 +1348,7 @@ RecordDecl                      (.
 
 
                                     //undo changes
-                                    nextAddress = nextAddressBackup;
+                                    nextHeapAddress = nextHeapAddressBackup;
                                     program = programBackup;
                                     memoryAddressOffset = memoryAddressOffsetBackup;
 
@@ -1455,11 +1439,11 @@ VarDecl<bool external>          (.
 
                                     addOrReplaceRecord(parentRecord,varName, typeName);
 
-                                    int stringAddress = nextAddress;
-                                    nextAddress = nextAddress + recordType.Item3;
+                                    int stringAddress = nextHeapAddress;
+                                    nextHeapAddress = nextHeapAddress + recordType.Item3;
 
                                     //pointer to record in memory, will be replaced with absolute address later
-                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
+                                    program.Add(new Instruction("","Const " + Convert.ToString(stringAddress + 3)));
 
                                     if ((openScopes.Count-1) == 0) {
                                       if (external) {
@@ -1491,11 +1475,11 @@ VarDecl<bool external>          (.
                                     }
                                     addOrReplaceRecord(parentRecord,varName, typeName);
 
-                                    stringAddress = nextAddress;
-                                    nextAddress = nextAddress + recordType.Item3;
+                                    stringAddress = nextHeapAddress;
+                                    nextHeapAddress = nextHeapAddress + recordType.Item3;
 
                                     //pointer to record in memory, will be replaced with absolute address later
-                                    program.Add(new Instruction("StrReplaceAddr",Convert.ToString(stringAddress + 3)));
+                                    program.Add(new Instruction("","Const " + Convert.ToString(stringAddress + 3)));
 
                                     if ((openScopes.Count-1) == 0) {
                                       if (external) {
