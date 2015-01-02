@@ -905,7 +905,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                 .)
   | "allocate" '('              (.
-                                    if((type != TastierType.Record) && (type != TastierType.Array)) {
+                                    if((sym.Item3 != (int)TastierType.Record) && (sym.Item3 != (int)TastierType.Array)) {
                                       SemErr("Allocate can only be used for records and arrays");
                                     }
                                 .)
