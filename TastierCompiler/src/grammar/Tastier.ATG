@@ -560,7 +560,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     }
                                   } else if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
-                                  } else if(dimesions > 0) {
+                                  } else if(dimensions > 0) {
                                     typeOfLastReferencedArray = arraySymbol.Item3;
                                     dimensionsOfLastReferencedArray = dimensions;
                                   }
