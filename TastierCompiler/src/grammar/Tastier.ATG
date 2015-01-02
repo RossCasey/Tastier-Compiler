@@ -921,7 +921,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
                                     //increment heap counter
                                     program.Add(new Instruction("","LoadG 3"));
-                                    program.Add(new Instruction("","Const " + size));
+                                    program.Add(new Instruction("","Const " + recordSize));
                                     program.Add(new Instruction("","Add"));
                                     program.Add(new Instruction("","StoG 3"));
                                 .)
