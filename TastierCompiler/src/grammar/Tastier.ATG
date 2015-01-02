@@ -1637,7 +1637,7 @@ VarDecl<bool external>          (.
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address));
 
                                     if(!isArray) {
-                                      addOrReplaceRecord(parentRecord,varName, typeName);
+                                      addOrReplaceRecord("",varName, typeName);
 
                                       int stringAddress = nextHeapAddress;
                                       nextHeapAddress = nextHeapAddress + recordType.Item3;
@@ -1680,7 +1680,7 @@ VarDecl<bool external>          (.
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address));
 
                                     if(!isArray) {
-                                      addOrReplaceRecord(parentRecord,varName, typeName);
+                                      addOrReplaceRecord("",varName, typeName);
 
                                       stringAddress = nextHeapAddress;
                                       nextHeapAddress = nextHeapAddress + recordType.Item3;
