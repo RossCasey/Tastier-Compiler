@@ -493,7 +493,7 @@ Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
 
 Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; string name;  .)
 =                               (.  type = TastierType.Undefined; string parent = ""; int dimensions = 0;
-                                    ArrayTableEntry arraySymbol.)
+                                    ArrayTableEntry arraySymbol; .)
   ( Ident<out name>             (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
                                     sym = lookup(openScopes, name);
