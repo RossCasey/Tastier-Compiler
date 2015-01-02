@@ -327,6 +327,7 @@ int recordsDefined = 0;
 string typeOfLastReferencedRecord;
 int dimensionsOfLastReferencedArray;
 int typeOfLastReferencedArray;
+string subTypeOfLastReferencedArray;
 
 //This string is set to the name of a record being defined so that the parent of a record within a record is known
 //string parentRecord = "";
@@ -561,7 +562,8 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                   } else if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
                                   } else if(dimensions > 0) {
-                                    typeOfLastReferencedArray = arraySymbol.Item3;
+                                    typeOfLastReferencedArray = arraySymbol.Item2;
+                                    subTypeOfLastReferencedArray = arraySymbol.Item3;
                                     dimensionsOfLastReferencedArray = dimensions;
                                   }
 
@@ -875,7 +877,10 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     } else if (type == TastierType.Array) {
                                       if(typeOfLastReferencedArray != (int) type) {
                                         SemErr("Array types do not match");
-                                      } else if(dimensionsOfLastReferencedArray != dimensions) {
+                                      } else if(!subTypeOfLastReferencedArray.Equals(arraySymbol.Item3)) {
+                                        SemErr("Array record types do not match");
+                                      }
+                                      else if(dimensionsOfLastReferencedArray != dimensions) {
                                         SemErr("Dimensions of arrays do not match");
                                       }
                                     }
