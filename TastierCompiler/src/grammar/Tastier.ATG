@@ -780,7 +780,7 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
 Stat                            (.  TastierType type;TastierType type1; TastierType type2; string name; string name1;
                                     Symbol sym; Symbol subSym = null; string parent = "";
                                     bool external = false; bool isExternal = false; Program incrementer;
-                                    int dimensions; ArrayTableEntry arraySymbol = null;
+                                    int dimensions = 0; ArrayTableEntry arraySymbol = null;
                                 .)
 
 = Ident<out name>               (.
@@ -1682,7 +1682,7 @@ VarDecl<bool external>          (.
                                     if(!isArray) {
                                       addOrReplaceRecord("",varName, typeName);
 
-                                      stringAddress = nextHeapAddress;
+                                      int stringAddress = nextHeapAddress;
                                       nextHeapAddress = nextHeapAddress + recordType.Item3;
 
                                       //pointer to record in memory, will be replaced with absolute address later
