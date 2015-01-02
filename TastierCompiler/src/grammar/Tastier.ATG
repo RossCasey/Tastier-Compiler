@@ -556,11 +556,13 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                   if(dimensions == 0) {
                                     type = (TastierType) arraySymbol.Item2;
                                     if(type == TastierType.Record) {
-                                      typeOfLastReferencedRecord = arraySymbol.3;
+                                      typeOfLastReferencedRecord = arraySymbol.Item3;
                                     }
-                                  }
-                                  if(dimensions < 0) {
+                                  } else if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
+                                  } else if(dimesions > 0) {
+                                    typeOfLastReferencedArray = arraySymbol.Item3;
+                                    dimensionsOfLastReferencedArray = dimensions; 
                                   }
 
                                   program.Add(new Instruction("","Add"));
