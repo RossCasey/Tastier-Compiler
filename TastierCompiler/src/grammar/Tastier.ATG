@@ -330,7 +330,6 @@ int typeOfLastReferencedArray;
 string subTypeOfLastReferencedArray;
 
 //This string is set to the name of a record being defined so that the parent of a record within a record is known
-//string parentRecord = "";
 
 void addOrReplaceRecord(string parent, string recName, string typeName) {
   int index = 0;
@@ -1477,7 +1476,6 @@ RecordDecl                      (.
                                     if(checkNoCollisions != "") {
                                       SemErr("A record with this name has already been defined");
                                     }
-                                    parentRecord = typeName;
 
                                     //Adding new record type to list and giving it its own list of variables
                                     type = recordsDefined;
@@ -1537,7 +1535,6 @@ RecordDecl                      (.
                                     }
                                     //now that the size is known we can add an entry to the record types list
                                     recordTypes.Add(new RecordType(typeName,type,size));
-                                    parentRecord = "";
                                 .).
 
 /*------------------------------------------------------------------------*/
