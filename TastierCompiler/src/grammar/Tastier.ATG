@@ -796,6 +796,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(sym.Item3 == (int)TastierType.Record) {
                                       //if ident is a record then the address of the record variable must be calculated
                                       program.Add(new Instruction("","Const " + (sym.Item5 + 3)));
+                                      program.Add(new Instruction("","Nop")); //debug
                                     }
                                     if(sym.Item3 == (int)TastierType.Array) {
                                         arraySymbol = arrayLookup(name);
