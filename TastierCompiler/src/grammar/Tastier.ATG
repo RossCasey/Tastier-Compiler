@@ -920,7 +920,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       program.Add(new Instruction("","MemStore"));
                                     }
                                 .)
-  | "allocate" '('              (.
+  | "allocate"  '('             (.
                                     //no need to load pointer so the previous instruciton is removed
                                     program.RemoveAt(program.Count() - 1);
 
