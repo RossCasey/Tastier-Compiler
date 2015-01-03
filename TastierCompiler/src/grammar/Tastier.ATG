@@ -1571,6 +1571,7 @@ VarDecl<bool external>          (.
                                         nextHeapAddress++;
                                       } else {
                                         address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+
                                       }
                                       currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
                                     }
@@ -1643,6 +1644,7 @@ VarDecl<bool external>          (.
                                       int stringAddress = nextHeapAddress;
                                       nextHeapAddress = nextHeapAddress + recordType.Item3;
 
+                                      program.Add(new Instruction(Convert.ToString(stringAddress),"Nop"));
                                       program.Add(new Instruction("","Const " + Convert.ToString(stringAddress + 3)));
 
                                       if ((openScopes.Count-1) == 0) {
