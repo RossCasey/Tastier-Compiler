@@ -795,7 +795,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
                                     if(sym.Item3 == (int)TastierType.Record) {
                                       //if ident is a record then the address of the record variable must be calculated
-                                      //program.Add(new Instruction("","Const " + (sym.Item5 + 3)));
                                       if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
                                         if (sym.Item4 == 0) {
                                           if (isExternal) {
@@ -809,7 +808,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                           program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
                                         }
                                       } else SemErr("Variable or constant Expected");
-                                      //program.Add(new Instruction(Convert.ToString(sym.Item5),"Nop")); //debug
                                     }
                                     if(sym.Item3 == (int)TastierType.Array) {
                                         arraySymbol = arrayLookup(name);
@@ -1657,7 +1655,6 @@ VarDecl<bool external>          (.
                                       int stringAddress = nextHeapAddress;
                                       nextHeapAddress = nextHeapAddress + recordType.Item3;
 
-                                      program.Add(new Instruction(Convert.ToString(stringAddress),"Nop"));
                                       program.Add(new Instruction("","Const " + Convert.ToString(stringAddress + 3)));
 
                                       if ((openScopes.Count-1) == 0) {
