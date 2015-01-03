@@ -782,6 +782,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int dimensions = 0; ArrayTableEntry arraySymbol = null;
                                     TastierType arrayAccessType;
+                                    bool isArray = false;
                                 .)
 
 = Ident<out name>               (.
@@ -813,7 +814,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(sym.Item3 == (int)TastierType.Array) {
                                         arraySymbol = arrayLookup(name);
                                         dimensions = arraySymbol.Item4;
-                                        type1 = TastierType.Array;
+                                        isArray = true;
                                       }
                                 .)
   {
@@ -845,12 +846,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
       Expr<out arrayAccessType>  (.
                                   dimensions--;
                                   if(dimensions == 0) {
-                                    type = (TastierType) arraySymbol.Item2;
-                                    /*
-                                    if(type1 == TastierType.Record) {
-                                      typeOfLastReferencedRecord = arraySymbol.Item3;
-                                    }
-                                    */
+                                    //type = (TastierType) arraySymbol.Item2;
                                   }
                                   if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
@@ -880,13 +876,27 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       if(type != (TastierType)subSym.Item3) {
                                         SemErr("Type of identifer and type of expression do not match");
                                       }
-                                    } else if (type != TastierType.Array) {
+                                    } else if (!isArray) {
                                       if(type != (TastierType)sym.Item3) {
                                         SemErr("Type of identifer and type of expression do not match");
                                       }
                                     } else {
-                                      if(type != type1) {
-                                        SemErr("Cannot assign arrays and array items");
+                                      if(type == TastierType.Array) {
+                                        if((arraySymbol.Item2 != typeOfLastReferencedArray) ||
+                                          (arraySymbol.Item3 != subTypeOfLastReferencedArray) ||
+                                          (dimensions != dimensionsOfLastReferencedArray)) {
+                                          SemErr("Array mismatch");
+                                        }
+                                      } else {
+                                        if((dimensions != 0) ||
+                                           (type != (TastierType)arraySymbol.Item2)) {
+                                          SemErr("Type of identifer and type of expression do not match");
+                                        }
+                                        if (type != TastierType.Record) {
+                                          if (!typeOfLastReferencedRecord.Equals(arraySymbol.Item3)) {
+                                            SemErr("Type of identifer and type of expression do not match");
+                                          }
+                                        }
                                       }
                                     }
                                     if(type == TastierType.Record) {
