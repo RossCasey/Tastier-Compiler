@@ -316,6 +316,7 @@ ArrayTable arrayTable = new ArrayTable();
 
 //keeps track of the next available index number for record types
 int recordsDefined = 0;
+string parentRecord = "";
 
 /*
   If the programmer wants to assign a record pointer to another record pointer the types of the
@@ -1476,6 +1477,7 @@ RecordDecl                      (.
                                     if(checkNoCollisions != "") {
                                       SemErr("A record with this name has already been defined");
                                     }
+                                    parentRecord = typeName;
 
                                     //Adding new record type to list and giving it its own list of variables
                                     type = recordsDefined;
@@ -1535,6 +1537,7 @@ RecordDecl                      (.
                                     }
                                     //now that the size is known we can add an entry to the record types list
                                     recordTypes.Add(new RecordType(typeName,type,size));
+                                    parentRecord = "";
                                 .).
 
 /*------------------------------------------------------------------------*/
@@ -1634,7 +1637,7 @@ VarDecl<bool external>          (.
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address));
 
                                     if(!isArray) {
-                                      addOrReplaceRecord("",varName, typeName);
+                                      addOrReplaceRecord(parentRecord,varName, typeName);
 
                                       int stringAddress = nextHeapAddress;
                                       nextHeapAddress = nextHeapAddress + recordType.Item3;
@@ -1677,7 +1680,7 @@ VarDecl<bool external>          (.
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address));
 
                                     if(!isArray) {
-                                      addOrReplaceRecord("",varName, typeName);
+                                      addOrReplaceRecord(parentRecord,varName, typeName);
 
                                       int stringAddress = nextHeapAddress;
                                       nextHeapAddress = nextHeapAddress + recordType.Item3;
