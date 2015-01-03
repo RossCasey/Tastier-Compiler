@@ -1382,7 +1382,7 @@ Tastier                         (.  string name; bool external = false; .)
                                     //add function that initialises the heap memory counter
                                     header.Add(new Instruction("InitHeapCounter","Enter 0"));
                                     header.Add(new Instruction("","Const " + nextHeapAddress));
-                                    header.Add(new Instruction("","LoadG 3"));
+                                    header.Add(new Instruction("","StoG 3"));
                                     header.Add(new Instruction("","Leave"));
                                     header.Add(new Instruction("","Ret"));
 
