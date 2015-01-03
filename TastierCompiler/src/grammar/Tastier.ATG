@@ -795,7 +795,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr("reference to undefined variable " + name);
                                     }
 
-                                    if(sym.Item3 == (int)TastierType.Record) {
+                                    if(sym.Item3 == (int)TastierType.Record || sym.Item3 == (int)TastierType.Array) {
                                       //if ident is a record then the address of the record variable must be calculated
                                       if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
                                         if (sym.Item4 == 0) {
@@ -880,7 +880,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       if(type != (TastierType)sym.Item3) {
                                         SemErr("Type of identifer and type of expression do not match");
                                       }
-                                    } 
+                                    }
                                     if(type == TastierType.Record) {
 
                                       string parentRecordType = lookupRecordType(parent,sym.Item1);
