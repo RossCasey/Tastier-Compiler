@@ -795,8 +795,21 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
                                     if(sym.Item3 == (int)TastierType.Record) {
                                       //if ident is a record then the address of the record variable must be calculated
-                                      program.Add(new Instruction("","Const " + (sym.Item5 + 3)));
-                                      program.Add(new Instruction(Convert.ToString(sym.Item5),"Nop")); //debug
+                                      //program.Add(new Instruction("","Const " + (sym.Item5 + 3)));
+                                      if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
+                                        if (sym.Item4 == 0) {
+                                          if (isExternal) {
+                                            program.Add(new Instruction("", "LoadG " + sym.Item1));
+                                            // if the symbol is external, we load it by name. The linker will resolve the name to an address.
+                                          } else {
+                                            program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
+                                          }
+                                        } else {
+                                          int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                          program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
+                                        }
+                                      } else SemErr("Variable or constant Expected");
+                                      //program.Add(new Instruction(Convert.ToString(sym.Item5),"Nop")); //debug
                                     }
                                     if(sym.Item3 == (int)TastierType.Array) {
                                         arraySymbol = arrayLookup(name);
