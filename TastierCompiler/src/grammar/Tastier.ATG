@@ -813,7 +813,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(sym.Item3 == (int)TastierType.Array) {
                                         arraySymbol = arrayLookup(name);
                                         dimensions = arraySymbol.Item4;
-                                        type1 = TastierType.Array; 
+                                        type1 = TastierType.Array;
                                       }
                                 .)
   {
@@ -880,9 +880,13 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       if(type != (TastierType)subSym.Item3) {
                                         SemErr("Type of identifer and type of expression do not match");
                                       }
-                                    } else  {
+                                    } else if (type != TastierType.Array) {
                                       if(type != (TastierType)sym.Item) {
                                         SemErr("Type of identifer and type of expression do not match");
+                                      }
+                                    } else {
+                                      if(type != type1) {
+                                        SemErr("Cannot assign arrays and array items");
                                       }
                                     }
                                     if(type == TastierType.Record) {
