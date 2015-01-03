@@ -856,8 +856,8 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     SemErr("Integer type expected for array access");
                                   }
 
-                                  program.Add(new Instruction("","Add"));
                                   program.Add(new Instruction("","MemLoad"));
+                                  program.Add(new Instruction("","Add"));
                                 .)
       ']'
   }
