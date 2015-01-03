@@ -880,25 +880,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       if(type != (TastierType)sym.Item3) {
                                         SemErr("Type of identifer and type of expression do not match");
                                       }
-                                    } else {
-                                      if(type == TastierType.Array) {
-                                        if((arraySymbol.Item2 != typeOfLastReferencedArray) ||
-                                          (arraySymbol.Item3 != subTypeOfLastReferencedArray) ||
-                                          (dimensions != dimensionsOfLastReferencedArray)) {
-                                          SemErr("Array mismatch");
-                                        }
-                                      } else {
-                                        if((dimensions != 0) ||
-                                           (type != (TastierType)arraySymbol.Item2)) {
-                                          SemErr("Type of identifer and type of expression do not match");
-                                        }
-                                        if (type != TastierType.Record) {
-                                          if (!typeOfLastReferencedRecord.Equals(arraySymbol.Item3)) {
-                                            SemErr("Type of identifer and type of expression do not match");
-                                          }
-                                        }
-                                      }
-                                    }
+                                    } 
                                     if(type == TastierType.Record) {
 
                                       string parentRecordType = lookupRecordType(parent,sym.Item1);
