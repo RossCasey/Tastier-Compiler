@@ -1572,6 +1572,10 @@ VarDecl<bool external>          (.
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + name + " is already in use");
                                     }
+                                    if(isArray) {
+                                      addOrReplaceArray(name, (int)type, "", dimensions);
+                                      type = TastierType.Array;
+                                    }
 
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
@@ -1588,9 +1592,7 @@ VarDecl<bool external>          (.
                                       currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
                                     }
 
-                                    if(isArray) {
-                                      addOrReplaceArray(name, (int)type, "", dimensions);
-                                    }
+
                                 .)
    { ',' Ident<out name>  (.
                                     //check that there are no name collisions
@@ -1598,6 +1600,10 @@ VarDecl<bool external>          (.
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + name + " is already in use");
                                     }
+                                    if(isArray) {
+                                      addOrReplaceArray(name, (int)type, "", dimensions);
+                                      type = TastierType.Array;
+                                    }
 
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
@@ -1613,9 +1619,6 @@ VarDecl<bool external>          (.
                                       currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
                                     }
 
-                                    if(isArray) {
-                                      addOrReplaceArray(name, (int)type, "", dimensions);
-                                    }
                                 .)
   } ';'
   | "record"
@@ -1637,6 +1640,10 @@ VarDecl<bool external>          (.
                                     Symbol checkNoCollisions = lookup(openScopes,varName);
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + varName + " is already in use");
+                                    }
+                                    if(isArray) {
+                                      addOrReplaceArray(varName, (int)type, typeName, dimensions);
+                                      type = TastierType.Array;
                                     }
 
                                     //create new instance of record in current scope
@@ -1671,8 +1678,6 @@ VarDecl<bool external>          (.
                                         int lexicalLevelDifference = 0;
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
                                       }
-                                    } else {
-                                      addOrReplaceArray(varName, (int)type, typeName, dimensions);
                                     }
                                 .)
     { ',' Ident<out varName>    (.
@@ -1680,6 +1685,10 @@ VarDecl<bool external>          (.
                                     checkNoCollisions = lookup(openScopes,varName);
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + varName + " is already in use");
+                                    }
+                                    if(isArray) {
+                                      addOrReplaceArray(varName, (int)type, typeName, dimensions);
+                                      type = TastierType.Array;
                                     }
 
 
@@ -1715,9 +1724,7 @@ VarDecl<bool external>          (.
                                         int lexicalLevelDifference = 0;
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
                                       }
-                                    } else {
-                                      addOrReplaceArray(varName, (int)type, typeName, dimensions);
-                                    }
+                                    } 
                                 .)
   } ';'
   ).
