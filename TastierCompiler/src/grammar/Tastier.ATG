@@ -47,7 +47,7 @@ COMPILER Tastier
     Address 0 is the pointer to the next free address in the heap
     Address 1 is needed as a temporary storage location for calculating the size of a memory allocation
   */
-  int nextHeapAddress = 2;
+  int nextHeapAddress = 0;
 
 
 
