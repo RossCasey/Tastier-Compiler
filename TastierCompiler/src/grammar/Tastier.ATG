@@ -904,13 +904,18 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
 
                                     if(type == TastierType.Record) {
-                                      Console.WriteLine("Got Here 2");
                                       string parentRecordType = lookupRecordType(parent,sym.Item1);
-                                      string recordType = lookupRecordType(parentRecordType,subSym.Item1);
+                                      if(subSym != null) {
+                                        string recordType = lookupRecordType(parentRecordType,subSym.Item1);
 
-                                      if(!(recordType.Equals(typeOfLastReferencedRecord))) {
-                                        SemErr("Cannot assign record of type " + typeOfLastReferencedRecord +
-                                                " to record reference variable of type " + recordType);
+                                        if(!(recordType.Equals(typeOfLastReferencedRecord))) {
+                                          SemErr("Cannot assign record of type " + typeOfLastReferencedRecord +
+                                                  " to record reference variable of type " + recordType);
+                                        }
+                                      } else {
+                                        if(!parentRecordType.Equals(typeOfLastReferencedRecord)) {
+                                          SemErr("Record type mismatch");
+                                        }
                                       }
                                     } else if (type == TastierType.Array) {
                                       if(typeOfLastReferencedArray != (int) type) {
