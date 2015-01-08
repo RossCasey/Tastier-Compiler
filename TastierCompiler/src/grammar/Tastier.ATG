@@ -528,6 +528,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       } else SemErr("Variable or constant Expected");
                                     }
                                 .)
+    (
     {
       access                    (.
                                     if(sym.Item3 != (int)TastierType.Record) {
@@ -558,6 +559,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                 .)
     }
 
+    |
     {
       '['
       Expr<out arrayAccessType>  (.
@@ -586,6 +588,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                 .)
       ']'
     }
+    )
 
                                 (.
                                     if(type == TastierType.Record) {
