@@ -421,6 +421,9 @@ string lookupRecordType(string parent,string recName) {
 
 Symbol recordVariableLookup(string parent,string recName, string varName) {
   string typeName = lookupRecordType(parent,recName);
+  if(typeName == null) {
+    SemErr("This record does not exist in the current context");
+  }
   RecordType recType = recordLookup(typeName);
   int variableIndex = recType.Item2;
   foreach(Symbol s in recordVariables.ElementAt(variableIndex)) {
@@ -543,15 +546,6 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       sym = subSym;
                                     }
                                     Console.WriteLine("Start of troubled section");
-                                    if(sym == null) {
-                                      SemErr("Sym is null");
-                                    }
-                                    if(name == null) {
-                                      SemErr("name is null");
-                                    }
-                                    if(parent == null) {
-                                      SemErr("parent is null");
-                                    }
                                     subSym = recordVariableLookup(parent,sym.Item1,name);
                                     Console.WriteLine("End of troubled section");
 
