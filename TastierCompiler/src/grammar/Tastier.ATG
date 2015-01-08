@@ -530,11 +530,8 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                 .)
     {
     (access                    (.
-                                    if(sym.Item3 != (int)TastierType.Record) {
+                                    if(sym.Item3 != (int)TastierType.Record && type != TastierType.Record) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
-                                      if(isArray) {
-                                        Console.WriteLine("This has been executed");
-                                      }
                                     }
                                 .)
       Ident<out name>          (.
