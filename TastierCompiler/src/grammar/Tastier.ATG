@@ -1008,6 +1008,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     } else {
                                       program.Add(new Instruction("","MemStore"));
                                     }
+                                    Console.WriteLine("Got here 3");
                                 .)
 
 
