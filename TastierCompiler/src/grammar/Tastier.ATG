@@ -563,17 +563,13 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                   subTypeOfLastReferencedArray = arraySymbol.Item3;
 
                                   dimensionsOfLastReferencedArray = dimensions;
-                                  Console.WriteLine((TastierType)typeOfLastReferencedArray);
-                                  Console.WriteLine(subTypeOfLastReferencedArray);
-                                  Console.WriteLine(dimensionsOfLastReferencedArray);
 
 
                                   if(dimensions == 0) {
                                     type = (TastierType) arraySymbol.Item2;
-                                    Console.WriteLine("This is executed -1");
                                     if(type == TastierType.Record) {
-                                      Console.WriteLine("This is executed");
                                       typeOfLastReferencedRecord = arraySymbol.Item3;
+                                      Console.WriteLine(typeOfLastReferencedRecord);
                                     }
                                   } else if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
@@ -904,7 +900,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
 
 
-                                    Console.WriteLine(type);
                                     if(type == TastierType.Record) {
                                       string parentRecordType = lookupRecordType(parent,sym.Item1);
                                       if(subSym != null) {
