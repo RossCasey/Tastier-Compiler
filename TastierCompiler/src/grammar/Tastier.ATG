@@ -557,7 +557,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                   if(arrayAccessType != TastierType.Integer) {
                                     SemErr("Integer type expected for array access");
                                   }
-                                  
+
                                   dimensions--;
                                   if(dimensions == 0) {
                                     type = (TastierType) arraySymbol.Item2;
@@ -948,6 +948,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
     ( "record"
       Ident<out name>           (.
+                                    Console.WriteLine("Got here 0");
                                     RecordType recType = recordLookup(name);
                                     if(recType == null) {
                                       SemErr("Record Type " + name + " has not been defined");
@@ -956,6 +957,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     //get next heap pointer
                                     program.Add(new Instruction("","LoadG 3"));
 
+                                    Console.WriteLine("Got here 1");
                                     //add memory offset
                                     program.Add(new Instruction("","Const 3"));
                                     program.Add(new Instruction("","Add"));
@@ -965,6 +967,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     program.Add(new Instruction("","Const " + recordSize));
                                     program.Add(new Instruction("","Add"));
                                     program.Add(new Instruction("","StoG 3"));
+                                    Console.WriteLine("Got here 2");
                                 .)
     | Expr<out type>            (.
                                     if(type != TastierType.Integer) {
