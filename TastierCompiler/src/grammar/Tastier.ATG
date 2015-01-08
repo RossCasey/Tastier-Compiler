@@ -862,8 +862,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     SemErr("Integer type expected for array access");
                                   }
 
-                                  Console.WriteLine("Dimensions: " + dimensions);
-
                                   program.Add(new Instruction("","Add"));
                                 .)
       ']'
@@ -887,7 +885,16 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       if(type != (TastierType)sym.Item3) {
                                         SemErr("Type of identifer and type of expression do not match");
                                       }
+                                    } else if (type != TastierType.Array) {
+                                      if(arraySymbol.Item2 != (int)type) {
+                                        SemErr("Cannot assign " + type + " to " + (TastierType)arraySymbol.Item2 + " array.");
+                                      } else if(dimensions != 0) {
+                                        SemErr("Cannot assign " + type + " to " + type + " array pointer");
+                                      }
                                     }
+
+
+
                                     if(type == TastierType.Record) {
 
                                       string parentRecordType = lookupRecordType(parent,sym.Item1);
