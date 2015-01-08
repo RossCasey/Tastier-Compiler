@@ -529,9 +529,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     }
                                 .)
     {
-    (
-    {
-      access                    (.
+    (access                    (.
                                     if(sym.Item3 != (int)TastierType.Record) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                       if(isArray) {
@@ -558,11 +556,8 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       program.Add(new Instruction("","MemLoad"));
                                     }
                                 .)
-    }
 
-    |
-    {
-      '['
+    |'['
       Expr<out arrayAccessType>  (.
                                   if(arrayAccessType != TastierType.Integer) {
                                     SemErr("Integer type expected for array access");
@@ -588,7 +583,6 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                   program.Add(new Instruction("","MemLoad"));
                                 .)
       ']'
-    }
     )
     }
 
