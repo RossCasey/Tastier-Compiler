@@ -910,6 +910,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                                   " to record reference variable of type " + recordType);
                                         }
                                       } else {
+                                        Console.WriteLine(parentRecordType);
                                         if(!parentRecordType.Equals(typeOfLastReferencedRecord)) {
                                           SemErr("Record type mismatch");
                                         }
