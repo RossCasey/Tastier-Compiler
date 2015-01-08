@@ -553,6 +553,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
     {
       '['
       Expr<out type>            (.
+                                  Console.WriteLine(dimensions);
                                   dimensions--;
                                   if(dimensions == 0) {
                                     type = (TastierType) arraySymbol.Item2;
@@ -862,7 +863,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     SemErr("Integer type expected for array access");
                                   }
 
-                                  Console.WriteLine("Got here");
                                   program.Add(new Instruction("","Add"));
                                 .)
       ']'
