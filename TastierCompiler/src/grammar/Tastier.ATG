@@ -986,7 +986,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
     )
     ')'
     ';'                         (.
-                                    if(subSym == null && !isArray) {
+                                    if(subSym == null && (!isArray || (isArray && (dimensions == arraySymbol.Item4)))) {
                                       if (sym.Item4 == 0) {
                                         if (isExternal) {
                                           program.Add(new Instruction("", "StoG " + sym.Item1));
