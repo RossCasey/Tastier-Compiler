@@ -937,7 +937,10 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   | "allocate"  '('             (.
                                     //no need to load pointer so the previous instruciton is removed
-                                    //program.RemoveAt(program.Count() - 1);
+                                    //if accessing the pointer of the array
+                                    if(isArray && (dimensions == arraySymbol.Item4)) {
+                                      program.RemoveAt(program.Count() - 1);
+                                    }
 
                                     if((sym.Item3 != (int)TastierType.Record) && (sym.Item3 != (int)TastierType.Array)) {
                                       SemErr("Allocate can only be used for records and arrays");
