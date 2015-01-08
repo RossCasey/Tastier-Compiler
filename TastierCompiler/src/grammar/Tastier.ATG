@@ -1747,6 +1747,7 @@ VarDecl<bool external>          (.
                                       } else {
                                         //There is no need for a lexical difference here as the record has just been declared
                                         //in the current scope
+                                        addOrReplaceRecord(parentRecord,varName, typeName);
                                         int lexicalLevelDifference = 0;
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
                                       }
