@@ -561,6 +561,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                   dimensions--;
                                   typeOfLastReferencedArray = arraySymbol.Item2;
                                   subTypeOfLastReferencedArray = arraySymbol.Item3;
+
                                   dimensionsOfLastReferencedArray = dimensions;
                                   Console.WriteLine((TastierType)typeOfLastReferencedArray);
                                   Console.WriteLine(subTypeOfLastReferencedArray);
@@ -570,6 +571,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                   if(dimensions == 0) {
                                     type = (TastierType) arraySymbol.Item2;
                                     if(type == TastierType.Record) {
+                                      Console.WriteLine("This is executed");
                                       typeOfLastReferencedRecord = arraySymbol.Item3;
                                     }
                                   } else if(dimensions < 0) {
