@@ -862,7 +862,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     SemErr("Integer type expected for array access");
                                   }
 
-                                  Console.WriteLine("Dimensions: " + dimensions;
+                                  Console.WriteLine("Dimensions: " + dimensions);
 
                                   program.Add(new Instruction("","Add"));
                                 .)
