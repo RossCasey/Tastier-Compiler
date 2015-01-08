@@ -836,7 +836,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   {
     (
     access                      (.
-                                    if(sym.Item3 != (int)TastierType.Record && (sym.Item3 == (int)TastierType.Array && arraySymbol.Item2 == (int)TastierType.Record && dimensions != 0) {
+                                    if(sym.Item3 != (int)TastierType.Record && (sym.Item3 == (int)TastierType.Array && arraySymbol.Item2 == (int)TastierType.Record && dimensions != 0)) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
                                 .)
