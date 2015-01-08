@@ -877,11 +877,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                 .)
    Assignment<out type>         (.
-                                    Console.WriteLine("Got Here 0");
-
-                                    if(arraySymbol == null) {
-                                      Console.WriteLine("ArraySymbol is null");
-                                    }
 
                                     //check type of assignment and type of identifier are the same
                                     if(subSym != null) {
