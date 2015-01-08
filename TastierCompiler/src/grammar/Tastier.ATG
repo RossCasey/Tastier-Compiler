@@ -841,23 +841,18 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                 .)
     Ident<out name>            (.
-                                    //allows for records within records
                                     if(subSym != null) {
-                                      //this will execute every time but the first
                                       parent = lookupRecordType(parent,sym.Item1);
                                       sym = subSym;
+                                      program.Add(new Instruction("","MemLoad"));
                                     }
-
                                     subSym = recordVariableLookup(parent,sym.Item1,name);
-
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
-
                                       type = (TastierType)subSym.Item3;
                                       program.Add(new Instruction("","Const " + (subSym.Item5)));
                                       program.Add(new Instruction("","Add"));
-                                      program.Add(new Instruction("","MemLoad"));
                                     }
                                 .)
 
