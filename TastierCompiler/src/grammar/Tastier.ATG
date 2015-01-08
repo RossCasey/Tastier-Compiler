@@ -793,7 +793,7 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
 
 /*------------------------------------------------------------------------*/
 
-Stat                            (.  TastierType type = null;TastierType type1; TastierType type2; string name; string name1;
+Stat                            (.  TastierType type;TastierType type1; TastierType type2; string name; string name1;
                                     Symbol sym; Symbol subSym = null; string parent = "";
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int dimensions = 0; ArrayTableEntry arraySymbol = null;
@@ -836,7 +836,7 @@ Stat                            (.  TastierType type = null;TastierType type1; T
   {
     (
     access                      (.
-                                    if(sym.Item3 != (int)TastierType.Record && type != TastierType.Record) {
+                                    if(sym.Item3 != (int)TastierType.Record && (sym.Item3 == (int)TastierType.Array && arraySymbol.Item2 == (int)TastierType.Record && dimensions == 0)) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
                                 .)
@@ -867,7 +867,7 @@ Stat                            (.  TastierType type = null;TastierType type1; T
       Expr<out arrayAccessType>  (.
                                   dimensions--;
                                   if(dimensions == 0) {
-                                    type = (TastierType) arraySymbol.Item2;
+                                    //type = (TastierType) arraySymbol.Item2;
                                   }
                                   if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
@@ -938,7 +938,7 @@ Stat                            (.  TastierType type = null;TastierType type1; T
 
                                 .)
    ';'                          (.
-                                    if(subSym == null && !isArray) {
+                                    if(subSym == null && !isArray ) {
                                       if (sym.Item4 == 0) {
                                         if (isExternal) {
                                           program.Add(new Instruction("", "StoG " + sym.Item1));
