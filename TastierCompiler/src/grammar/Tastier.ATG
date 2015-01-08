@@ -546,7 +546,9 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
-                                      Console.WriteLine("This has been executed");
+                                      if(isArray) {
+                                        Console.WriteLine("This has been executed");
+                                      }
                                       type = (TastierType)subSym.Item3;
                                       program.Add(new Instruction("","Const " + (subSym.Item5)));
                                       program.Add(new Instruction("","Add"));
