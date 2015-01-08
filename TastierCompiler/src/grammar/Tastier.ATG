@@ -898,9 +898,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       } else if(dimensions != 0) {
                                         SemErr("Cannot assign " + type + " to " + type + " array pointer");
                                       }
-                                      Console.WriteLine("Got Here 1");
-                                    }
 
+                                    }
+                                    Console.WriteLine("Got Here 1");
 
 
                                     if(type == TastierType.Record) {
