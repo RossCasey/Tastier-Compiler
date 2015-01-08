@@ -548,11 +548,8 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       parent = lookupRecordType(parent,sym.Item1);
                                       sym = subSym;
                                     }
-                                    Console.WriteLine("Start of troubled section");
-                                    Console.WriteLine(parent + " " + sym.Item1 + " " + name);
-                                    subSym = recordVariableLookup(parent,sym.Item1,name);
-                                    Console.WriteLine("End of troubled section");
 
+                                    subSym = recordVariableLookup(parent,sym.Item1,name);
 
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
