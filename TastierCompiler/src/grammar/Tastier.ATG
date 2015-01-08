@@ -422,9 +422,12 @@ string lookupRecordType(string parent,string recName) {
 Symbol recordVariableLookup(string parent,string recName, string varName) {
   string typeName = lookupRecordType(parent,recName);
   if(typeName == null) {
-    SemErr("This record does not exist in the current context");
+    SemErr("This record type does not exist in the current context");
   }
   RecordType recType = recordLookup(typeName);
+  if(recType == null) {
+    SemErr("This record does not exist in the current context");
+  }
   int variableIndex = recType.Item2;
   foreach(Symbol s in recordVariables.ElementAt(variableIndex)) {
     if(s.Item1.Equals(varName)) {
