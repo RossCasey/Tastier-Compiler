@@ -793,7 +793,7 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
 
 /*------------------------------------------------------------------------*/
 
-Stat                            (.  TastierType type;TastierType type1; TastierType type2; string name; string name1;
+Stat                            (.  TastierType type = null;TastierType type1; TastierType type2; string name; string name1;
                                     Symbol sym; Symbol subSym = null; string parent = "";
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int dimensions = 0; ArrayTableEntry arraySymbol = null;
