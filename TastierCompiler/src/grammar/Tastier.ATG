@@ -782,7 +782,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int dimensions = 0; ArrayTableEntry arraySymbol = null;
                                     TastierType arrayAccessType;
-                                    bool isArray = false;
+                                    bool isArray = false; bool firstAccess = true;
                                 .)
 
 = Ident<out name>               (.
@@ -843,7 +843,11 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
 
   {
       '['                        (.
-                                    //program.Add(new Instruction("","MemLoad"));
+                                    if(firstAccess) {
+                                      firstAccess = false;
+                                    } else {
+                                      program.Add(new Instruction("","MemLoad"));
+                                    }
                                  .)
       Expr<out arrayAccessType>  (.
                                   dimensions--;
