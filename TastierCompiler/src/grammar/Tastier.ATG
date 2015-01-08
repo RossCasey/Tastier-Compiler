@@ -790,6 +790,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     int dimensions = 0; ArrayTableEntry arraySymbol = null;
                                     TastierType arrayAccessType;
                                     bool isArray = false; bool firstAccess = true;
+                                    bool performed
                                 .)
 
 = Ident<out name>               (.
@@ -1388,14 +1389,14 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       //needed for WriteMul
                                       program.Add(new Instruction("", "Const " + (int)type));
                                     } else {
-                                      SemErr("unexpected variable type");
+                                      SemErr("unexpected variable type: " + type);
                                     }
                                     numArgs = 1;
                                  .)
   { ',' Expr<out type>          (.
                                     numArgs++;
                                     if((type != TastierType.String) && (type != TastierType.Integer)) {
-                                      SemErr("unexpected variable type");
+                                      SemErr("unexpected variable type: " + type);
                                     }
                                     //needed for WriteMul
                                     program.Add(new Instruction("", "Const " + (int)type));
