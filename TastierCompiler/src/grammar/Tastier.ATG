@@ -900,11 +900,11 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       }
 
                                     }
-                                    Console.WriteLine("Got Here 1");
+
 
 
                                     if(type == TastierType.Record) {
-
+                                      Console.WriteLine("Got Here 2");
                                       string parentRecordType = lookupRecordType(parent,sym.Item1);
                                       string recordType = lookupRecordType(parentRecordType,subSym.Item1);
 
