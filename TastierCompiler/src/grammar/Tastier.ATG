@@ -535,7 +535,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     }
                                 .)
       Ident<out name>          (.
-                                    Console.WriteLine("This has been executed");
+
                                     //allows for records within records
                                     if(subSym != null) {
                                       //this will execute every time but the first
@@ -546,7 +546,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
-
+                                      Console.WriteLine("This has been executed");
                                       type = (TastierType)subSym.Item3;
                                       program.Add(new Instruction("","Const " + (subSym.Item5)));
                                       program.Add(new Instruction("","Add"));
