@@ -495,7 +495,8 @@ Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
 Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; string name;  .)
 =                               (.  type = TastierType.Undefined; string parent = ""; int dimensions = 0;
                                     TastierType arrayAccessType;
-                                    ArrayTableEntry arraySymbol = null; .)
+                                    ArrayTableEntry arraySymbol = null;
+                                    bool isArray = false; .)
   ( Ident<out name>             (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
                                     sym = lookup(openScopes, name);
@@ -509,6 +510,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       type = (TastierType) sym.Item3;
                                       if(type == TastierType.Array) {
                                         arraySymbol = arrayLookup(name);
+                                        isArray = true;
                                         dimensions = arraySymbol.Item4;
                                       }
                                       if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
@@ -587,7 +589,9 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                         parent = lookupRecordType(parent,sym.Item1);
                                         recordType = lookupRecordType(parent,subSym.Item1);
                                       }
-                                      typeOfLastReferencedRecord = recordType;
+                                      if(!isArray) {
+                                        typeOfLastReferencedRecord = recordType;
+                                      }
                                     }
                                 .)
 
@@ -879,9 +883,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                 .)
    Assignment<out type>         (.
-                                    Console.WriteLine("Start: ");
-
-                                    Console.WriteLine(typeOfLastReferencedRecord);
                                     //check type of assignment and type of identifier are the same
                                     if(subSym != null) {
                                       if(type != (TastierType)subSym.Item3) {
@@ -911,8 +912,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                                   " to record reference variable of type " + recordType);
                                         }
                                       } else {
-                                        Console.WriteLine(parentRecordType);
-                                        Console.WriteLine(typeOfLastReferencedRecord);
                                         if(!parentRecordType.Equals(typeOfLastReferencedRecord)) {
                                           SemErr("Record type mismatch");
                                         }
