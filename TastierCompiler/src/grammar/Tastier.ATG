@@ -937,7 +937,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
   | "allocate"  '('             (.
                                     //no need to load pointer so the previous instruciton is removed
-                                    program.RemoveAt(program.Count() - 1);
+                                    //program.RemoveAt(program.Count() - 1);
 
                                     if((sym.Item3 != (int)TastierType.Record) && (sym.Item3 != (int)TastierType.Array)) {
                                       SemErr("Allocate can only be used for records and arrays");
@@ -986,7 +986,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
     )
     ')'
     ';'                         (.
-                                    if(subSym == null) {
+                                    if(subSym == null && !isArray) {
                                       if (sym.Item4 == 0) {
                                         if (isExternal) {
                                           program.Add(new Instruction("", "StoG " + sym.Item1));
