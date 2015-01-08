@@ -834,6 +834,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                 .)
   {
+    (
     access                      (.
                                     if(sym.Item3 != (int)TastierType.Record) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
@@ -855,16 +856,14 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       program.Add(new Instruction("","Add"));
                                     }
                                 .)
-  }
 
-  {
-      '['                        (.
+      |'['                        (.
                                     if(firstAccess) {
                                       firstAccess = false;
                                     } else {
                                       program.Add(new Instruction("","MemLoad"));
                                     }
-                                 .)
+                                .)
       Expr<out arrayAccessType>  (.
                                   dimensions--;
                                   if(dimensions == 0) {
@@ -881,6 +880,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                   program.Add(new Instruction("","Add"));
                                 .)
       ']'
+      )
   }
   (":="                          (.
                                     //error if user tries to reassign constant
