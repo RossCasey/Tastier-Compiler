@@ -559,6 +559,10 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                   }
 
                                   dimensions--;
+                                  typeOfLastReferencedArray = arraySymbol.Item2;
+                                  subTypeOfLastReferencedArray = arraySymbol.Item3;
+                                  dimensionsOfLastReferencedArray = dimensions;
+
                                   if(dimensions == 0) {
                                     type = (TastierType) arraySymbol.Item2;
                                     if(type == TastierType.Record) {
@@ -566,11 +570,6 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     }
                                   } else if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
-                                  } else if(dimensions > 0) {
-                                    typeOfLastReferencedArray = arraySymbol.Item2;
-                                    subTypeOfLastReferencedArray = arraySymbol.Item3;
-                                    dimensionsOfLastReferencedArray = dimensions;
-                                    Console.WriteLine("This happened");
                                   }
 
                                   program.Add(new Instruction("","Add"));
