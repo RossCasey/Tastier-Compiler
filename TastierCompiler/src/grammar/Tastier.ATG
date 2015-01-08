@@ -543,6 +543,9 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       sym = subSym;
                                     }
                                     Console.WriteLine("Start of troubled section");
+                                    if(sym == null) {
+                                      SemErr("Sym is null");
+                                    }
                                     subSym = recordVariableLookup(parent,sym.Item1,name);
                                     Console.WriteLine("End of troubled section");
 
