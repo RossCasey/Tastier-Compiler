@@ -836,7 +836,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   {
     (
     access                      (.
-                                    if(sym.Item3 != (int)TastierType.Record) {
+                                    if(sym.Item3 != (int)TastierType.Record && type != TastierType.Record) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
                                 .)
@@ -867,7 +867,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
       Expr<out arrayAccessType>  (.
                                   dimensions--;
                                   if(dimensions == 0) {
-                                    //type = (TastierType) arraySymbol.Item2;
+                                    type = (TastierType) arraySymbol.Item2;
                                   }
                                   if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
