@@ -879,7 +879,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                 .)
    Assignment<out type>         (.
+                                    Console.WriteLine("Start: ");
 
+                                    Console.WriteLine(typeOfLastReferencedRecord);
                                     //check type of assignment and type of identifier are the same
                                     if(subSym != null) {
                                       if(type != (TastierType)subSym.Item3) {
