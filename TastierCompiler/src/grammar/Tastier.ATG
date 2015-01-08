@@ -816,7 +816,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                         arraySymbol = arrayLookup(name);
                                         dimensions = arraySymbol.Item4;
                                         isArray = true;
-                                      }
+                                    }
                                 .)
   {
     access                      (.
@@ -877,6 +877,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                 .)
    Assignment<out type>         (.
+                                    Console.WriteLine("Got Here 0");
                                     //check type of assignment and type of identifier are the same
                                     if(subSym != null) {
                                       if(type != (TastierType)subSym.Item3) {
@@ -892,6 +893,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       } else if(dimensions != 0) {
                                         SemErr("Cannot assign " + type + " to " + type + " array pointer");
                                       }
+                                      Console.WriteLine("Got Here 1");
                                     }
 
 
@@ -948,7 +950,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
     ( "record"
       Ident<out name>           (.
-                                    Console.WriteLine("Got here 0");
                                     RecordType recType = recordLookup(name);
                                     if(recType == null) {
                                       SemErr("Record Type " + name + " has not been defined");
@@ -957,7 +958,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     //get next heap pointer
                                     program.Add(new Instruction("","LoadG 3"));
 
-                                    Console.WriteLine("Got here 1");
                                     //add memory offset
                                     program.Add(new Instruction("","Const 3"));
                                     program.Add(new Instruction("","Add"));
@@ -967,7 +967,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     program.Add(new Instruction("","Const " + recordSize));
                                     program.Add(new Instruction("","Add"));
                                     program.Add(new Instruction("","StoG 3"));
-                                    Console.WriteLine("Got here 2");
                                 .)
     | Expr<out type>            (.
                                     if(type != TastierType.Integer) {
@@ -1008,7 +1007,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     } else {
                                       program.Add(new Instruction("","MemStore"));
                                     }
-                                    Console.WriteLine("Got here 3");
                                 .)
 
 
