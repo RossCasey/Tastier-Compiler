@@ -862,11 +862,11 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
 
       |'['                        (.
-                                    //if(firstAccess) {
-                                    //  firstAccess = false;
-                                    //} else {
-                                    //  program.Add(new Instruction("","MemLoad"));
-                                    //}
+                                    if(firstAccess) {
+                                      firstAccess = false;
+                                    } else {
+                                      program.Add(new Instruction("","MemLoad"));
+                                    }
                                 .)
       Expr<out arrayAccessType>  (.
                                   dimensions--;
@@ -882,7 +882,6 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                   }
 
                                   program.Add(new Instruction("","Add"));
-                                  program.Add(new Instruction("","MemLoad"));
                                 .)
       ']'
       )
