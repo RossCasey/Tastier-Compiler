@@ -570,6 +570,7 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     typeOfLastReferencedArray = arraySymbol.Item2;
                                     subTypeOfLastReferencedArray = arraySymbol.Item3;
                                     dimensionsOfLastReferencedArray = dimensions;
+                                    Console.WriteLine("This happened");
                                   }
 
                                   program.Add(new Instruction("","Add"));
