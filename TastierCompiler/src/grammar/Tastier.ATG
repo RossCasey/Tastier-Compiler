@@ -556,14 +556,12 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                   dimensions--;
                                   if(dimensions == 0) {
                                     type = (TastierType) arraySymbol.Item2;
-                                    Console.WriteLine("This should not happen");
                                     if(type == TastierType.Record) {
                                       typeOfLastReferencedRecord = arraySymbol.Item3;
                                     }
                                   } else if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
                                   } else if(dimensions > 0) {
-                                    Console.WriteLine("Dimensions: " + dimensions + " Type " + type);
                                     typeOfLastReferencedArray = arraySymbol.Item2;
                                     subTypeOfLastReferencedArray = arraySymbol.Item3;
                                     dimensionsOfLastReferencedArray = dimensions;
@@ -864,7 +862,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     SemErr("Integer type expected for array access");
                                   }
 
-
+                                  Console.WriteLine("Dimensions: " + dimensions + " type: " + type);
 
                                   program.Add(new Instruction("","Add"));
                                 .)
