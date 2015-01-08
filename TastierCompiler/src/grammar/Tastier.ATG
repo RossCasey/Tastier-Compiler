@@ -863,7 +863,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                   }
 
                                   Console.WriteLine("Got here");
-                                  program.Add(new Instruction("mad","Add"));
+                                  program.Add(new Instruction("","Add"));
                                 .)
       ']'
   }
