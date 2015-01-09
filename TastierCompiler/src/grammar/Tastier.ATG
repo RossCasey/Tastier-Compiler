@@ -1431,11 +1431,11 @@ RecordDecl                      (.
   '}'                           (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
-                                    sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, s.Item6);
+                                    sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, sym.Item6);
                                     while(sym.Item1 != "@RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
                                       sym = currentScope.Pop();
-                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, s.Item6);
+                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, sym.Item6);
                                     }
 
                                     //stack returns variables in reverse order
