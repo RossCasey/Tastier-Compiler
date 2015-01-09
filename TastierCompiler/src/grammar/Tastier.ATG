@@ -66,7 +66,7 @@ COMPILER Tastier
 */
 
   int maxSystemType = 3;
-  int typesDefined = 3;
+  int typesDefined = 4;
 
   enum TastierType : int {   // types for variables
     Undefined,
@@ -1421,7 +1421,8 @@ RecordDecl                      (.
                                     //Adding new record type to list and giving it its own list of variables
                                     type = typesDefined;
                                     typesDefined++;
-                                    recordTypes.Add(new RecordType(typeName,type,recordsDefined));
+                                    int variableIndex = recordsDefined;
+                                    recordTypes.Add(new RecordType(typeName,type,variableIndex));
                                     recordsDefined++;
 
                                     recordVariables.Add(new List<Symbol>());
@@ -1446,7 +1447,7 @@ RecordDecl                      (.
                                     sym = currentScope.Pop();
                                     sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, sym.Item6);
                                     while(sym.Item1 != "@RecordMarker") {
-                                      recordVariables.ElementAt(type).Add(sym);
+                                      recordVariables.ElementAt(variableIndex).Add(sym);
                                       sym = currentScope.Pop();
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, sym.Item6);
                                     }
@@ -1463,7 +1464,7 @@ RecordDecl                      (.
 
                                     int index = 0;
                                     foreach(Symbol s in recordVariables.ElementAt(type)) {
-                                      recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,index,s.Item6);
+                                      recordVariables.ElementAt(variableIndex)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,index,s.Item6);
                                       index++;
                                     }
                                     Console.WriteLine("Got here 2");
