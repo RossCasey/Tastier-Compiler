@@ -680,7 +680,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     Symbol sym; int dim; int dim1; int dim2;
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int arrayAccessType; bool firstAccess = true; bool isRecordOrArrayAccess = false;
-
+                                    int dimensions = 0;
                                 .)
 
 = Ident<out name>               (.
@@ -694,6 +694,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                       SemErr("reference to undefined variable " + name);
                                     } else {
                                       dim = sym.Item6;
+                                      dimensions = sym.Item6;
                                       //if record or array then load pointer
                                       if((sym.Item3 > maxSystemType) || (sym.Item6 != 0)) {
                                         if (sym.Item4 == 0) {
@@ -724,7 +725,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     } else {
                                       program.Add(new Instruction("","MemLoad"));
                                     }
-                                    
+
                                     sym = recordVariableLookup(sym.Item3,name);
                                     if(sym == null) {
                                       SemErr(name + " is not defined in referenced record");
@@ -745,7 +746,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     }
                                 .)
       Expr<out arrayAccessType, out dim1>  (.
-                                  dim--;
+                                  dimensions--;
                                   if(dim < 0) {
                                     SemErr("Too many array accesses [ ]");
                                   }
@@ -772,7 +773,7 @@ Stat                            (.  int type; int type1; int type2; string name;
    Assignment<out type,out dim> (.
                                     if(sym.Item3 != type) {
                                       SemErr("Incompatible types");
-                                    } else if(sym.Item6 != dim) {
+                                    } else if(dimensions!= dim) {
                                       SemErr("Dimensions of arrays do not match");
                                     }
                                 .)
