@@ -1441,6 +1441,7 @@ RecordDecl                      (.
   VarDecl<external>
   }
   '}'                           (.
+                                    Console.WriteLine("Type is: " + type);
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
                                     sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, sym.Item6);
