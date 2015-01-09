@@ -661,7 +661,7 @@ Assignment<out int type, out int dim>(. int type1; int type2; int dim1; int dim2
                                 .)
   Expr<out type2,out dim2>      (.
                                     //check that the type of expression 1 is the same as expression 2
-                                    if((type2 != type1) && (dim1 == dim2) {
+                                    if((type2 != type1) && (dim1 == dim2)) {
                                       SemErr("Types mismatch in conditional assignment");
                                     }
                                     //set type of assignment
@@ -1328,10 +1328,10 @@ Term<out int type>      (.  int type1; int dim1; Instruction inst; .)
 = Factor<out type,out dim>
   { MulOp<out inst>
     Factor<out type1,out dim1>  (.
-                                    if (type != (int)TastierType.Integer ||
-                                        type1 != (int)TastierType.Integer) ||
-                                        dim != 0 ||
-                                        dim1 != 0 {
+                                    if ((type != (int)TastierType.Integer) ||
+                                        (type1 != (int)TastierType.Integer) ||
+                                        (dim != 0) ||
+                                        (dim1 != 0)) {
                                       SemErr("integer type expected");
                                     }
                                     program.Add(inst);
