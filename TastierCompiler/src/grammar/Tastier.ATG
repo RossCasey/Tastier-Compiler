@@ -1146,22 +1146,22 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     }
                                     if (sym == null) {
                                       SemErr("reference to undefined variable " + name1);
-                                    }
-
-                                    if (type2 != sym.Item3 || dim2 != sym.Item6) {
-                                      SemErr("incompatible types");
-                                    }
-                                    if (sym.Item4 == 0) {
-                                      if (isExternal) {
-                                        incrementer.Add(new Instruction("", "StoG " + sym.Item1));
-                                        // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
-                                      } else {
-                                        incrementer.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                    } else {
+                                      if (type2 != sym.Item3 || dim2 != sym.Item6) {
+                                        SemErr("incompatible types");
                                       }
-                                    }
-                                    else {
-                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                      incrementer.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                      if (sym.Item4 == 0) {
+                                        if (isExternal) {
+                                          incrementer.Add(new Instruction("", "StoG " + sym.Item1));
+                                          // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
+                                        } else {
+                                          incrementer.Add(new Instruction("", "StoG " + (sym.Item5+3)));
+                                        }
+                                      }
+                                      else {
+                                        int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                        incrementer.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                      }
                                     }
                                 .)
   ')'
