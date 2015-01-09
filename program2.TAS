@@ -1,0 +1,51 @@
+program Tastier {
+
+	create record test {
+		int a;
+		int b;
+		int c;
+		string d;
+	}
+
+	create record test2 {
+		string name;
+		record test rec1;
+		record test rec2;
+	}
+
+	create record test3 {
+		string type;
+		record test2 subRec;
+	}
+
+
+	void Main() {
+		record test3 top;
+
+		record test2 var;
+		top.subRec := var;
+		top.type := "type name";
+
+		top.subRec.name := "Ross";
+		record test tmp;
+		record test tmp2;
+		top.subRec.rec1 := tmp;
+		top.subRec.rec2 := tmp2;
+
+		top.subRec.rec1.a := 10;
+		top.subRec.rec1.b := 20;
+		top.subRec.rec1.c := 30;
+		top.subRec.rec1.d := "Hello ";
+		top.subRec.rec2.a := 40;
+		top.subRec.rec2.b := 50;
+		top.subRec.rec2.c := 60;
+		top.subRec.rec2.d := "World!";
+
+		top.subRec.rec2 := top.subRec.rec1;
+		write top.subRec.rec2.a;
+		write top.subRec.rec2.b;
+		write top.subRec.rec2.c;
+		write top.subRec.rec2.d;
+
+	}
+}
