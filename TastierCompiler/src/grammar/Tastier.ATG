@@ -65,13 +65,14 @@ COMPILER Tastier
   First, let's declare all the types we're going to use.
 */
 
+  int maxSystemType = 3;
+  int typesDefined = maxSystemType;
+
   enum TastierType : int {   // types for variables
     Undefined,
     Integer,
     Boolean,
-    String,        //new string type
-    Record,
-    Array
+    String        //new string type
   };
 
   /*
@@ -95,7 +96,7 @@ COMPILER Tastier
   Parser.frame, but they're documented in this file, with the rest.
 */
 
-  //using Symbol = System.Tuple<string, int, int, int, int>;
+  //using Symbol = System.Tuple<string, int, int, int, int, int>;
 
 /*
   A Symbol is a name with a type and a kind. The first int in the
@@ -143,6 +144,7 @@ COMPILER Tastier
     * Symbol.Item4 -> stack frame pointer
     * Symbol.Item5 -> variable's address in the stack frame pointed to by
                       Item4, -1 if procedure
+    * Symbol.Item6 -> The dimensions of the item. If > 0 then it's an array.
 */
 
   class Scope : Stack<Symbol> {}
@@ -293,83 +295,19 @@ string generateLabel() {
 */
 
 
-//This tuple is declared in Parser.frame for the same reason that Instruction,Symbol etc. are.
-//using RecordPointer = System.Tuple<string, int>;
-
-//stores the name of a record and the index of its list of variables in recordVariables
-class RecordTypes : List<RecordType> {}
-
-//stores the record type of each declared record reference variable
-class RecordTable : List<RecordTableEntry> {}
-
 //stores the lists of variables for each record
 class RecordVariables : List<List<Symbol>> {}
 
-//stores the types and number of dimensions for each array
-class ArrayTable : List<ArrayTableEntry> {}
+//stores the name of a record types against the index that its symbols are stored at
+class RecordTypes : List<RecordTypes> {}
 
-
-RecordTypes recordTypes = new RecordTypes();
-RecordTable recordTable = new RecordTable();
 RecordVariables recordVariables = new RecordVariables();
-ArrayTable arrayTable = new ArrayTable();
+
 
 //keeps track of the next available index number for record types
 int recordsDefined = 0;
-string parentRecord = "";
 
-/*
-  If the programmer wants to assign a record pointer to another record pointer the types of the
-  records need to match. This global variable will be set to the last referenced record in the
-  factor production. This allows for the checking of record types without the need to modify
-  all productions between assignment and factor so that the type of a record is available in the
-  Stat production.
-*/
-string typeOfLastReferencedRecord;
-int dimensionsOfLastReferencedArray;
-int typeOfLastReferencedArray;
-string subTypeOfLastReferencedArray;
 
-//This string is set to the name of a record being defined so that the parent of a record within a record is known
-
-void addOrReplaceRecord(string parent, string recName, string typeName) {
-  int index = 0;
-  bool match = false;
-  foreach(RecordTableEntry rec in recordTable) {
-    if((rec.Item1 == parent) && (rec.Item2 == recName)) {
-      recordTable[index] = (new RecordTableEntry(parent,recName,typeName));
-      match = true;
-    }
-    index++;
-  }
-  if(!match) {
-    recordTable.Add(new RecordTableEntry(parent,recName,typeName));
-  }
-}
-
-void addOrReplaceArray(string name, int type, string subType, int dimensions) {
-  int index = 0;
-  bool match = false;
-  foreach(ArrayTableEntry arr in arrayTable) {
-    if(arr.Item1.Equals(name)) {
-      match = true;
-      arrayTable[index] = (new ArrayTableEntry(name,type,subType,dimensions));
-    }
-    index++;
-  }
-  if(!match) {
-    arrayTable.Add(new ArrayTableEntry(name,type,subType,dimensions));
-  }
-}
-
-ArrayTableEntry arrayLookup(string arrayName) {
-  foreach(ArrayTableEntry arr in arrayTable) {
-    if(arr.Item1.Equals(arrayName)) {
-      return arr;
-    }
-  }
-  return null;
-}
 
 Symbol _lookup(Scope scope, string name) {
   foreach (Symbol s in scope) {
@@ -399,36 +337,16 @@ Symbol lookup(Stack<Scope> scopes, string name) {
   return null; // if the name wasn't found in any open scopes.
 }
 
-RecordType recordLookup(string name) {
-  foreach (RecordType rec in recordTypes) {
-    if (rec.Item1.Equals(name)) {
-      return rec;
+
+//modify
+Symbol recordVariableLookup(int type, string varName) {
+  int variableIndex = -1;
+  foreach(RecordType rec in recordTypes) {
+    if(rec.Item2 == type) {
+      variableIndex = rec.Item3;
     }
   }
-  return null;
-}
 
-string lookupRecordType(string parent,string recName) {
-  foreach(RecordTableEntry rec in recordTable) {
-    if((rec.Item1.Equals(parent)) && (rec.Item2.Equals(recName))) {
-      return rec.Item3;
-    }
-  }
-  return "";
-}
-
-
-
-Symbol recordVariableLookup(string parent,string recName, string varName) {
-  string typeName = lookupRecordType(parent,recName);
-  if(typeName == null) {
-    SemErr("This record type does not exist in the current context");
-  }
-  RecordType recType = recordLookup(typeName);
-  if(recType == null) {
-    SemErr("This record does not exist in the current context");
-  }
-  int variableIndex = recType.Item2;
   foreach(Symbol s in recordVariables.ElementAt(variableIndex)) {
     if(s.Item1.Equals(varName)) {
       return s;
@@ -482,28 +400,25 @@ AddOp<out Instruction inst>
 
 /*------------------------------------------------------------------------*/
 
-Expr<out TastierType type>      (.  TastierType type1; Instruction inst; .)
-= SimExpr<out type>
+Expr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
+= SimExpr<out type, out dim>
   [ RelOp<out inst>
-    SimExpr<out type1>          (.
-                                    if (type != type1) {
+    SimExpr<out type1, out dim1> (.
+                                    if ((type != type1) || (dim != dim1)) {
                                       SemErr("incompatible types");
                                     }
                                     else {
                                       program.Add(inst);
-                                      type = TastierType.Boolean;
+                                      type = (int)TastierType.Boolean;
                                     }
                                 .)
   ].
 
 /*------------------------------------------------------------------------*/
 
-Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; string name;  .)
-=                               (.  type = TastierType.Undefined; string parent = ""; int dimensions = 0;
-                                    TastierType arrayAccessType;
-                                    ArrayTableEntry arraySymbol = null;
-                                    bool isArray = false; .)
-  ( Ident<out name>             (.
+Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim; int dim1; .)
+=                                 (.  type = (int)TastierType.Undefined; .)
+  ( Ident<out name>               (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
@@ -513,75 +428,50 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                     if (sym == null) {
                                       SemErr("reference to undefined variable " + name);
                                     } else {
-                                      type = (TastierType) sym.Item3;
-                                      if(type == TastierType.Array) {
-                                        arraySymbol = arrayLookup(name);
-                                        isArray = true;
-                                        dimensions = arraySymbol.Item4;
-                                      }
-                                      if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
-                                        if (sym.Item4 == 0) {
-                                          if (isExternal) {
-                                            program.Add(new Instruction("", "LoadG " + sym.Item1));
-                                            // if the symbol is external, we load it by name. The linker will resolve the name to an address.
-                                          } else {
-                                            program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
-                                          }
+                                      type = sym.Item3;
+                                      dim = sym.Item6;
+                                      if (sym.Item4 == 0) {
+                                        if (isExternal) {
+                                          program.Add(new Instruction("", "LoadG " + sym.Item1));
+                                          // if the symbol is external, we load it by name. The linker will resolve the name to an address.
                                         } else {
-                                          int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                          program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
+                                          program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
                                         }
-                                      } else SemErr("Variable or constant Expected");
+                                      } else {
+                                        int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                        program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
+                                      }
                                     }
                                 .)
     {
     (access                    (.
-                                    if(sym.Item3 != (int)TastierType.Record && type != TastierType.Record) {
+                                    if(sym.Item3 <= maxSystemType || sym.Item6 != 0) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
                                 .)
       Ident<out name>          (.
-
-                                    //allows for records within records
-                                    if(subSym != null) {
-                                      //this will execute every time but the first
-                                      parent = lookupRecordType(parent,sym.Item1);
-                                      sym = subSym;
-                                    }
-
-                                    subSym = recordVariableLookup(parent,sym.Item1,name);
-
+                                    sym = recordVariableLookup(sym.Item3,name);
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
-
-                                      type = (TastierType)subSym.Item3;
-                                      program.Add(new Instruction("","Const " + (subSym.Item5)));
+                                      type = sym.Item3;
+                                      dim = sym.Item6;
+                                      program.Add(new Instruction("","Const " + (sym.Item5)));
                                       program.Add(new Instruction("","Add"));
                                       program.Add(new Instruction("","MemLoad"));
                                     }
                                 .)
 
     |'['
-      Expr<out arrayAccessType>  (.
-                                  if(arrayAccessType != TastierType.Integer) {
-                                    SemErr("Integer type expected for array access");
+      Expr<out arrayAccessType, out dim1> (.
+                                  dim--;
+                                  if(dim < 0) {
+                                    SemErr("Too many array accesses [ ]");
                                   }
 
-                                  dimensions--;
-                                  typeOfLastReferencedArray = arraySymbol.Item2;
-                                  subTypeOfLastReferencedArray = arraySymbol.Item3;
-
-                                  dimensionsOfLastReferencedArray = dimensions;
-
-
-                                  if(dimensions == 0) {
-                                    type = (TastierType) arraySymbol.Item2;
-                                    if(type == TastierType.Record) {
-                                      typeOfLastReferencedRecord = arraySymbol.Item3;
-                                    }
-                                  } else if(dimensions < 0) {
-                                    SemErr("Too many array accesses [ ]");
+                                  if((arrayAccessType != (int)TastierType.Integer) ||
+                                    (dim1 != 0)){
+                                    SemErr("Integer type expected for array access");
                                   }
 
                                   program.Add(new Instruction("","Add"));
@@ -591,36 +481,25 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
     )
     }
 
-                                (.
-                                    if(type == TastierType.Record) {
-                                      string recordType = lookupRecordType(parent,sym.Item1);
-                                      if(subSym != null) {
-                                        parent = lookupRecordType(parent,sym.Item1);
-                                        recordType = lookupRecordType(parent,subSym.Item1);
-                                      }
-                                      if(!isArray) {
-                                        typeOfLastReferencedRecord = recordType;
-                                      }
-                                    }
-                                .)
-
   | number                      (.
                                     n = Convert.ToInt32(t.val);
                                     program.Add(new Instruction("", "Const " + n));
-                                    type = TastierType.Integer;
+                                    type = (int)TastierType.Integer;
+                                    dim = 0;
                                 .)
   | '-'
-    Factor<out type>            (.
-                                    if (type != TastierType.Integer) {
+    Factor<out type,out dim>    (.
+                                    if ((type != (int)TastierType.Integer) || (dim != 0)) {
                                       SemErr("integer type expected");
-                                      type = TastierType.Integer;
+                                      type = (int)TastierType.Integer;
+                                      dim = 0;
                                     }
                                     program.Add(new Instruction("", "Neg"));
                                     program.Add(new Instruction("", "Const 1"));
                                     program.Add(new Instruction("", "Add"));
                                 .)
-  | "true"                      (.  program.Add(new Instruction("", "Const " + 1)); type = TastierType.Boolean; .)
-  | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = TastierType.Boolean; .)
+  | "true"                      (.  program.Add(new Instruction("", "Const " + 1)); type = (int)TastierType.Boolean; dim = 0.)
+  | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = (int)TastierType.Boolean; dim = 0.)
   | string                      (.
                                     /*
                                       Strings are stored in the heap. The string is stored
@@ -645,7 +524,8 @@ Factor<out TastierType type>    (.  int n; Symbol sym; Symbol subSym = null; str
                                       nextHeapAddress++;
                                     }
                                     program.Add(new Instruction("","Const " + (stringAddress + 3)));
-                                    type = TastierType.String;
+                                    type = (int)TastierType.String;
+                                    dim = 0;
                                   .)
   ).
 
@@ -732,15 +612,16 @@ RelOp<out Instruction inst>
 
 /*------------------------------------------------------------------------*/
 
-SimExpr<out TastierType type>   (.  TastierType type1; Instruction inst; .)
-= Term<out type>
+SimExpr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
+= Term<out type, out dim>
   { AddOp<out inst>
-    Term<out type1>             (.
-                                    if (type != TastierType.Integer || type1 != TastierType.Integer) {
-                                      SemErr("integer type expected");
-                                    }
-                                    program.Add(inst);
-                                .)
+    Term<out type1, out dim1>      (.
+                                      if (type != (int)TastierType.Integer || type1 != (int)TastierType.Integer ||
+                                          dim != 0 || dim1 != 0) {
+                                        SemErr("integer type expected");
+                                      }
+                                      program.Add(inst);
+                                    .)
   }.
 
 /*------------------------------------------------------------------------*/
@@ -749,10 +630,10 @@ SimExpr<out TastierType type>   (.  TastierType type1; Instruction inst; .)
   assignment can also be used. This prevents a lot of code repetition
   in places like the for loop.
 */
-Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
+Assignment<out int type, out int dim>(. int type1; int type2; int dim1; int dim2; .)
 
 =
-  Expr<out type>
+  Expr<out type, out dim>
   [
   '?'                           (.
                                     /* The conditional assignment statement is converted into an
@@ -760,7 +641,7 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
                                        conditional assignment to the language without altering the
                                        virtual machine.
                                     */
-                                    if (type != TastierType.Boolean) {
+                                    if ((type != (int)TastierType.Boolean) || (dim != 0)) {
                                       SemErr("Boolean expression expected in conditional assignment");
                                     }
                                     program.Add(new Instruction("","Const 1"));
@@ -769,7 +650,7 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
                                     openLabels.Push(generateLabel());
                                     program.Add(new Instruction("", "FJmp " + openLabels.Peek()));
                                 .)
-  Expr<out type1>
+  Expr<out type1,out dim1>
   ':'                           (.
                                     Instruction startOfElse = new Instruction(openLabels.Pop(), "Nop");
                                     openLabels.Push(generateLabel());
@@ -778,13 +659,14 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
                                     //add label to allow jumping to else
                                     program.Add(startOfElse);
                                 .)
-  Expr<out type2>               (.
+  Expr<out type2,out dim2>      (.
                                     //check that the type of expression 1 is the same as expression 2
-                                    if(type2 != type1) {
+                                    if((type2 != type1) && (dim1 == dim2) {
                                       SemErr("Types mismatch in conditional assignment");
                                     }
                                     //set type of assignment
                                     type = type2;
+                                    dim = dim2;
 
                                     //end if-else
                                     program.Add(new Instruction(openLabels.Pop(), "Nop"));
@@ -793,12 +675,11 @@ Assignment<out TastierType type>(. TastierType type1; TastierType type2; .)
 
 /*------------------------------------------------------------------------*/
 
-Stat                            (.  TastierType type;TastierType type1; TastierType type2; string name; string name1;
-                                    Symbol sym; Symbol subSym = null; string parent = "";
+Stat                            (.  int type; int type1; int type2; string name; string name1;
+                                    Symbol sym; int dim; int dim1;
                                     bool external = false; bool isExternal = false; Program incrementer;
-                                    int dimensions = 0; ArrayTableEntry arraySymbol = null;
-                                    TastierType arrayAccessType;
-                                    bool isArray = false; bool firstAccess = true;
+                                    int arrayAccessType; bool firstAccess = true; bool isRecordOrArrayAccess = false;
+
                                 .)
 
 = Ident<out name>               (.
@@ -809,70 +690,57 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                     if (sym == null) {
                                       SemErr("reference to undefined variable " + name);
-                                    }
-
-                                    if(sym.Item3 == (int)TastierType.Record || sym.Item3 == (int)TastierType.Array) {
-                                      //if ident is a record then the address of the record variable must be calculated
-                                      if (((TastierKind)sym.Item2 == TastierKind.Var) || ((TastierKind)sym.Item2 == TastierKind.Const)) {
-                                        if (sym.Item4 == 0) {
-                                          if (isExternal) {
-                                            program.Add(new Instruction("", "LoadG " + sym.Item1));
-                                            // if the symbol is external, we load it by name. The linker will resolve the name to an address.
-                                          } else {
-                                            program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
-                                          }
+                                    } else {
+                                      dim = sym.Item6;
+                                      if (sym.Item4 == 0) {
+                                        if (isExternal) {
+                                          program.Add(new Instruction("", "LoadG " + sym.Item1));
+                                          // if the symbol is external, we load it by name. The linker will resolve the name to an address.
                                         } else {
-                                          int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
-                                          program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
+                                          program.Add(new Instruction("", "LoadG " + (sym.Item5+3)));
                                         }
-                                      } else SemErr("Variable or constant Expected");
-                                    }
-                                    if(sym.Item3 == (int)TastierType.Array) {
-                                        arraySymbol = arrayLookup(name);
-                                        dimensions = arraySymbol.Item4;
-                                        isArray = true;
+                                      } else {
+                                        int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
+                                        program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
+                                      }
                                     }
                                 .)
   {
     (
     access                      (.
-                                    if(sym.Item3 != (int)TastierType.Record && (sym.Item3 == (int)TastierType.Array && arraySymbol.Item2 == (int)TastierType.Record && dimensions != 0)) {
-                                      SemErr("The access operator \'.\' can only be used for record reference variables");
-                                    }
+                                  if(sym.Item3 <= maxSystemType || dimensions != 0) {
+                                    SemErr("The access operator \'.\' can only be used for record reference variables");
+                                  }
                                 .)
-    Ident<out name>            (.
-                                    if(subSym != null) {
-                                      parent = lookupRecordType(parent,sym.Item1);
-                                      sym = subSym;
-                                      program.Add(new Instruction("","MemLoad"));
-                                    }
-                                    subSym = recordVariableLookup(parent,sym.Item1,name);
+    Ident<out name>             (.
+                                    isRecordOrArrayAccess = true;
+                                    program.Add(new Instruction("","MemLoad"));
+                                    sym = recordVariableLookup(sym.Item3,name);
                                     if(subSym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
-                                      type = (TastierType)subSym.Item3;
-                                      program.Add(new Instruction("","Const " + (subSym.Item5)));
+                                      type = sym.Item3;
+                                      dim = sym.Item6;
+                                      program.Add(new Instruction("","Const " + (sym.Item5)));
                                       program.Add(new Instruction("","Add"));
                                     }
                                 .)
 
       |'['                        (.
                                     if(firstAccess) {
+                                      isRecordOrArrayAccess = true;
                                       firstAccess = false;
                                     } else {
                                       program.Add(new Instruction("","MemLoad"));
                                     }
                                 .)
-      Expr<out arrayAccessType>  (.
-                                  dimensions--;
-                                  if(dimensions == 0) {
-                                    //type = (TastierType) arraySymbol.Item2;
-                                  }
+      Expr<out arrayAccessType, out dim1>  (.
+                                  dim--;
                                   if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
                                   }
 
-                                  if(arrayAccessType != TastierType.Integer) {
+                                  if(arrayAccessType != TastierType.Integer || dim1 != 0) {
                                     SemErr("Integer type expected for array access");
                                   }
 
@@ -890,54 +758,15 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr("cannot assign to non-variable");
                                     }
                                 .)
-   Assignment<out type>         (.
-                                    //check type of assignment and type of identifier are the same
-                                    if(subSym != null) {
-                                      if(type != (TastierType)subSym.Item3) {
-                                        SemErr("Type of identifer and type of expression do not match");
-                                      }
-                                    } else if (!isArray) {
-                                      if(type != (TastierType)sym.Item3) {
-                                        SemErr("Type of identifer and type of expression do not match");
-                                      }
-                                    } else if (type != TastierType.Array) {
-                                      if(arraySymbol.Item2 != (int)type) {
-                                        SemErr("Cannot assign " + type + " to " + (TastierType)arraySymbol.Item2 + " array.");
-                                      } else if(dimensions != 0) {
-                                        SemErr("Cannot assign " + type + " to " + type + " array pointer");
-                                      }
-
+   Assignment<out type,out dim> (.
+                                    if(sym.Item3 != type) {
+                                      SemErr("Incompatible types");
+                                    } else if(sym.Item6 != dim) {
+                                      SemErr("Dimensions of arrays do not match");
                                     }
-
-
-                                    if(type == TastierType.Record) {
-                                      string parentRecordType = lookupRecordType(parent,sym.Item1);
-                                      if(subSym != null) {
-                                        string recordType = lookupRecordType(parentRecordType,subSym.Item1);
-
-                                        if(!(recordType.Equals(typeOfLastReferencedRecord))) {
-                                          SemErr("Cannot assign record of type " + typeOfLastReferencedRecord +
-                                                  " to record reference variable of type " + recordType);
-                                        }
-                                      } else {
-                                        if(!parentRecordType.Equals(typeOfLastReferencedRecord)) {
-                                          SemErr("Record type mismatch");
-                                        }
-                                      }
-                                    } else if (type == TastierType.Array) {
-                                      if(typeOfLastReferencedArray != (int) type) {
-                                        SemErr("Array types do not match");
-                                      } else if(!subTypeOfLastReferencedArray.Equals(arraySymbol.Item3)) {
-                                        SemErr("Array record types do not match");
-                                      }
-                                      else if(dimensionsOfLastReferencedArray != dimensions) {
-                                        SemErr("Dimensions of arrays do not match");
-                                      }
-                                    }
-
                                 .)
    ';'                          (.
-                                    if(subSym == null && !isArray ) {
+                                    if(!isRecordOrArrayAccess) {
                                       if (sym.Item4 == 0) {
                                         if (isExternal) {
                                           program.Add(new Instruction("", "StoG " + sym.Item1));
@@ -955,38 +784,46 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                 .)
   | "allocate"  '('             (.
-                                    //no need to load pointer so the previous instruciton is removed
-                                    //if accessing the pointer of the array
-                                    if(isArray && (dimensions == arraySymbol.Item4)) {
+                                    //no need for load instruction if accessing base pointer or record or array
+                                    if(isRecordOrArrayAccess) {
                                       program.RemoveAt(program.Count() - 1);
                                     }
 
-                                    if((sym.Item3 != (int)TastierType.Record) && (sym.Item3 != (int)TastierType.Array)) {
+                                    if((sym.Item3 <= maxSystemType) && (sym.Item6 == 0) {
                                       SemErr("Allocate can only be used for records and arrays");
                                     }
                                 .)
     ( "record"
       Ident<out name>           (.
-                                    RecordType recType = recordLookup(name);
-                                    if(recType == null) {
-                                      SemErr("Record Type " + name + " has not been defined");
+                                    bool found = false;
+                                    int variableIndex = -1;
+                                    foreach(RecordType rec in recordTypes) {
+                                      if(rec.Item1.Equals(name)) {
+                                        found = true;
+                                        variableIndex = rec.Item3;
+                                      }
                                     }
-                                    int recordSize = recType.Item3;
-                                    //get next heap pointer
-                                    program.Add(new Instruction("","LoadG 3"));
 
-                                    //add memory offset
-                                    program.Add(new Instruction("","Const 3"));
-                                    program.Add(new Instruction("","Add"));
+                                    if(found) {
+                                      int recordSize = recordVariables[variableIndex].Count();
+                                      //get next heap pointer
+                                      program.Add(new Instruction("","LoadG 3"));
 
-                                    //increment heap counter
-                                    program.Add(new Instruction("","LoadG 3"));
-                                    program.Add(new Instruction("","Const " + recordSize));
-                                    program.Add(new Instruction("","Add"));
-                                    program.Add(new Instruction("","StoG 3"));
+                                      //add memory offset
+                                      program.Add(new Instruction("","Const 3"));
+                                      program.Add(new Instruction("","Add"));
+
+                                      //increment heap counter
+                                      program.Add(new Instruction("","LoadG 3"));
+                                      program.Add(new Instruction("","Const " + recordSize));
+                                      program.Add(new Instruction("","Add"));
+                                      program.Add(new Instruction("","StoG 3"));
+                                    } else {
+                                      SemErr("A record of type " + name + " has not been declared");
+                                    }
                                 .)
-    | Expr<out type>            (.
-                                    if(type != TastierType.Integer) {
+    | Expr<out type,out dim>    (.
+                                    if(type != (int)TastierType.Integer || dim != 0) {
                                       SemErr("Allocate can only take expressions of type Integer or a record definition");
                                     }
                                     //store size of allocation temporarily
@@ -1008,7 +845,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
     )
     ')'
     ';'                         (.
-                                    if(subSym == null && (!isArray || (isArray && (dimensions == arraySymbol.Item4)))) {
+                                    if(!isRecordOrArrayAccess) {
                                       if (sym.Item4 == 0) {
                                         if (isExternal) {
                                           program.Add(new Instruction("", "StoG " + sym.Item1));
@@ -1040,8 +877,8 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   )
 
 | "if"
-  '(' Expr<out type> ')'        (.
-                                    if ((TastierType)type != TastierType.Boolean) {
+  '(' Expr<out type,out dim> ')'(.
+                                    if (type != (int)TastierType.Boolean) {
                                       SemErr("boolean type expected");
                                     }
                                     openLabels.Push(generateLabel());
@@ -1084,7 +921,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     //the switch value back on the top of the stack can be found
                                     program.Add(new Instruction("switchValueMarker",""));
                                 .)
-  Expr<out type> ')' '{'        (.
+  Expr<out type,out dim> ')' '{'(.
                                     int index = program.Count() - 1;
                                     int size = 0;
                                     bool markerFound = false;
@@ -1102,7 +939,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       index--;
                                       size++;
                                     }
-                                    if (((TastierType)type != TastierType.Integer) && ((TastierType)type != TastierType.String)){
+                                    if (((type != (int)TastierType.Integer) && (type != (int)TastierType.String))) || (dim != 0)){
                                       SemErr("integer or string type expected");
                                     }
                                     string endLabel = generateLabel();
@@ -1124,8 +961,8 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     program.Add(new Instruction("caseMarker",""));
 
                                 .)
-    Expr<out type1>             (.
-                                    if(type != type1) {
+    Expr<out type1,out dim1>    (.
+                                    if(type != type1 || dim != 0 || dim1 != 0) {
                                       SemErr("Type of case statement does not match type of switch statement");
                                     }
                                     index = program.Count() - 1;
@@ -1216,7 +1053,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   '('
   [Ident<out name>
   ":="
-  Assignment<out type>            (.
+  Assignment<out type,out dim>    (.
                                     //optional assignment statement at start of for loop
 
                                     //This is placed before the loop begins as it only need to
@@ -1231,8 +1068,12 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr("reference to undefined variable " + name);
                                     }
 
-                                    if (type != (TastierType)sym.Item3) {
+                                    if (type != sym.Item3 || sym.Item6 != dim) {
                                       SemErr("incompatible types");
+                                    }
+
+                                    if (dim != 0) {
+                                      SemErr("Array pointers cannot be used in switch statements");
                                     }
                                     if (sym.Item4 == 0) {
                                       if (isExternal) {
@@ -1254,9 +1095,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     openLabels.Push(generateLabel()); //second label is for the loop end
                                     program.Add(new Instruction(loopStartLabel, "Nop"));
                                 .)
-  Expr<out type1>               (.
+  Expr<out type1,out dim1>      (.
                                     //add condition check to the loop, the expression must be boolean
-                                    if(type1 != TastierType.Boolean) {
+                                    if(type1 != (int)TastierType.Boolean || dim1 != 0) {
                                       SemErr("For loop condition must be type boolean ");
                                     }
                                     program.Add(new Instruction("", "FJmp " + openLabels.Peek())); // jump to the loop end label if condition is false
@@ -1264,7 +1105,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
   ';'
   Ident<out name1>
   ":="
-  Assignment<out type2>          (.
+  Assignment<out type2,out dim2> (.
                                     /* The last part of the for loop updates the loop variable
                                        The variable cannot be updated at the start of the loop
                                        because then the value of the variable will be incorrect
@@ -1295,7 +1136,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr("reference to undefined variable " + name1);
                                     }
 
-                                    if (type2 != (TastierType)sym.Item3) {
+                                    if (type2 != sym.Item3 || dim2 != sym.Item6) {
                                       SemErr("incompatible types");
                                     }
                                     if (sym.Item4 == 0) {
@@ -1327,8 +1168,8 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     openLabels.Push(generateLabel()); //second label is for the loop end
                                     program.Add(new Instruction(loopStartLabel, "Nop"));
                                 .)
-  '(' Expr<out type> ')'        (.
-                                    if ((TastierType)type != TastierType.Boolean) {
+  '(' Expr<out type,out dim> ')'(.
+                                    if (type != (int)TastierType.Boolean || dim != 0) {
                                       SemErr("boolean type expected");
                                     }
                                     program.Add(new Instruction("", "FJmp " + openLabels.Peek())); // jump to the loop end label if condition is false
@@ -1352,7 +1193,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                       SemErr("variable type expected but " + sym.Item1 + " has kind " + (TastierType)sym.Item2);
                                     }
 
-                                    if (sym.Item3 != (int)TastierType.Integer) {
+                                    if (sym.Item3 != (int)TastierType.Integer || sym.Item6 != 0) {
                                       SemErr("integer type expected but " + sym.Item1 + " has type " + (TastierType)sym.Item2);
                                     }
                                     program.Add(new Instruction("", "Read"));
@@ -1372,7 +1213,7 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                 .)
 
 | "write"
-  Expr<out type>                 (.
+  Expr<out type,out dim>        (.
                                     /*
                                       There are 3 types of write instructions.
                                         1) Write: outputs value on top of stack
@@ -1389,10 +1230,10 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                         is contained in TastierMachine/TastierMachine/Instructions.hs
                                     */
 
-                                    if (type == TastierType.Integer) {
+                                    if (type == (int)TastierType.Integer && dim == 0) {
                                       //needed for WriteMul
                                       program.Add(new Instruction("", "Const " + (int)type));
-                                    } else if (type == TastierType.String) {
+                                    } else if (type == (int)TastierType.String && dim == 0) {
                                       //needed for WriteMul
                                       program.Add(new Instruction("", "Const " + (int)type));
                                     } else {
@@ -1400,9 +1241,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     }
                                     numArgs = 1;
                                  .)
-  { ',' Expr<out type>          (.
+  { ',' Expr<out type,out dim>  (.
                                     numArgs++;
-                                    if((type != TastierType.String) && (type != TastierType.Integer)) {
+                                    if(((type != (int)TastierType.String) && (type != (int)TastierType.Integer)) || (dim != 0)) {
                                       SemErr("unexpected variable type: " + type);
                                     }
                                     //needed for WriteMul
@@ -1412,9 +1253,9 @@ Stat                            (.  TastierType type;TastierType type1; TastierT
                                     if(numArgs == 1) {
                                       //no need for WriteMul so we can remove type placed on stack
                                       program.RemoveAt(program.Count()-1);
-                                      if (type == TastierType.Integer) {
+                                      if (type == (int)TastierType.Integer) {
                                         program.Add(new Instruction("", "Write"));
-                                      } else if (type == TastierType.String) {
+                                      } else if (type == (int)TastierType.String) {
                                         program.Add(new Instruction("", "WriteStr"));
                                       }
                                     } else {
@@ -1483,12 +1324,14 @@ Tastier                         (.  string name; bool external = false; .)
 
 /*------------------------------------------------------------------------*/
 
-Term<out TastierType type>      (.  TastierType type1; Instruction inst; .)
-= Factor<out type>
+Term<out int type>      (.  int type1; int dim1; Instruction inst; .)
+= Factor<out type,out dim>
   { MulOp<out inst>
-    Factor<out type1>           (.
-                                    if (type != TastierType.Integer ||
-                                        type1 != TastierType.Integer) {
+    Factor<out type1,out dim1>  (.
+                                    if (type != (int)TastierType.Integer ||
+                                        type1 != (int)TastierType.Integer) ||
+                                        dim != 0 ||
+                                        dim1 != 0 {
                                       SemErr("integer type expected");
                                     }
                                     program.Add(inst);
@@ -1496,16 +1339,16 @@ Term<out TastierType type>      (.  TastierType type1; Instruction inst; .)
   }.
 /*------------------------------------------------------------------------*/
 
-Type<out TastierType type>
-=                               (.  type = TastierType.Undefined; .)
- ( "int"                        (.  type = TastierType.Integer; .)
- | "bool"                       (.  type = TastierType.Boolean; .)
- | "string"                     (.  type = TastierType.String;  .)
+Type<out int type>
+=                               (.  type = (int)TastierType.Undefined; .)
+ ( "int"                        (.  type = (int)TastierType.Integer; .)
+ | "bool"                       (.  type = (int)TastierType.Boolean; .)
+ | "string"                     (.  type = (int)TastierType.String;  .)
  ).
 
 /*------------------------------------------------------------------------*/
 ConstDecl                       (.
-                                    string name; TastierType type; Scope currentScope = openScopes.Peek();
+                                    string name; int type; Scope currentScope = openScopes.Peek();
                                     Symbol sym;
 
                                     if(!constantsDeclared) {
@@ -1537,9 +1380,11 @@ ConstDecl                       (.
                                     currentScope.Push(sym);
                                 .)
   ":="
-  Expr<out type>                (.
-                                    if (type != (TastierType)sym.Item3) {
+  Expr<out type,out dim>        (.
+                                    if (type != sym.Item3) {
                                       SemErr("incompatible types");
+                                    } else if (type > maxSystemType || dim != 0) {
+                                      SemErr("constants can only be declared for non array system types");
                                     }
                                     program.Add(new Instruction("", "StoG " + (sym.Item5+3)));
                                 .)
@@ -1554,19 +1399,21 @@ RecordDecl                      (.
                                 .)
 = "create"
   "record"
-  Ident<out typeName>           (.
-                                    string checkNoCollisions = lookupRecordType("",typeName);
-                                    if(checkNoCollisions != "") {
-                                      SemErr("A record with this name has already been defined");
+  Ident<out typeName>            (.
+                                    foreach(RecordType rec in recordTypes) {
+                                      if(rec.Item1.Equals(typeName)) {
+                                        SemErr(typeName + " has already been declared");
+                                      }
                                     }
-                                    parentRecord = typeName;
 
                                     //Adding new record type to list and giving it its own list of variables
-                                    type = recordsDefined;
-
+                                    type = typesDefined;
+                                    typesDefined++;
+                                    recordTypes.Add(new RecordType(typeName,type,recordsDefined));
                                     recordsDefined++;
+
                                     recordVariables.Add(new List<Symbol>());
-                                    currentScope.Push(new Symbol("RecordMarker", -1, -1, -1, -1));
+                                    currentScope.Push(new Symbol("@RecordMarker", -1, -1, -1, -1));
 
                                     //need to undo any changes made by variables declared within records
                                     //so backups are created here to undo any changes
@@ -1583,7 +1430,7 @@ RecordDecl                      (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
                                     sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
-                                    while(sym.Item1 != "RecordMarker") {
+                                    while(sym.Item1 != "@RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
                                       sym = currentScope.Pop();
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
@@ -1599,40 +1446,25 @@ RecordDecl                      (.
 
 
                                     int index = 0;
-                                    int size = 0;
                                     foreach(Symbol s in recordVariables.ElementAt(type)) {
-                                      /*if(s.Item3 == (int)TastierType.Record) {
-                                        string subRecName = lookupRecordType(typeName,s.Item1);
-                                        RecordType subRecType = recordLookup(subRecName);
-                                        recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
-                                        size = size + subRecType.Item3;
-                                      } else {
-                                      */
-                                      if(s.Item3 == (int)TastierType.Record) {
-                                        string subRecType = lookupRecordType(typeName,s.Item1);
-                                        addOrReplaceRecord(typeName,s.Item1,subRecType);
-                                      }
-                                        recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,size);
-                                        size++;
-                                      //}
+                                      recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,index,s.Item6);
                                       index++;
                                     }
                                     //now that the size is known we can add an entry to the record types list
-                                    recordTypes.Add(new RecordType(typeName,type,size));
+
                                     parentRecord = "";
                                 .).
 
 /*------------------------------------------------------------------------*/
 
 VarDecl<bool external>          (.
-                                    string name; TastierType type; Scope currentScope = openScopes.Peek(); RecordType recordType;
-                                    string typeName; string varName; int dimensions = 0; bool isArray = false;
+                                    string name; int type; Scope currentScope = openScopes.Peek(); RecordType recordType;
+                                    string typeName; string varName; int dimensions = 0;
                                 .)
 = (Type<out type>
    {
       '[' ']'                   (.
                                     dimensions++;
-                                    isArray = true;
                                 .)
    }
    Ident<out name>        (.
@@ -1640,10 +1472,6 @@ VarDecl<bool external>          (.
                                     Symbol checkNoCollisions = lookup(openScopes,name);
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + name + " is already in use");
-                                    }
-                                    if(isArray) {
-                                      addOrReplaceArray(name, (int)type, "", dimensions);
-                                      type = TastierType.Array;
                                     }
 
                                     if (external) {
@@ -1656,9 +1484,8 @@ VarDecl<bool external>          (.
                                         nextHeapAddress++;
                                       } else {
                                         address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
-
                                       }
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, type, openScopes.Count-1, address, dimensions));
                                     }
 
 
@@ -1669,10 +1496,6 @@ VarDecl<bool external>          (.
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + name + " is already in use");
                                     }
-                                    if(isArray) {
-                                      addOrReplaceArray(name, (int)type, "", dimensions);
-                                      type = TastierType.Array;
-                                    }
 
                                     if (external) {
                                       externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
@@ -1685,23 +1508,28 @@ VarDecl<bool external>          (.
                                       } else {
                                         address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                       }
-                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address));
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, (int)type, openScopes.Count-1, address,dimensions));
                                     }
 
                                 .)
   } ';'
   | "record"
     Ident<out typeName>         (.
-                                    recordType = recordLookup(typeName);
-                                    type = TastierType.Record;
-                                    if(recordType == null) {
+                                    RecordType recType = null;
+                                    foreach(RecordType rec in recordTypes) {
+                                      if(rec.Item1.Equals(typeName)) {
+                                        recType = rec;
+                                      }
+                                    }
+                                    if(recType == null) {
                                       SemErr("Record " + typeName + " has not been declared");
+                                    } else {
+                                      type = recType.Item2;
                                     }
                                 .)
     {
       '[' ']'                   (.
                                     dimensions++;
-                                    isArray = true;
                                 .)
    }
     Ident<out varName>          (.
@@ -1709,10 +1537,6 @@ VarDecl<bool external>          (.
                                     Symbol checkNoCollisions = lookup(openScopes,varName);
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + varName + " is already in use");
-                                    }
-                                    if(isArray) {
-                                      addOrReplaceArray(varName, (int)type, typeName, dimensions);
-                                      type = TastierType.Array;
                                     }
 
                                     //create new instance of record in current scope
@@ -1724,11 +1548,9 @@ VarDecl<bool external>          (.
                                     } else {
                                       address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     }
-                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address));
+                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address,dimensions));
 
-                                    addOrReplaceRecord(parentRecord,varName, typeName);
-
-                                    if(!isArray) {
+                                    /*if(!isArray) {
 
                                       int stringAddress = nextHeapAddress;
                                       nextHeapAddress = nextHeapAddress + recordType.Item3;
@@ -1748,17 +1570,13 @@ VarDecl<bool external>          (.
                                         int lexicalLevelDifference = 0;
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
                                       }
-                                    }
+                                    } */
                                 .)
     { ',' Ident<out varName>    (.
                                     //check that there are no name collisions
                                     checkNoCollisions = lookup(openScopes,varName);
                                     if(checkNoCollisions != null) {
                                       SemErr("Variable name " + varName + " is already in use");
-                                    }
-                                    if(isArray) {
-                                      addOrReplaceArray(varName, (int)type, typeName, dimensions);
-                                      type = TastierType.Array;
                                     }
 
 
@@ -1770,11 +1588,10 @@ VarDecl<bool external>          (.
                                     } else {
                                       address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     }
-                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address));
+                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address, dimensions));
 
-                                    addOrReplaceRecord(parentRecord,varName, typeName);
 
-                                    if(!isArray) {
+                                    /*if(!isArray) {
 
 
                                       int stringAddress = nextHeapAddress;
@@ -1796,7 +1613,7 @@ VarDecl<bool external>          (.
                                         int lexicalLevelDifference = 0;
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
                                       }
-                                    }
+                                    }*/
                                 .)
   } ';'
   ).
@@ -1806,7 +1623,7 @@ ExternDecl                      (.  string name; bool external = true; Scope cur
   ( VarDecl<external>
   | "procedure" Ident<out name> ';'
                                 (.
-                                    externalDeclarations.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, 1, -1));
+                                    externalDeclarations.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, 1, -1,0));
                                 .)
   ) .
 
