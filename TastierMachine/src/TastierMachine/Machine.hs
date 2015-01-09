@@ -248,7 +248,6 @@ run = do
 
           {-- Get output string --}
           let str = (stringPrint ptAddr memList)
-          error $ show rtp
           {-- Remove quotes from string --}
           let strNoQuotes = filter (/='"') str
           tell $ [strNoQuotes]
