@@ -1325,7 +1325,7 @@ Tastier                         (.  string name; bool external = false; .)
 
 /*------------------------------------------------------------------------*/
 
-Term<out int type>      (.  int type1; int dim1; Instruction inst; .)
+Term<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
 = Factor<out type,out dim>
   { MulOp<out inst>
     Factor<out type1,out dim1>  (.
