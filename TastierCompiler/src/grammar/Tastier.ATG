@@ -416,7 +416,7 @@ Expr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
 
 /*------------------------------------------------------------------------*/
 
-Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim; int dim1; .)
+Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim1; .)
 =                                 (.  type = (int)TastierType.Undefined; .)
   ( Ident<out name>               (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
@@ -498,8 +498,8 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                     program.Add(new Instruction("", "Const 1"));
                                     program.Add(new Instruction("", "Add"));
                                 .)
-  | "true"                      (.  program.Add(new Instruction("", "Const " + 1)); type = (int)TastierType.Boolean; dim = 0.)
-  | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = (int)TastierType.Boolean; dim = 0.)
+  | "true"                      (.  program.Add(new Instruction("", "Const " + 1)); type = (int)TastierType.Boolean; dim = 0; .)
+  | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = (int)TastierType.Boolean; dim = 0; .)
   | string                      (.
                                     /*
                                       Strings are stored in the heap. The string is stored
@@ -789,7 +789,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                       program.RemoveAt(program.Count() - 1);
                                     }
 
-                                    if((sym.Item3 <= maxSystemType) && (sym.Item6 == 0) {
+                                    if((sym.Item3 <= maxSystemType) && (sym.Item6 == 0)) {
                                       SemErr("Allocate can only be used for records and arrays");
                                     }
                                 .)
@@ -939,7 +939,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                       index--;
                                       size++;
                                     }
-                                    if (((type != (int)TastierType.Integer) && (type != (int)TastierType.String))) || (dim != 0)){
+                                    if (((type != (int)TastierType.Integer) && (type != (int)TastierType.String)) || (dim != 0)){
                                       SemErr("integer or string type expected");
                                     }
                                     string endLabel = generateLabel();
