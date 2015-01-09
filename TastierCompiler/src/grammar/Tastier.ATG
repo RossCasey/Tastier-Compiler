@@ -714,7 +714,7 @@ Stat                            (.  int type; int type1; int type2; string name;
   {
     (
     access                      (.
-                                  if(sym.Item3 <= maxSystemType || dim != 0) {
+                                  if(sym.Item3 <= maxSystemType || dimensions != 0) {
                                     SemErr("The access operator \'.\' can only be used for record reference variables");
                                   }
                                 .)
