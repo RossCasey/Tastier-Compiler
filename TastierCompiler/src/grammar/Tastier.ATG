@@ -418,10 +418,9 @@ Expr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
 /*------------------------------------------------------------------------*/
 
 Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim1; .)
-=                                 (.  type = (int)TastierType.Undefined; .)
+=                                 (.  type = (int)TastierType.Undefined; dim = 0; .)
   ( Ident<out name>               (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
-                                    dim = 0; 
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -549,7 +548,7 @@ MulOp<out Instruction inst>
 ProcDecl                        (.  string name; string label; Scope currentScope = openScopes.Peek(); int enterInstLocation = 0; bool external = false; .)
 = "void"
   Ident<out name>               (.
-                                    currentScope.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, openScopes.Count, -1));
+                                    currentScope.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, openScopes.Count, -1,0));
                                     openScopes.Push(new Scope());
                                     currentScope = openScopes.Peek();
                                 .)
@@ -678,7 +677,7 @@ Assignment<out int type, out int dim>(. int type1; int type2; int dim1; int dim2
 /*------------------------------------------------------------------------*/
 
 Stat                            (.  int type; int type1; int type2; string name; string name1;
-                                    Symbol sym; int dim; int dim1;
+                                    Symbol sym; int dim; int dim1; int dim2; 
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int arrayAccessType; bool firstAccess = true; bool isRecordOrArrayAccess = false;
 
@@ -711,7 +710,7 @@ Stat                            (.  int type; int type1; int type2; string name;
   {
     (
     access                      (.
-                                  if(sym.Item3 <= maxSystemType || dimensions != 0) {
+                                  if(sym.Item3 <= maxSystemType || dim != 0) {
                                     SemErr("The access operator \'.\' can only be used for record reference variables");
                                   }
                                 .)
@@ -739,11 +738,11 @@ Stat                            (.  int type; int type1; int type2; string name;
                                 .)
       Expr<out arrayAccessType, out dim1>  (.
                                   dim--;
-                                  if(dimensions < 0) {
+                                  if(dim < 0) {
                                     SemErr("Too many array accesses [ ]");
                                   }
 
-                                  if(arrayAccessType != TastierType.Integer || dim1 != 0) {
+                                  if((arrayAccessType != (int)TastierType.Integer) || (dim1 != 0)) {
                                     SemErr("Integer type expected for array access");
                                   }
 
@@ -1478,7 +1477,7 @@ VarDecl<bool external>          (.
                                     }
 
                                     if (external) {
-                                      externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
+                                      externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0, 0));
                                     } else {
                                       int address;
                                       //if in global scope, need to find next available heap location and increment heap address counter
@@ -1501,7 +1500,7 @@ VarDecl<bool external>          (.
                                     }
 
                                     if (external) {
-                                      externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0));
+                                      externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0, 0));
                                     } else {
                                       int address;
                                       //if in global scope, need to find next available heap location and increment heap address counter
@@ -1526,6 +1525,7 @@ VarDecl<bool external>          (.
                                     }
                                     if(recType == null) {
                                       SemErr("Record " + typeName + " has not been declared");
+                                      type = (int)TastierType.Undefined;
                                     } else {
                                       type = recType.Item2;
                                     }
