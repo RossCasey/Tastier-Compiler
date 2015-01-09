@@ -755,14 +755,6 @@ Stat                            (.  int type; int type1; int type2; string name;
       )
   }
   (":="                          (.
-                                    /*
-                                    if(!isRecordOrArrayAccess) {
-                                      //if there is no record or array access then we are just
-                                      //working with the storage location of the pointer so there
-                                      //is no need to load it so it can be removed.
-                                      program.RemoveAt(program.Count() - 1);
-                                    }
-                                    */
 
                                     //error if user tries to reassign constant
                                     if ((TastierKind)sym.Item2 == TastierKind.Const) {
