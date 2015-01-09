@@ -718,7 +718,13 @@ Stat                            (.  int type; int type1; int type2; string name;
                                   }
                                 .)
     Ident<out name>             (.
-                                    isRecordOrArrayAccess = true;
+                                    if(firstAccess) {
+                                      isRecordOrArrayAccess = true;
+                                      firstAccess = false;
+                                    } else {
+                                      program.Add(new Instruction("","MemLoad"));
+                                    }
+                                    
                                     program.Add(new Instruction("","MemLoad"));
                                     sym = recordVariableLookup(sym.Item3,name);
                                     if(sym == null) {
