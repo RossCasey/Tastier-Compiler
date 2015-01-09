@@ -421,6 +421,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
 =                                 (.  type = (int)TastierType.Undefined; .)
   ( Ident<out name>               (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
+                                    dim = 0; 
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -452,7 +453,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                 .)
       Ident<out name>          (.
                                     sym = recordVariableLookup(sym.Item3,name);
-                                    if(subSym == null) {
+                                    if(sym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
                                       type = sym.Item3;
@@ -684,6 +685,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                 .)
 
 = Ident<out name>               (.
+                                    dim = 0;
                                     sym = lookup(openScopes, name);
                                     if (sym == null) {
                                       sym = _lookup(externalDeclarations, name);
@@ -717,7 +719,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     isRecordOrArrayAccess = true;
                                     program.Add(new Instruction("","MemLoad"));
                                     sym = recordVariableLookup(sym.Item3,name);
-                                    if(subSym == null) {
+                                    if(sym == null) {
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
                                       type = sym.Item3;
