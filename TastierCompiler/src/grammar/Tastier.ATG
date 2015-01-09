@@ -1463,7 +1463,7 @@ RecordDecl                      (.
 
 
                                     int index = 0;
-                                    foreach(Symbol s in recordVariables.ElementAt(type)) {
+                                    foreach(Symbol s in recordVariables.ElementAt(variableIndex)) {
                                       recordVariables.ElementAt(variableIndex)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,index,s.Item6);
                                       index++;
                                     }
