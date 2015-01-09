@@ -732,6 +732,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     } else {
                                       type = sym.Item3;
                                       dim = sym.Item6;
+                                      dimensions = sym.Item6;
                                       program.Add(new Instruction("","Const " + (sym.Item5)));
                                       program.Add(new Instruction("","Add"));
                                     }
