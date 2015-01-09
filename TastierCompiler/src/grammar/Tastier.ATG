@@ -677,7 +677,7 @@ Assignment<out int type, out int dim>(. int type1; int type2; int dim1; int dim2
 /*------------------------------------------------------------------------*/
 
 Stat                            (.  int type; int type1; int type2; string name; string name1;
-                                    Symbol sym; int dim; int dim1; int dim2; 
+                                    Symbol sym; int dim; int dim1; int dim2;
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int arrayAccessType; bool firstAccess = true; bool isRecordOrArrayAccess = false;
 
@@ -1350,7 +1350,7 @@ Type<out int type>
 
 /*------------------------------------------------------------------------*/
 ConstDecl                       (.
-                                    string name; int type; Scope currentScope = openScopes.Peek();
+                                    string name; int type; int dim Scope currentScope = openScopes.Peek();
                                     Symbol sym;
 
                                     if(!constantsDeclared) {
@@ -1378,7 +1378,7 @@ ConstDecl                       (.
                                     } else {
                                       memLocation = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     }
-                                    sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, memLocation);
+                                    sym = new Symbol(name, (int)TastierKind.Const, (int)type, openScopes.Count-1, memLocation, 0);
                                     currentScope.Push(sym);
                                 .)
   ":="
@@ -1415,7 +1415,7 @@ RecordDecl                      (.
                                     recordsDefined++;
 
                                     recordVariables.Add(new List<Symbol>());
-                                    currentScope.Push(new Symbol("@RecordMarker", -1, -1, -1, -1));
+                                    currentScope.Push(new Symbol("@RecordMarker", -1, -1, -1, -1, -1));
 
                                     //need to undo any changes made by variables declared within records
                                     //so backups are created here to undo any changes
@@ -1431,11 +1431,11 @@ RecordDecl                      (.
   '}'                           (.
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
-                                    sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
+                                    sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, s.Item6);
                                     while(sym.Item1 != "@RecordMarker") {
                                       recordVariables.ElementAt(type).Add(sym);
                                       sym = currentScope.Pop();
-                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1);
+                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, s.Item6);
                                     }
 
                                     //stack returns variables in reverse order
@@ -1452,9 +1452,7 @@ RecordDecl                      (.
                                       recordVariables.ElementAt(type)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,index,s.Item6);
                                       index++;
                                     }
-                                    //now that the size is known we can add an entry to the record types list
 
-                                    parentRecord = "";
                                 .).
 
 /*------------------------------------------------------------------------*/
