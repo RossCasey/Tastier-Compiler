@@ -1434,7 +1434,6 @@ RecordDecl                      (.
                                     Program programBackup = new Program();
                                     programBackup.AddRange(program);
 
-                                    Console.WriteLine("Got here 0");
                                 .)
   '{'
   VarDecl<external>
@@ -1442,7 +1441,6 @@ RecordDecl                      (.
   VarDecl<external>
   }
   '}'                           (.
-                                    Console.WriteLine("Type is: " + type);
                                     //Remove symbol from global symbol table and add it to symbol table for record
                                     sym = currentScope.Pop();
                                     sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, sym.Item6);
@@ -1452,7 +1450,6 @@ RecordDecl                      (.
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, -1, sym.Item6);
                                     }
 
-                                    Console.WriteLine("Got here 1");
                                     //stack returns variables in reverse order
                                     recordVariables[variableIndex].Reverse();
 
@@ -1467,7 +1464,6 @@ RecordDecl                      (.
                                       recordVariables.ElementAt(variableIndex)[index] = new Symbol(s.Item1,s.Item2,s.Item3,s.Item4,index,s.Item6);
                                       index++;
                                     }
-                                    Console.WriteLine("Got here 2");
 
                                 .).
 
