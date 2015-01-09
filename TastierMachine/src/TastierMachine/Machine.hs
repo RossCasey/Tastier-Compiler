@@ -242,13 +242,13 @@ run = do
           {-- Get pointer from stack --}
 
           let ptAddr = fromIntegral $ smem ! (rtp-1)
-          error $ show rtp
+
           {-- Convert data memory to list --}
           let memList = elems dmem
 
           {-- Get output string --}
           let str = (stringPrint ptAddr memList)
-
+          error $ show rtp
           {-- Remove quotes from string --}
           let strNoQuotes = filter (/='"') str
           tell $ [strNoQuotes]
