@@ -1454,7 +1454,7 @@ RecordDecl                      (.
 
                                     Console.WriteLine("Got here 1");
                                     //stack returns variables in reverse order
-                                    recordVariables[type].Reverse();
+                                    recordVariables[variableIndex].Reverse();
 
 
                                     //undo changes
