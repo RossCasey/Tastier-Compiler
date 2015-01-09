@@ -725,7 +725,6 @@ Stat                            (.  int type; int type1; int type2; string name;
                                       program.Add(new Instruction("","MemLoad"));
                                     }
                                     
-                                    program.Add(new Instruction("","MemLoad"));
                                     sym = recordVariableLookup(sym.Item3,name);
                                     if(sym == null) {
                                       SemErr(name + " is not defined in referenced record");
