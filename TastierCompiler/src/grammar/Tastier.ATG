@@ -747,7 +747,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                 .)
       Expr<out arrayAccessType, out dim1>  (.
                                   dimensions--;
-                                  if(dim < 0) {
+                                  if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
                                   }
 
@@ -797,7 +797,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                 .)
   | "allocate"  '('             (.
                                     //no need for load instruction if accessing base pointer or record or array
-                                    if(isRecordOrArrayAccess) {
+                                    if(!isRecordOrArrayAccess) {
                                       program.RemoveAt(program.Count() - 1);
                                     }
 
