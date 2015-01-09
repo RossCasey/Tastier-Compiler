@@ -1458,7 +1458,7 @@ RecordDecl                      (.
 /*------------------------------------------------------------------------*/
 
 VarDecl<bool external>          (.
-                                    string name; int type; Scope currentScope = openScopes.Peek(); RecordType recordType;
+                                    string name; int type; Scope currentScope = openScopes.Peek();
                                     string typeName; string varName; int dimensions = 0;
                                 .)
 = (Type<out type>
