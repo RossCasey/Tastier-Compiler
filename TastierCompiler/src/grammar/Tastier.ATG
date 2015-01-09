@@ -299,7 +299,7 @@ string generateLabel() {
 class RecordVariables : List<List<Symbol>> {}
 
 //stores the name of a record types against the index that its symbols are stored at
-class RecordTypes : List<RecordTypes> {}
+class RecordTypes : List<RecordType> {}
 
 RecordVariables recordVariables = new RecordVariables();
 RecordTypes recordTypes = new RecordTypes();
