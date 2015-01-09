@@ -240,8 +240,9 @@ run = do
 
         Instructions.WriteStr  -> do
           {-- Get pointer from stack --}
+          error $ show rtp
           let ptAddr = fromIntegral $ smem ! (rtp-1)
-
+          error $ show rtp
           {-- Convert data memory to list --}
           let memList = elems dmem
 
