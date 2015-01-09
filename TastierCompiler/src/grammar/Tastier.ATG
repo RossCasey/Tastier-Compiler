@@ -446,7 +446,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                 .)
     {
     (access                    (.
-                                    if(sym.Item3 <= maxSystemType || sym.Item6 != 0) {
+                                    if(sym.Item3 <= maxSystemType || dim != 0) {
                                       SemErr("The access operator \'.\' can only be used for record reference variables");
                                     }
                                 .)
