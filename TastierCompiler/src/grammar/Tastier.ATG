@@ -1350,7 +1350,7 @@ Type<out int type>
 
 /*------------------------------------------------------------------------*/
 ConstDecl                       (.
-                                    string name; int type; int dim Scope currentScope = openScopes.Peek();
+                                    string name; int type; int dim; Scope currentScope = openScopes.Peek();
                                     Symbol sym;
 
                                     if(!constantsDeclared) {
