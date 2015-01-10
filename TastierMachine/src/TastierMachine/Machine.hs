@@ -464,7 +464,7 @@ run = do
           level delta at (rtp - 1) and the return address at (rtp - 2).
           -}
           put $ machine { rpc = b, rtp = rtp + 3,
-                          smem = (smem // [(rtp, (rpc+1)), (rtp+1, a)]) }
+                          smem = (smem // [(rtp, (rpc+1)), (rtp+2, a)]) }
           run
 
 {-
