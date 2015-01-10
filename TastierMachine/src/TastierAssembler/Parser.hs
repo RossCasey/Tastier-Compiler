@@ -107,7 +107,7 @@ parseInstruction lineNumber text =
 
     ["CallNonVoid", a, b]  ->
       case B.readInteger b of
-        Just i -> Right $ I.Binary I.Call
+        Just i -> Right $ I.Binary I.CallNonVoid
                           (convert $ B.readInteger a)
                           (convert $ B.readInteger b)
         _ -> Left $ ["CallNonVoid", a, b]
