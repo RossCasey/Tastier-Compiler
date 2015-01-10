@@ -462,8 +462,8 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                         foreach(FunctionType func in functionTypes) {
                                           if(func.Item1.Equals(sym.Item1)) {
                                             functionIndex = func.Item2;
+                                            paramsInFunction = functionParameters[functionIndex].Count();
                                           }
-                                          paramsInFunction = functionParameters[functionIndex].Count();
                                         }
                                         Console.WriteLine("Got here -2");
                                       }
