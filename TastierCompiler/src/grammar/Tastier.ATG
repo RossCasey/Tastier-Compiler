@@ -1879,7 +1879,7 @@ VarDecl<bool external>          (.
   } ';'
   ).
 
-ExternDecl                      (.  string name; bool external = true; Scope currentScope = openScopes.Peek(); .)
+ExternDecl                      (.  string name; bool external = true; .)
 = "external"
   ( VarDecl<external>
   | "procedure" Ident<out name> ';'
