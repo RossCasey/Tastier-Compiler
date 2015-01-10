@@ -733,6 +733,8 @@ ProcDecl                        (.  string name; string label; Scope currentScop
 
   ')'
   '{'                           (.
+                                    Console.WriteLine(currentScope.Count());
+
                                     if(parameters > 0) {
                                       //Remove symbol from symbol table and add it to symbol table for record
                                       sym = currentScope.Pop();
