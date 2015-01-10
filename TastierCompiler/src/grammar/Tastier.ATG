@@ -545,10 +545,37 @@ MulOp<out Instruction inst>
 
 /*------------------------------------------------------------------------*/
 
-ProcDecl                        (.  string name; string label; Scope currentScope = openScopes.Peek(); int enterInstLocation = 0; bool external = false; .)
-= "void"
+ProcDecl                        (.  string name; string label; Scope currentScope = openScopes.Peek(); int enterInstLocation = 0; bool external = false;
+                                    int type; int dimensions = 0; string typeName; bool returnDeclared = false; int returnType; int returnDim; .)
+= ("void"                       (.
+                                    type = TastierType.Undefined;
+                                .)
+  | Type<out type>
+  | "record" Ident<out typeName>;(.
+                                    bool found = false;
+                                    foreach(RecordType rec in recordTypes) {
+                                      if(rec.Item1.Equals(typeName)) {
+                                        found = true;
+                                        type = rec.Item2;
+                                      }
+                                    }
+                                    if(!found) {
+                                      SemErr("Record type " + typeName + " has not been declared");
+                                      type = -1;
+                                    }
+                                .)
+  )
+  {
+    '[' ']'                     (.
+                                    if(type == (int)TastierType.Undefined) {
+                                      SemErr("It is not possible to have an array of void");
+                                    } else {
+                                      dimensions++;
+                                    }
+                                .)
+  }
   Ident<out name>               (.
-                                    currentScope.Push(new Symbol(name, (int)TastierKind.Proc, (int)TastierType.Undefined, openScopes.Count, -1,0));
+                                    currentScope.Push(new Symbol(name, (int)TastierKind.Proc, type, openScopes.Count, -1,dimensions));
                                     openScopes.Push(new Scope());
                                     currentScope = openScopes.Peek();
                                 .)
@@ -588,6 +615,20 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                 .)
     ProcDecl                    (. program.Add(new Instruction(openLabels.Pop(), "Nop")); .)
   }
+
+  [
+    "return"                    (.
+                                    if(type == (int)TastierType.Undefined) {
+                                      SemErr("Cannot return a value from a void function");
+                                    }
+                                .)
+    Expr<out returnType, out returnDim>
+                                (.
+                                    if(type != returnType) || (dimensions != returnDim) {
+                                      SemErr("Function type and return type do not match");
+                                    }
+                                .)
+  ]
   '}'                           (.
                                     program.Add(new Instruction("", "Leave"));
                                     program.Add(new Instruction("", "Ret"));
