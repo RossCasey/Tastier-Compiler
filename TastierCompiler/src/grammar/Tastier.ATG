@@ -635,7 +635,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                 .)
   ]
   '}'                           (.
-                                    if((type != (int)TastierType.Undefined) && (!returnDeclated)) {
+                                    if((type != (int)TastierType.Undefined) && (!returnDeclared)) {
                                       SemErr("A return value has not been declared for this non-void function");
                                     }
 
