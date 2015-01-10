@@ -1913,7 +1913,7 @@ ParamDecl<bool external>          (.
                                     }
 
 
-                                .) ';'
+                                .) 
   | "record"
     Ident<out typeName>         (.
                                     RecordType recType = null;
@@ -1973,7 +1973,7 @@ ParamDecl<bool external>          (.
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
                                       }
                                     } */
-                                .) ';'
+                                .)
   ).
 
 ExternDecl                      (.  string name; bool external = true; .)
