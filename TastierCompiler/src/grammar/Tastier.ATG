@@ -463,7 +463,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                             functionIndex = sym.Item2;
                                           }
                                           paramsInFunction = functionParameters[functionIndex].Count();
-                                          Console.WriteLine(paramsInFunction);
                                         }
                                       }
                                     }
@@ -711,6 +710,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     currentScope.Push(new Symbol(name, (int)TastierKind.Proc, type, openScopes.Count, -1,dimensions));
                                     openScopes.Push(new Scope());
                                     currentScope = openScopes.Peek();
+
                                     currentScope.Push(new Symbol("@FunctionMarker",-1,-1,-1,-1,-1));
                                     functionIndex = functionsDefined;
                                     functionTypes.Add(new FunctionType(name, functionIndex));
@@ -745,6 +745,8 @@ ProcDecl                        (.  string name; string label; Scope currentScop
 
                                       //stack returns variables in reverse order
                                       functionParameters[functionIndex].Reverse();
+
+                                      Console.WriteLine(functionParameters[functionIndex].Count());
 
                                       //add variable back to currentscope in original order
                                       foreach(Symbol s in functionParameters[functionIndex]) {
