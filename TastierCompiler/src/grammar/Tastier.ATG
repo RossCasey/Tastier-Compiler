@@ -431,7 +431,8 @@ Expr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
 Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim1; int paramType; int paramDim; .)
 =                                 (.  type = (int)TastierType.Undefined; dim = 0; bool functionCalled = false; int parameters = 0;
                                       bool firstParamDeclared = false; int functionIndex = -1; int paramsInFunction = 0;
-                                      Stack<Instruction> parameterStack = new Stack<Instruction>(); int pType; int pDim; .)
+                                      Stack<Instruction> parameterStack = new Stack<Instruction>(); int pType; int pDim;
+                                      Instruction inst; .)
   ( Ident<out name>               (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
                                     sym = lookup(openScopes, name);
@@ -481,7 +482,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                              SemErr("Unexpected expression type in this parameter slot");
                                            }
 
-                                           Instruction inst;
                                            int programCounter = program.Count() -1;
                                            inst = program.ElementAt(programCounter);
                                            program.RemoveAt(programCounter);
@@ -514,7 +514,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                              SemErr("Unexpected expression type in this parameter slot");
                                            }
 
-                                           Instruction inst;
                                            int programCounter = program.Count() -1;
                                            inst = program.ElementAt(programCounter);
                                            program.RemoveAt(programCounter);
@@ -532,7 +531,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                 (.
 
                                   //add paramter expressions back into program, now in reverse order
-                                  Instruction inst;
                                   while(parameterStack.Count() != 0) {
                                     inst = parameterStack.Pop();
                                     program.Add(inst);
