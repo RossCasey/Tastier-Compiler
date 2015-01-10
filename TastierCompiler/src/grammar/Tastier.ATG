@@ -718,7 +718,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                 .)
   '('
       [
-        VarDecl<external>       (. parameters++; firstParamDeclared = true; .)
+        ParamDecl<external>       (. parameters++; firstParamDeclared = true; .)
       ]
       {
         ','                     (.
@@ -727,7 +727,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                      firstParamDeclared = true;
                                   }
                                 .)
-        VarDecl<external>        (. parameters++; .)
+        ParamDecl<external>        (. parameters++; .)
       }
 
   ')'
@@ -1877,6 +1877,103 @@ VarDecl<bool external>          (.
                                     }*/
                                 .)
   } ';'
+  ).
+
+/*------------------------------------------------------------------------*/
+
+ParamDecl<bool external>          (.
+                                    string name; int type; Scope currentScope = openScopes.Peek();
+                                    string typeName; string varName; int dimensions = 0;
+                                .)
+= (Type<out type>
+   {
+      '[' ']'                   (.
+                                    dimensions++;
+                                .)
+   }
+   Ident<out name>        (.
+                                    //check that there are no name collisions
+                                    Symbol checkNoCollisions = lookup(openScopes,name);
+                                    if(checkNoCollisions != null) {
+                                      SemErr("Variable name " + name + " is already in use");
+                                    }
+
+                                    if (external) {
+                                      externalDeclarations.Push(new Symbol(name, (int)TastierKind.Var, (int)type, 0, 0, 0));
+                                    } else {
+                                      int address;
+                                      //if in global scope, need to find next available heap location and increment heap address counter
+                                      if((openScopes.Count-1) == 0) {
+                                        address = nextHeapAddress;
+                                        nextHeapAddress++;
+                                      } else {
+                                        address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                      }
+                                      currentScope.Push(new Symbol(name, (int)TastierKind.Var, type, openScopes.Count-1, address, dimensions));
+                                    }
+
+
+                                .) ';'
+  | "record"
+    Ident<out typeName>         (.
+                                    RecordType recType = null;
+                                    foreach(RecordType rec in recordTypes) {
+                                      if(rec.Item1.Equals(typeName)) {
+                                        recType = rec;
+                                      }
+                                    }
+                                    if(recType == null) {
+                                      SemErr("Record " + typeName + " has not been declared");
+                                      type = (int)TastierType.Undefined;
+                                    } else {
+                                      type = recType.Item2;
+                                    }
+                                .)
+    {
+      '[' ']'                   (.
+                                    dimensions++;
+                                .)
+   }
+    Ident<out varName>          (.
+                                    //check that there are no name collisions
+                                    Symbol checkNoCollisions = lookup(openScopes,varName);
+                                    if(checkNoCollisions != null) {
+                                      SemErr("Variable name " + varName + " is already in use");
+                                    }
+
+                                    //create new instance of record in current scope
+                                    int address;
+                                    //if in global scope, need to find next available heap location and increment heap address counter
+                                    if((openScopes.Count-1) == 0) {
+                                      address = nextHeapAddress;
+                                      nextHeapAddress++;
+                                    } else {
+                                      address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                    }
+                                    currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address,dimensions));
+
+                                    /*if(!isArray) {
+
+                                      int stringAddress = nextHeapAddress;
+                                      nextHeapAddress = nextHeapAddress + recordType.Item3;
+
+                                      program.Add(new Instruction("","Const " + Convert.ToString(stringAddress + 3)));
+
+                                      if ((openScopes.Count-1) == 0) {
+                                        if (external) {
+                                          program.Add(new Instruction("", "StoG " + varName));
+                                          // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
+                                        } else {
+                                          program.Add(new Instruction("", "StoG " + (address+3)));
+                                        }
+                                      } else {
+                                        //There is no need for a lexical difference here as the record has just been declared
+                                        //in the current scope
+                                        int lexicalLevelDifference = 0;
+                                        program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
+                                      }
+                                    } */
+                                .) ';'
   ).
 
 ExternDecl                      (.  string name; bool external = true; .)
