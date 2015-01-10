@@ -627,12 +627,18 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     if((type != returnType) || (dimensions != returnDim)) {
                                       SemErr("Function type and return type do not match");
                                     }
+                                    returnDeclated = true;
+
                                     //moves the value at the top of the stack into the slot
                                     //designated for return values
                                     program.Add(new Instruction("", "RetValue"));
                                 .)
   ]
   '}'                           (.
+                                    if((type != (int)TastierType.Undefined) && (!returnDeclated)) {
+                                      SemErr("A return value has not been declared for this non-void function");
+                                    }
+
                                     program.Add(new Instruction("", "Leave"));
                                     program.Add(new Instruction("", "Ret"));
                                     openScopes.Pop();
