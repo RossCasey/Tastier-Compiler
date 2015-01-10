@@ -16,7 +16,6 @@ data Instruction = Add
                  | Load
                  | Sto
                  | Call
-                 | CallNonVoid
                  | LoadG
                  | StoG
                  | Const
