@@ -463,6 +463,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                             functionIndex = sym.Item2;
                                           }
                                           paramsInFunction = functionParameters[functionIndex].Count();
+                                          Console.WriteLine(paramsInFunction);
                                         }
                                       }
                                     }
@@ -1913,7 +1914,7 @@ ParamDecl<bool external>          (.
                                     }
 
 
-                                .) 
+                                .)
   | "record"
     Ident<out typeName>         (.
                                     RecordType recType = null;
