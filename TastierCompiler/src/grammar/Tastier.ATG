@@ -514,7 +514,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                              SemErr("Unexpected expression type in this parameter slot");
                                            }
 
-                                           inst;
                                            int programCounter = program.Count() -1;
                                            inst = program.ElementAt(programCounter);
                                            program.RemoveAt(programCounter);
@@ -532,7 +531,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                 (.
 
                                   //add paramter expressions back into program, now in reverse order
-                                  inst;
                                   while(parameterStack.Count() != 0) {
                                     inst = parameterStack.Pop();
                                     program.Add(inst);
