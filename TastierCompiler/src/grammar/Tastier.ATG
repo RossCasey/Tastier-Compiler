@@ -627,6 +627,9 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     if(type != returnType) || (dimensions != returnDim) {
                                       SemErr("Function type and return type do not match");
                                     }
+                                    //moves the value at the top of the stack into the slot
+                                    //designated for return values
+                                    program.Add(new Instruction("", "RetValue"));
                                 .)
   ]
   '}'                           (.
@@ -926,7 +929,12 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     int currentStackLevel = openScopes.Count;
                                     int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4);
                                     string procedureLabel = getLabelForProcedureName(lexicalLevelDifference, sym.Item1);
-                                    program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
+
+                                    if(sym.Item3 == (int)TastierType.Undefined) {
+                                      program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
+                                    } else {
+                                      program.Add(new Instruction("", "CallNonVoid " + lexicalLevelDifference + " " + procedureLabel));
+                                    }
                                 .)
   )
 
