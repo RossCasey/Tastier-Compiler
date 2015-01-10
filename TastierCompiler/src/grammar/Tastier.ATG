@@ -304,6 +304,17 @@ class RecordTypes : List<RecordType> {}
 RecordVariables recordVariables = new RecordVariables();
 RecordTypes recordTypes = new RecordTypes();
 
+//stores the index of a functions parameter list
+class FunctionTypes : List<FunctionType> {}
+FunctionTypes functionTypes = new FunctionTypes();
+
+//stores the parameters types and positions of each function as a list of symbol lists
+class FunctionParameters : List<List<Symbol>> {}
+FunctionParameters functionParameters = new FunctionParameters();
+
+//keeps track of the next available index number for function parameter definitions
+int functionsDefined = 0;
+
 
 //keeps track of the next available index number for record types
 int recordsDefined = 0;
@@ -418,7 +429,9 @@ Expr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
 /*------------------------------------------------------------------------*/
 
 Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim1; int paramType; int paramDim; .)
-=                                 (.  type = (int)TastierType.Undefined; dim = 0; bool functionCalled = false; int parameters = 0; .)
+=                                 (.  type = (int)TastierType.Undefined; dim = 0; bool functionCalled = false; int parameters = 0;
+                                      bool firstParamDeclared = false; int functionIndex = -1; int paramsInFunction = 0;
+                                      Stack<Instruction> parameterStack = new Stack<Instruction>();.)
   ( Ident<out name>               (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
                                     sym = lookup(openScopes, name);
@@ -443,23 +456,92 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                           int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4)-1;
                                           program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
                                         }
+                                      } else {
+                                        foreach(FunctionType func in functionTypes) {
+                                          if(func.Item1.Equals(sym.Item1)) {
+                                            functionIndex = sym.Item2;
+                                          }
+                                          paramsInFunction = functionVariables[functionIndex].Count();
+                                        }
                                       }
                                     }
                                 .)
     [
 
-      '('
+      '('                             (. program.Add(new Instruction("@parameterMarker","Nop"));  .)
+        [
+          Expr<out pType, out pDim>   (. parameters++;
+                                         firstParamDeclared= true;
+                                         if(parameters > paramsInFunction) {
+                                           SemErr("This function only takes " + paramsInFunction + " parameters");
+                                         } else {
 
-      { Expr<out paramType, out paramDim> ','(.
-                                              parameters++;
-                                            .)
-      }
+                                           Symbol param = functionVariable[functionIndex][parameters-1];
+                                           if((pType != param.Item3) || (pDim != param.Item6)) {
+                                             SemErr("Unexpected expression type in this parameter slot");
+                                           }
+
+                                           Instruction inst;
+                                           int programCounter = program.Count() -1;
+                                           inst = program.ElementAt(programCounter);
+                                           program.RemoveAt(programCounter);
+                                           while(!inst.Item1.Equals("@parameterMarker")) {
+                                             parameterStack.push(inst);
+                                             programCounter--;
+                                             inst = program.ElementAt(programCounter);
+                                             program.RemoveAt(programCounter);
+                                           }
+                                         }
+                                      .)
+        ]
+        {
+          ','                         (.
+                                        if(!firstParamDeclared) {
+                                          SemErr("Parameter missing or extra comma");
+                                          firstParamDeclared = true;
+                                          functionCalled = true;
+                                        } else {
+                                          program.Add(new Instruction("@parameterMarker","Nop"));
+                                        }
+                                      .)
+          Expr<out pType, out pDim>   (. parameters++;
+                                         if(parameters > paramsInFunction) {
+                                           SemErr("This function only takes " + paramsInFunction + " parameters");
+                                         } else {
+
+                                           Symbol param = functionVariable[functionIndex][parameters-1];
+                                           if((pType != param.Item3) || (pDim != param.Item6)) {
+                                             SemErr("Unexpected expression type in this parameter slot");
+                                           }
+
+                                           Instruction inst;
+                                           int programCounter = program.Count() -1;
+                                           inst = program.ElementAt(programCounter);
+                                           program.RemoveAt(programCounter);
+                                           while(!inst.Item1.Equals("@parameterMarker")) {
+                                             parameterStack.push(inst);
+                                             programCounter--;
+                                             inst = program.ElementAt(programCounter);
+                                             program.RemoveAt(programCounter);
+                                           }
+
+                                         }
+                                      .)
+        }
       ')'
                                 (.
+
+                                  //add paramter expressions back into program, now in reverse order
+                                  Instrunction inst;
+                                  while(parameterStack.Count() != 0) {
+                                    inst = parameterStack.Pop();
+                                    program.Add(inst);
+                                  }
+
                                   if(!functionCalled) {
                                     functionCalled = true;
                                   } else {
-                                    SemErr("Too many (), implying a function call of a funtion");
+                                    SemErr("Too many (), implying a function call of a funtcion");
                                   }
 
                                   if ((TastierKind)sym.Item2 != TastierKind.Proc) {
@@ -596,7 +678,8 @@ MulOp<out Instruction inst>
 /*------------------------------------------------------------------------*/
 
 ProcDecl                        (.  string name; string label; Scope currentScope = openScopes.Peek(); int enterInstLocation = 0; bool external = false;
-                                    int type = 0; int dimensions = 0; string typeName; bool returnDeclared = false; int returnType; int returnDim; .)
+                                    int type = 0; int dimensions = 0; string typeName; bool returnDeclared = false; int returnType; int returnDim;
+                                    int parameters = 0; bool firstParamDeclared = false; Symbol sym; int functionIndex; .)
 = "function"
   ("void"                       (.
                                     type = (int)TastierType.Undefined;
@@ -629,9 +712,48 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     currentScope.Push(new Symbol(name, (int)TastierKind.Proc, type, openScopes.Count, -1,dimensions));
                                     openScopes.Push(new Scope());
                                     currentScope = openScopes.Peek();
+                                    currentScope.Push(new Symbol("@FunctionMarker",-1,-1,-1,-1,-1));
+                                    functionIndex = functionsDefined;
+                                    functionTypes.Add(new FunctionType(name, functionIndex));
+                                    functionVariables.Add(new List<Symbol>());
+                                    functionsDefined++;
                                 .)
-  '(' ')'
+  '('
+      [
+        VarDecl<out external>   (. parameters++; firstParamDeclared = true; .)
+      ]
+      {
+        ','                     (.
+                                  if(!firstParamDeclared) {
+                                     SemErr("Parameter missing or extra comma");
+                                     firstParamDeclared = true;
+                                  }
+                                .)
+        VarDecl<out external>   (. parameters++; .)
+      }
+
+  ')'
   '{'                           (.
+                                    if(parameters > 0) {
+                                      //Remove symbol from symbol table and add it to symbol table for record
+                                      sym = currentScope.Pop();
+                                      sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
+                                      while(sym.Item1 != "@FunctionMarker") {
+                                        functionVariables.ElementAt(functionIndex).Add(sym);
+                                        sym = currentScope.Pop();
+                                        sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item4, sym.Item6);
+                                      }
+
+                                      //stack returns variables in reverse order
+                                      functionVariables[functionIndex].Reverse();
+
+                                      //add variable back to currentscope in original order
+                                      currentScope.AddRange(functionVariables[functionIndex]);
+                                    } else {
+                                      currentScope.Pop(); //remove the function marker from symbol table
+                                    }
+
+
                                     program.Add(new Instruction("", "Enter 0"));
                                     enterInstLocation = program.Count - 1;
                                     if(name=="ConstDecl") {
@@ -652,6 +774,21 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       put the right value in.
                                     */
                                 .)
+
+                                //load parameters passed by previous function into their local parameter space on stack
+                                int returnValueOffset = 1;
+                                if(type == (int)TastierType.Undefined) {
+                                  returnValueOffset = 0;   //no extra space on stack for a return value
+                                }
+
+                                int index = 1;
+                                foreach(Symbol s in functionVariables.ElementAt(functionIndex)) {
+                                  program.Add(new Instruction("","LoadG 2"));     //load rbp
+                                  program.Add(new Instruction("","Const " + Convert.ToString(index + returnValueOffset)));
+                                  program.Add(new Instruction("","Sub"));
+                                  program.Add(new Instruction("","StackLoad"));
+                                  program.Add(new Instruction("","Sto " + s.Item4 + " " + s.Item5));
+                                }
 
   { VarDecl<external> | Stat |  (.
                                     openLabels.Push(generateLabel());
