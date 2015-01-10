@@ -738,16 +738,11 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     if(parameters > 0) {
                                       //Remove symbol from symbol table and add it to symbol table for record
                                       sym = currentScope.Pop();
-                          
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
-
                                       while(sym.Item1 != "@FunctionMarker") {
                                         functionParameters.ElementAt(functionIndex).Add(sym);
                                         sym = currentScope.Pop();
-
                                         sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
-
-
                                       }
 
                                       //stack returns variables in reverse order
@@ -799,6 +794,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       program.Add(new Instruction("","StackLoad"));
                                       int lexicalLevelDifference = Math.Abs(openScopes.Count - s.Item4)-1;
                                       program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + s.Item5));
+                                      index++;
                                     }
                                 .)
 
