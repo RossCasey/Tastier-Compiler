@@ -634,6 +634,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     //designated for return values
                                     program.Add(new Instruction("", "RetValue"));
                                 .)
+   ';'
   ]
   '}'                           (.
                                     if((type != (int)TastierType.Undefined) && (!returnDeclared)) {
