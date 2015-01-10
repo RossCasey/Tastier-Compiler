@@ -431,7 +431,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                     } else {
                                       type = sym.Item3;
                                       dim = sym.Item6;
-                                      if (sym.Item4 == 0) {
+                                      if ((sym.Item4 == 0) && (sym.Item2 != (int)TastierKind.Proc)) {
                                         if (isExternal) {
                                           program.Add(new Instruction("", "LoadG " + sym.Item1));
                                           // if the symbol is external, we load it by name. The linker will resolve the name to an address.
