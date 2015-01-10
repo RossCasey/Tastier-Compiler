@@ -431,6 +431,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                     } else {
                                       type = sym.Item3;
                                       dim = sym.Item6;
+                                      Console.WriteLine("Name: " + sym.Item1 + " kind: " + (TastierKind)sym.Item2 + " type: " + (TastierType)sym.Item3);
                                       if ((sym.Item4 == 0) && (sym.Item2 != (int)TastierKind.Proc)) {
                                         if (isExternal) {
                                           program.Add(new Instruction("", "LoadG " + sym.Item1));
