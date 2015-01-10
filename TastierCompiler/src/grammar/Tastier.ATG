@@ -461,7 +461,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                           if(func.Item1.Equals(sym.Item1)) {
                                             functionIndex = sym.Item2;
                                           }
-                                          paramsInFunction = functionVariables[functionIndex].Count();
+                                          paramsInFunction = functionParameters[functionIndex].Count();
                                         }
                                       }
                                     }
@@ -713,7 +713,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     currentScope.Push(new Symbol("@FunctionMarker",-1,-1,-1,-1,-1));
                                     functionIndex = functionsDefined;
                                     functionTypes.Add(new FunctionType(name, functionIndex));
-                                    functionVariables.Add(new List<Symbol>());
+                                    functionParameters.Add(new List<Symbol>());
                                     functionsDefined++;
                                 .)
   '('
@@ -737,16 +737,16 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       sym = currentScope.Pop();
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
                                       while(sym.Item1 != "@FunctionMarker") {
-                                        functionVariables.ElementAt(functionIndex).Add(sym);
+                                        functionParameters.ElementAt(functionIndex).Add(sym);
                                         sym = currentScope.Pop();
                                         sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item4, sym.Item6);
                                       }
 
                                       //stack returns variables in reverse order
-                                      functionVariables[functionIndex].Reverse();
+                                      functionParameters[functionIndex].Reverse();
 
                                       //add variable back to currentscope in original order
-                                      currentScope.AddRange(functionVariables[functionIndex]);
+                                      currentScope.AddRange(functionParameters[functionIndex]);
                                     } else {
                                       currentScope.Pop(); //remove the function marker from symbol table
                                     }
@@ -780,7 +780,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     }
 
                                     int index = 1;
-                                    foreach(Symbol s in functionVariables.ElementAt(functionIndex)) {
+                                    foreach(Symbol s in functionParameters.ElementAt(functionIndex)) {
                                       program.Add(new Instruction("","LoadG 2"));     //load rbp
                                       program.Add(new Instruction("","Const " + Convert.ToString(index + returnValueOffset)));
                                       program.Add(new Instruction("","Sub"));
