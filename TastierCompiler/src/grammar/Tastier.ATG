@@ -738,15 +738,15 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     if(parameters > 0) {
                                       //Remove symbol from symbol table and add it to symbol table for record
                                       sym = currentScope.Pop();
-                                      Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
+                          
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
-                                      Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
+
                                       while(sym.Item1 != "@FunctionMarker") {
                                         functionParameters.ElementAt(functionIndex).Add(sym);
                                         sym = currentScope.Pop();
-                                        Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
-                                        sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item4, sym.Item6);
-                                        Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
+
+                                        sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
+
 
                                       }
 
