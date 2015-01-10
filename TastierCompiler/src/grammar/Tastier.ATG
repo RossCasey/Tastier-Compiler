@@ -458,14 +458,12 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                           program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
                                         }
                                       } else {
-                                        Console.WriteLine("Got here -1");
                                         foreach(FunctionType func in functionTypes) {
                                           if(func.Item1.Equals(sym.Item1)) {
                                             functionIndex = func.Item2;
                                             paramsInFunction = functionParameters[functionIndex].Count();
                                           }
                                         }
-                                        Console.WriteLine("Got here -2");
                                       }
                                     }
                                 .)
@@ -479,7 +477,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                            SemErr("This function only takes " + paramsInFunction + " parameters");
                                          } else {
 
-                                           Console.WriteLine("Got here 0 ");
                                            Symbol param = functionParameters[functionIndex][parameters-1];
                                            if((pType != param.Item3) || (pDim != param.Item6)) {
                                              SemErr("Unexpected expression type in this parameter slot");
@@ -495,7 +492,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                              program.RemoveAt(programCounter);
                                            }
                                          }
-                                         Console.WriteLine("Got here 1 ");
                                       .)
         ]
         {
@@ -507,7 +503,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                         } else {
                                           program.Add(new Instruction("@parameterMarker","Nop"));
                                         }
-                                        Console.WriteLine("Got here 2 ");
                                       .)
           Expr<out pType, out pDim>   (. parameters++;
                                          if(parameters > paramsInFunction) {
@@ -518,7 +513,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                            if((pType != param.Item3) || (pDim != param.Item6)) {
                                              SemErr("Unexpected expression type in this parameter slot");
                                            }
-                                           Console.WriteLine("Got here 3 ");
+
 
                                            int programCounter = program.Count() -1;
                                            inst = program.ElementAt(programCounter);
@@ -529,7 +524,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                              inst = program.ElementAt(programCounter);
                                              program.RemoveAt(programCounter);
                                            }
-                                           Console.WriteLine("Got here 4 ");
 
                                          }
                                       .)
