@@ -797,7 +797,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       program.Add(new Instruction("","Sub"));
                                       program.Add(new Instruction("","StackLoad"));
                                       int lexicalLevelDifference = Math.Abs(openScopes.Count - s.Item4)-1;
-                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
+                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + s.Item5));
                                     }
                                 .)
 
