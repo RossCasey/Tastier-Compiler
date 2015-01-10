@@ -738,9 +738,11 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       sym = currentScope.Pop();
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
                                       while(sym.Item1 != "@FunctionMarker") {
+                                        Console.WriteLine("Scope: " + sym.Item4 + " addr: " + sym.Item5);
                                         functionParameters.ElementAt(functionIndex).Add(sym);
                                         sym = currentScope.Pop();
                                         sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item4, sym.Item6);
+
                                       }
 
                                       //stack returns variables in reverse order
