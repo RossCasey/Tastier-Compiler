@@ -417,7 +417,7 @@ Expr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
 
 /*------------------------------------------------------------------------*/
 
-Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim1; .)
+Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim1; int paramType; int paramDim; .)
 =                                 (.  type = (int)TastierType.Undefined; dim = 0; bool functionCalled = false; int parameters = 0; .)
   ( Ident<out name>               (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
@@ -446,49 +446,16 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                       }
                                     }
                                 .)
-    {
-    (access                    (.
-                                    if(sym.Item3 <= maxSystemType || dim != 0) {
-                                      SemErr("The access operator \'.\' can only be used for record reference variables");
-                                    }
-                                .)
-      Ident<out name>          (.
-                                    sym = recordVariableLookup(sym.Item3,name);
-                                    if(sym == null) {
-                                      SemErr(name + " is not defined in referenced record");
-                                    } else {
-                                      type = sym.Item3;
-                                      dim = sym.Item6;
-                                      program.Add(new Instruction("","Const " + (sym.Item5)));
-                                      program.Add(new Instruction("","Add"));
-                                      program.Add(new Instruction("","MemLoad"));
-                                    }
-                                .)
+    [
 
-    |'['
-      Expr<out arrayAccessType, out dim1> (.
-                                  dim--;
-                                  if(dim < 0) {
-                                    SemErr("Too many array accesses [ ]");
-                                  }
-
-                                  if((arrayAccessType != (int)TastierType.Integer) ||
-                                    (dim1 != 0)){
-                                    SemErr("Integer type expected for array access");
-                                  }
-
-                                  program.Add(new Instruction("","Add"));
-                                  program.Add(new Instruction("","MemLoad"));
-                                .)
-      ']'
-    | {
       '('
-      Expr<out paramType, out paramDim>
-                                (.
-                                  parameters++;
-                                .)
+
+      { Expr<out paramType, out paramDim> ','(.
+                                              parameters++;
+                                            .)
+      }
       ')'
-      }                          (.
+                                (.
                                   if(!functionCalled) {
                                     functionCalled = true;
                                   } else {
@@ -525,6 +492,43 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                     program.Add(new Instruction("","LoadG 4"));  //place return value on stack
                                   }
                                 .)
+    ]
+
+    {
+    (access                    (.
+                                    if(sym.Item3 <= maxSystemType || dim != 0) {
+                                      SemErr("The access operator \'.\' can only be used for record reference variables");
+                                    }
+                                .)
+      Ident<out name>          (.
+                                    sym = recordVariableLookup(sym.Item3,name);
+                                    if(sym == null) {
+                                      SemErr(name + " is not defined in referenced record");
+                                    } else {
+                                      type = sym.Item3;
+                                      dim = sym.Item6;
+                                      program.Add(new Instruction("","Const " + (sym.Item5)));
+                                      program.Add(new Instruction("","Add"));
+                                      program.Add(new Instruction("","MemLoad"));
+                                    }
+                                .)
+
+    |'['
+      Expr<out arrayAccessType, out dim1> (.
+                                  dim--;
+                                  if(dim < 0) {
+                                    SemErr("Too many array accesses [ ]");
+                                  }
+
+                                  if((arrayAccessType != (int)TastierType.Integer) ||
+                                    (dim1 != 0)){
+                                    SemErr("Integer type expected for array access");
+                                  }
+
+                                  program.Add(new Instruction("","Add"));
+                                  program.Add(new Instruction("","MemLoad"));
+                                .)
+      ']'
     )
     }
 
