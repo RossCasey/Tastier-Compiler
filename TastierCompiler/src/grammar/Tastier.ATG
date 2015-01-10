@@ -530,6 +530,11 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
       ')'
                                 (.
 
+                                  if(!firstParameterDeclared) {
+                                    //if no paramters are declared then the marker must be removed
+                                    program.RemoveAt(program.Count() - 1);
+                                  }
+
                                   //add paramter expressions back into program, now in reverse order
                                   while(parameterStack.Count() != 0) {
                                     inst = parameterStack.Pop();
