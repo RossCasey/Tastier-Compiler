@@ -479,6 +479,24 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                   program.Add(new Instruction("","MemLoad"));
                                 .)
       ']'
+    | '('')'                    (.
+                                  if ((TastierKind)sym.Item2 != TastierKind.Proc) {
+                                    SemErr("object is not a procedure");
+                                  }
+
+                                  int currentStackLevel = openScopes.Count;
+                                  int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4);
+                                  string procedureLabel = getLabelForProcedureName(lexicalLevelDifference, sym.Item1);
+
+                                  type = sym.Item3;
+                                  dim = sym.Item6; 
+
+                                  if(sym.Item3 == (int)TastierType.Undefined) {
+                                    program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
+                                  } else {
+                                    program.Add(new Instruction("", "CallNonVoid " + lexicalLevelDifference + " " + procedureLabel));
+                                  }
+                                .)
     )
     }
 
