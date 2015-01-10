@@ -328,8 +328,8 @@ run = do
           run
 
         Instructions.StackStore -> do
-          let value = (smem ! (rtp - 1))
-          let address = (smem ! (rtp - 2))
+          let value = (smem ! (rtp - 2))
+          let address = (smem ! (rtp - 1))
           put $ machine { rpc = rpc + 1, rtp = rtp - 2,
                           smem = (smem // [(address,value)]) }
           run

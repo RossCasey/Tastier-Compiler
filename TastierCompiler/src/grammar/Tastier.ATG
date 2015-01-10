@@ -418,7 +418,7 @@ Expr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
 /*------------------------------------------------------------------------*/
 
 Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim1; .)
-=                                 (.  type = (int)TastierType.Undefined; dim = 0; .)
+=                                 (.  type = (int)TastierType.Undefined; dim = 0; bool functionCalled = false; int parameters = 0; .)
   ( Ident<out name>               (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
                                     sym = lookup(openScopes, name);
@@ -481,7 +481,20 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                   program.Add(new Instruction("","MemLoad"));
                                 .)
       ']'
-    | '('')'                    (.
+    | {
+      '('
+      Expr<out paramType, out paramDim>
+                                (.
+                                  parameters++;
+                                .)
+      ')'
+      }                          (.
+                                  if(!functionCalled) {
+                                    functionCalled = true;
+                                  } else {
+                                    SemErr("Too many (), implying a function call of a funtion");
+                                  }
+
                                   if ((TastierKind)sym.Item2 != TastierKind.Proc) {
                                     SemErr("object is not a procedure");
                                   }
@@ -492,10 +505,24 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                   type = sym.Item3;
                                   dim = sym.Item6;
 
-                                  if(sym.Item3 == (int)TastierType.Undefined) {
-                                    program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
-                                  } else {
-                                    program.Add(new Instruction("", "CallNonVoid " + lexicalLevelDifference + " " + procedureLabel));
+                                  if(sym.Item3 != (int)TastierType.Undefined) {
+                                    //allocate space on stack for return value or function
+                                    program.Add(new Instruction("","Const 0"));
+                                  }
+                                  program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
+
+                                  //the following instructions:
+                                  // 1 Store the returned value in a temporary location
+                                  // 2 Pop the parameters off the stack
+                                  // 3 Place the returned value on top of stack again
+
+                                  if(parameters > 0) {
+                                    program.Add(new Instruction("","StoG 4"));
+                                    program.Add(new Instruction("","LoadG 1")); //load stack pointer
+                                    program.Add(new Instruction("","Const " + parameters));
+                                    program.Add(new Instruction("","Sub"));
+                                    program.Add(new Instruction("","StoG 1"));  //pop parameters
+                                    program.Add(new Instruction("","LoadG 4"));  //place return value on stack
                                   }
                                 .)
     )
@@ -649,9 +676,10 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     }
                                     returnDeclared = true;
 
-                                    //moves the value at the top of the stack into the slot
-                                    //designated for return values
-                                    program.Add(new Instruction("", "RetValue"));
+                                    program.Add(new Instruction("","LoadG 2")); //load rbp
+                                    program.Add(new Instruction("","Const 1"));
+                                    program.Add(new Instruction("","Sub"));     //calculate location for return value
+                                    program.Add(new Instruction("","StackStore")); //store return value
                                 .)
    ';'
   ]
