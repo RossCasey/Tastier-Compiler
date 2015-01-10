@@ -476,7 +476,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                            SemErr("This function only takes " + paramsInFunction + " parameters");
                                          } else {
 
-                                           Symbol param = functionVariable[functionIndex][parameters-1];
+                                           Symbol param = functionParameters[functionIndex][parameters-1];
                                            if((pType != param.Item3) || (pDim != param.Item6)) {
                                              SemErr("Unexpected expression type in this parameter slot");
                                            }
@@ -486,7 +486,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                            inst = program.ElementAt(programCounter);
                                            program.RemoveAt(programCounter);
                                            while(!inst.Item1.Equals("@parameterMarker")) {
-                                             parameterStack.push(inst);
+                                             parameterStack.Push(inst);
                                              programCounter--;
                                              inst = program.ElementAt(programCounter);
                                              program.RemoveAt(programCounter);
@@ -509,7 +509,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                            SemErr("This function only takes " + paramsInFunction + " parameters");
                                          } else {
 
-                                           Symbol param = functionVariable[functionIndex][parameters-1];
+                                           Symbol param = functionParameters[functionIndex][parameters-1];
                                            if((pType != param.Item3) || (pDim != param.Item6)) {
                                              SemErr("Unexpected expression type in this parameter slot");
                                            }
@@ -518,7 +518,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                            inst = program.ElementAt(programCounter);
                                            program.RemoveAt(programCounter);
                                            while(!inst.Item1.Equals("@parameterMarker")) {
-                                             parameterStack.push(inst);
+                                             parameterStack.Push(inst);
                                              programCounter--;
                                              inst = program.ElementAt(programCounter);
                                              program.RemoveAt(programCounter);
