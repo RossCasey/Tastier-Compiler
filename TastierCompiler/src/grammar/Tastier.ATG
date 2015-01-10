@@ -718,7 +718,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                 .)
   '('
       [
-        VarDecl<out external>   (. parameters++; firstParamDeclared = true; .)
+        VarDecl<external>       (. parameters++; firstParamDeclared = true; .)
       ]
       {
         ','                     (.
@@ -727,7 +727,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                      firstParamDeclared = true;
                                   }
                                 .)
-        VarDecl<out external>   (. parameters++; .)
+        VarDecl<external>        (. parameters++; .)
       }
 
   ')'
