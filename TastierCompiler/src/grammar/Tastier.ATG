@@ -624,7 +624,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                 .)
     Expr<out returnType, out returnDim>
                                 (.
-                                    if(type != returnType) || (dimensions != returnDim) {
+                                    if((type != returnType) || (dimensions != returnDim)) {
                                       SemErr("Function type and return type do not match");
                                     }
                                     //moves the value at the top of the stack into the slot
