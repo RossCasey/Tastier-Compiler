@@ -546,7 +546,7 @@ MulOp<out Instruction inst>
 /*------------------------------------------------------------------------*/
 
 ProcDecl                        (.  string name; string label; Scope currentScope = openScopes.Peek(); int enterInstLocation = 0; bool external = false;
-                                    int type; int dimensions = 0; string typeName; bool returnDeclared = false; int returnType; int returnDim; .)
+                                    int type = 0; int dimensions = 0; string typeName; bool returnDeclared = false; int returnType; int returnDim; .)
 = ("void"                       (.
                                     type = (int)TastierType.Undefined;
                                 .)
