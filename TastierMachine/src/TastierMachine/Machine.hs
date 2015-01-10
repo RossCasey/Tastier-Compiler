@@ -228,7 +228,8 @@ run = do
           {-
           The return address is on top of stack, set the pc to that address
           -}
-          put $ machine { rpc = (smem ! (rtp-1)), smem = (smem // [(rtp+1, result)]) }
+          let result = smem ! (rtp+1)
+          put $ machine { rpc = (smem ! (rtp-1)), smem = (smem // [(rtp-1, result)]) }
           run
 
         Instructions.Read   -> do
