@@ -551,7 +551,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     type = TastierType.Undefined;
                                 .)
   | Type<out type>
-  | "record" Ident<out typeName>;(.
+  | "record" Ident<out typeName> (.
                                     bool found = false;
                                     foreach(RecordType rec in recordTypes) {
                                       if(rec.Item1.Equals(typeName)) {
