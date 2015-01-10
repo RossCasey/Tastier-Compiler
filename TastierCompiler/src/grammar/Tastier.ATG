@@ -740,6 +740,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       sym = currentScope.Pop();
                                       Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
+                                      Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
                                       while(sym.Item1 != "@FunctionMarker") {
                                         functionParameters.ElementAt(functionIndex).Add(sym);
                                         sym = currentScope.Pop();
@@ -795,7 +796,8 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       program.Add(new Instruction("","Const " + Convert.ToString(index + returnValueOffset)));
                                       program.Add(new Instruction("","Sub"));
                                       program.Add(new Instruction("","StackLoad"));
-                                      program.Add(new Instruction("","Sto " + s.Item4 + " " + s.Item5));
+                                      int lexicalLevelDifference = Math.Abs(openScopes.Count - s.Item4)-1;
+                                      program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                     }
                                 .)
 
