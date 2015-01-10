@@ -214,8 +214,7 @@ patchLabelAddresses symtab instructions =
                             (fromIntegral $ fst $ fromJust $ B.readInteger a)
                             (fromIntegral $ symtab M.! b)))
           else badLabel lineNumber b
-        _ -> error $ "Line " ++ show lineNumber ++ ": Unresolved argument " ++
-                     "to instruction " ++ show x
+        
 
         ["CallNonVoid", a, b] ->
           if M.member b symtab then
