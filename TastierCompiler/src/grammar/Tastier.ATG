@@ -773,22 +773,25 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       the stack have been allocated, we can
                                       put the right value in.
                                     */
+
+
+                                    //load parameters passed by previous function into their local parameter space on stack
+                                    int returnValueOffset = 1;
+                                    if(type == (int)TastierType.Undefined) {
+                                      returnValueOffset = 0;   //no extra space on stack for a return value
+                                    }
+
+                                    int index = 1;
+                                    foreach(Symbol s in functionVariables.ElementAt(functionIndex)) {
+                                      program.Add(new Instruction("","LoadG 2"));     //load rbp
+                                      program.Add(new Instruction("","Const " + Convert.ToString(index + returnValueOffset)));
+                                      program.Add(new Instruction("","Sub"));
+                                      program.Add(new Instruction("","StackLoad"));
+                                      program.Add(new Instruction("","Sto " + s.Item4 + " " + s.Item5));
+                                    }
                                 .)
 
-                                //load parameters passed by previous function into their local parameter space on stack
-                                int returnValueOffset = 1;
-                                if(type == (int)TastierType.Undefined) {
-                                  returnValueOffset = 0;   //no extra space on stack for a return value
-                                }
 
-                                int index = 1;
-                                foreach(Symbol s in functionVariables.ElementAt(functionIndex)) {
-                                  program.Add(new Instruction("","LoadG 2"));     //load rbp
-                                  program.Add(new Instruction("","Const " + Convert.ToString(index + returnValueOffset)));
-                                  program.Add(new Instruction("","Sub"));
-                                  program.Add(new Instruction("","StackLoad"));
-                                  program.Add(new Instruction("","Sto " + s.Item4 + " " + s.Item5));
-                                }
 
   { VarDecl<external> | Stat |  (.
                                     openLabels.Push(generateLabel());
