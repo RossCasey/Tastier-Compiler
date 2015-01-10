@@ -458,6 +458,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                           program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
                                         }
                                       } else {
+                                        Console.WriteLine("Got here -1");
                                         foreach(FunctionType func in functionTypes) {
                                           if(func.Item1.Equals(sym.Item1)) {
                                             functionIndex = func.Item2;
