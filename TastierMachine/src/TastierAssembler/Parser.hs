@@ -220,7 +220,7 @@ patchLabelAddresses symtab instructions =
         ["CallNonVoid", a, b] ->
           if M.member b symtab then
             (lineNumber, (Right $
-                            I.Binary I.Call
+                            I.Binary I.CallNonVoid
                             (fromIntegral $ fst $ fromJust $ B.readInteger a)
                             (fromIntegral $ symtab M.! b)))
           else badLabel lineNumber b
