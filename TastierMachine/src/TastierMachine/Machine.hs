@@ -216,21 +216,14 @@ run = do
           put $ machine { rpc = rpc + 1, smem = (smem // [(rtp-1, result)]) }
           run
 
-        {--
+        
         Instructions.Ret    -> do
           {-
             The return address is on top of stack, set the pc to that address
           -}
           put $ machine { rpc = (smem ! (rtp-1)), rtp = rtp - 1 }
           run
-        --}
-        Instructions.Ret    -> do
-          {-
-          The return address is on top of stack, set the pc to that address
-          -}
-          let result = smem ! (rtp+1)
-          put $ machine { rpc = (smem ! (rtp-1)), rtp = rtp - 1 }
-          run
+
 
         Instructions.RetValue -> do
           {-
@@ -441,7 +434,7 @@ run = do
           run
 
 
-        {--
+
         Instructions.Call   -> do
           {-
             CALL gets passed the lexical level delta in slot a, and the
@@ -454,14 +447,17 @@ run = do
                           smem = (smem // [(rtp, (rpc+1)), (rtp+1, a)]) }
           run
 
-          --}
-        Instructions.Call   -> do
+
+        Instructions.CallNonVoid   -> do
           {-
           CALL gets passed the lexical level delta in slot a, and the
           address of the procedure in slot b. CALL pushes the return
           address onto the stack, then the lexical level delta, so when
           the called procedure does ENTER, the stack contains the lexical
           level delta at (rtp - 1) and the return address at (rtp - 2).
+
+          One extra space is left on the stack to store the return value
+          of the function.
           -}
           put $ machine { rpc = b, rtp = rtp + 3,
                           smem = (smem // [(rtp+1, (rpc+1)), (rtp+2, a)]) }
