@@ -746,7 +746,9 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       functionParameters[functionIndex].Reverse();
 
                                       //add variable back to currentscope in original order
-                                      currentScope.AddRange(functionParameters[functionIndex]);
+                                      foreach(Symbol s in functionParameters[functionIndex]) {
+                                        currentScope.Push(s);
+                                      }
                                     } else {
                                       currentScope.Pop(); //remove the function marker from symbol table
                                     }
