@@ -428,10 +428,10 @@ Expr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
 
 /*------------------------------------------------------------------------*/
 
-Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim1; int paramType; int paramDim; .)
+Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int arrayAccessType; int dim1; int pType; int pDim;.)
 =                                 (.  type = (int)TastierType.Undefined; dim = 0; bool functionCalled = false; int parameters = 0;
                                       bool firstParamDeclared = false; int functionIndex = -1; int paramsInFunction = 0;
-                                      Stack<Instruction> parameterStack = new Stack<Instruction>(); int pType; int pDim;
+                                      Stack<Instruction> parameterStack = new Stack<Instruction>();
                                       Instruction inst; .)
   ( Ident<out name>               (.
                                     bool isExternal = false; //CS3071 students can ignore external declarations, since they only deal with compilation of single files.
