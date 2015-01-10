@@ -38,7 +38,7 @@ using StackAddress = System.Tuple<int, int>;
 using RecordType = System.Tuple<string,int,int>;
 
 //string -> function name, int -> indexOfSymbolList
-using FunctionParameters = System.Tuple<string, int>; 
+using FunctionType = System.Tuple<string, int>; 
 
 
 
