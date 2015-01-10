@@ -216,7 +216,7 @@ run = do
           put $ machine { rpc = rpc + 1, smem = (smem // [(rtp-1, result)]) }
           run
 
-        
+
         Instructions.Ret    -> do
           {-
             The return address is on top of stack, set the pc to that address
@@ -313,6 +313,12 @@ run = do
           put $ machine { rpc = rpc + 1, smem = (smem // [(rtp-1, result)]) }
           run
 
+        Instructions.StackLoad  -> do
+          let address = (smem ! (rtp-1))
+          let result = smem ! address
+          put $ machine { rpc = rpc + 1, smem = (smem // [(rtp-1, result)]) }
+          run
+
         Instructions.MemStore  -> do
           let value = (smem ! (rtp - 1))
           let address = (smem ! (rtp - 2))
@@ -320,6 +326,14 @@ run = do
           put $ machine { rpc = rpc + 1, rtp = rtp - 2,
                           dmem = (dmem // [(adjustedMemory, value)]) }
           run
+
+        Instructions.StackStore -> do
+          let value = (smem ! (rtp - 1))
+          let address = (smem ! (rtp - 2))
+          put $ machine { rpc = rpc + 1, rtp = rtp - 2,
+                          smem = (smem // [(address,value)]) }
+          run
+
 
         Instructions.Leave  -> do
           {-
@@ -447,7 +461,7 @@ run = do
                           smem = (smem // [(rtp, (rpc+1)), (rtp+1, a)]) }
           run
 
-
+        {--
         Instructions.CallNonVoid   -> do
           {-
           CALL gets passed the lexical level delta in slot a, and the
@@ -462,7 +476,7 @@ run = do
           put $ machine { rpc = b, rtp = rtp + 3,
                           smem = (smem // [(rtp+1, (rpc+1)), (rtp+2, a)]) }
           run
-
+        --}
 {-
   followChain follows the static link chain to find the absolute address in
   stack memory of the base of the stack frame (n-limit) levels down the call

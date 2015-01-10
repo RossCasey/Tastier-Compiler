@@ -105,13 +105,14 @@ parseInstruction lineNumber text =
                           (convert $ B.readInteger b)
         _ -> Left $ ["Call", a, b]
 
+    {--
     ["CallNonVoid", a, b]  ->
       case B.readInteger b of
         Just i -> Right $ I.Binary I.CallNonVoid
                           (convert $ B.readInteger a)
                           (convert $ B.readInteger b)
         _ -> Left $ ["CallNonVoid", a, b]
-
+    --}
     ["Ret"]         -> Right $ I.Nullary I.Ret
     ["RetValue"]    -> Right $ I.Nullary I.RetValue
     ["Leave"]       -> Right $ I.Nullary I.Leave
@@ -120,7 +121,9 @@ parseInstruction lineNumber text =
     ["WriteStr"]    -> Right $ I.Nullary I.WriteStr
     ["WriteMul"]    -> Right $ I.Nullary I.WriteMul
     ["MemLoad"]     -> Right $ I.Nullary I.MemLoad
+    ["StackLoad"]   -> Right $ I.Nullary I.StackLoad
     ["MemStore"]    -> Right $ I.Nullary I.MemStore
+    ["StackStore"]  -> Right $ I.Nullary I.StackStore
     ["Halt"]        -> Right $ I.Nullary I.Halt
     ["Dup"]         -> Right $ I.Nullary I.Dup
     ["Nop"]         -> Right $ I.Nullary I.Nop
@@ -214,8 +217,8 @@ patchLabelAddresses symtab instructions =
                             (fromIntegral $ fst $ fromJust $ B.readInteger a)
                             (fromIntegral $ symtab M.! b)))
           else badLabel lineNumber b
-        
 
+        {--
         ["CallNonVoid", a, b] ->
           if M.member b symtab then
             (lineNumber, (Right $
@@ -223,6 +226,7 @@ patchLabelAddresses symtab instructions =
                             (fromIntegral $ fst $ fromJust $ B.readInteger a)
                             (fromIntegral $ symtab M.! b)))
           else badLabel lineNumber b
+        --}
         _ -> error $ "Line " ++ show lineNumber ++ ": Unresolved argument " ++
                      "to instruction " ++ show x
 

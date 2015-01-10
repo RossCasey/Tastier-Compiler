@@ -31,7 +31,9 @@ data Instruction = Add
                  | WriteStr
                  | WriteMul
                  | MemLoad
+                 | StackLoad
                  | MemStore
+                 | StackStore
                  | Halt
                  | Dup
                  | Nop
