@@ -23,6 +23,7 @@ data Instruction = Add
                  | Jmp
                  | FJmp
                  | Ret
+                 | RetValue
                  | Leave
                  | Read
                  | Write

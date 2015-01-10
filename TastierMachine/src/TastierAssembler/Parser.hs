@@ -106,6 +106,7 @@ parseInstruction lineNumber text =
         _ -> Left $ ["Call", a, b]
 
     ["Ret"]         -> Right $ I.Nullary I.Ret
+    ["RetValue"]    -> Right $ I.Nullary I.RetValue
     ["Leave"]       -> Right $ I.Nullary I.Leave
     ["Read"]        -> Right $ I.Nullary I.Read
     ["Write"]       -> Right $ I.Nullary I.Write
