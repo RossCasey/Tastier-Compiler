@@ -460,8 +460,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                       } else {
                                         foreach(FunctionType func in functionTypes) {
                                           if(func.Item1.Equals(sym.Item1)) {
-                                            functionIndex = sym.Item2;
-                                            Console.WriteLine(sym.Item2);
+                                            functionIndex = func.Item2;
                                           }
                                           paramsInFunction = functionParameters[functionIndex].Count();
                                         }
