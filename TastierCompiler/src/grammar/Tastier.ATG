@@ -532,7 +532,6 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                 (.
 
                                   //add paramter expressions back into program, now in reverse order
-                                  Instruction inst;
                                   while(parameterStack.Count() != 0) {
                                     inst = parameterStack.Pop();
                                     program.Add(inst);
