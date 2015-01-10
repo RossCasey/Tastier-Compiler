@@ -627,7 +627,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     if((type != returnType) || (dimensions != returnDim)) {
                                       SemErr("Function type and return type do not match");
                                     }
-                                    returnDeclated = true;
+                                    returnDeclared = true;
 
                                     //moves the value at the top of the stack into the slot
                                     //designated for return values
