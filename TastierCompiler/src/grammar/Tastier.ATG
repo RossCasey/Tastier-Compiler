@@ -746,6 +746,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                         sym = currentScope.Pop();
                                         Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
                                         sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item4, sym.Item6);
+                                        Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
 
                                       }
 
