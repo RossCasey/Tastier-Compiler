@@ -217,6 +217,16 @@ patchLabelAddresses symtab instructions =
         _ -> error $ "Line " ++ show lineNumber ++ ": Unresolved argument " ++
                      "to instruction " ++ show x
 
+        ["CallNonVoid", a, b] ->
+          if M.member b symtab then
+            (lineNumber, (Right $
+                            I.Binary I.Call
+                            (fromIntegral $ fst $ fromJust $ B.readInteger a)
+                            (fromIntegral $ symtab M.! b)))
+          else badLabel lineNumber b
+        _ -> error $ "Line " ++ show lineNumber ++ ": Unresolved argument " ++
+                     "to instruction " ++ show x
+
     badLabel lineNumber labelText =
       error $ "Reference to undefined label " ++ (show labelText) ++
               " on line " ++ (show lineNumber)
