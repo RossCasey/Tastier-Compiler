@@ -229,7 +229,7 @@ run = do
           The return address is on top of stack, set the pc to that address
           -}
           let result = smem ! (rtp+1)
-          put $ machine { rpc = (smem ! (rtp-1)), smem = (smem // [(rtp-1, result)]) }
+          put $ machine { rpc = (smem ! (rtp-1)), rtp = rtp - 1 }
           run
 
         Instructions.Read   -> do
@@ -432,6 +432,8 @@ run = do
                           smem = (smem // [(storeAddr, (smem ! (rtp-1)))]) }
           run
 
+
+        {--
         Instructions.Call   -> do
           {-
             CALL gets passed the lexical level delta in slot a, and the
@@ -441,6 +443,19 @@ run = do
             level delta at (rtp - 1) and the return address at (rtp - 2).
           -}
           put $ machine { rpc = b, rtp = rtp + 2,
+                          smem = (smem // [(rtp, (rpc+1)), (rtp+1, a)]) }
+          run
+
+          --}
+        Instructions.Call   -> do
+          {-
+          CALL gets passed the lexical level delta in slot a, and the
+          address of the procedure in slot b. CALL pushes the return
+          address onto the stack, then the lexical level delta, so when
+          the called procedure does ENTER, the stack contains the lexical
+          level delta at (rtp - 1) and the return address at (rtp - 2).
+          -}
+          put $ machine { rpc = b, rtp = rtp + 3,
                           smem = (smem // [(rtp, (rpc+1)), (rtp+1, a)]) }
           run
 
