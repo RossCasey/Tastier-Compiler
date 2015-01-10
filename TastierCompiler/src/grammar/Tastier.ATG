@@ -733,16 +733,17 @@ ProcDecl                        (.  string name; string label; Scope currentScop
 
   ')'
   '{'                           (.
-                                    Console.WriteLine(currentScope.Count());
+
 
                                     if(parameters > 0) {
                                       //Remove symbol from symbol table and add it to symbol table for record
                                       sym = currentScope.Pop();
+                                      Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
                                       while(sym.Item1 != "@FunctionMarker") {
-                                        Console.WriteLine("Scope: " + sym.Item4 + " addr: " + sym.Item5);
                                         functionParameters.ElementAt(functionIndex).Add(sym);
                                         sym = currentScope.Pop();
+                                        Console.WriteLine("scope: " + sym.Item4 + " addr: " + sym.Item5);
                                         sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item4, sym.Item6);
 
                                       }
@@ -1916,7 +1917,6 @@ ParamDecl<bool external>          (.
                                       } else {
 
                                         address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
-                                        Console.WriteLine(address);
                                       }
                                       currentScope.Push(new Symbol(name, (int)TastierKind.Var, type, openScopes.Count-1, address, dimensions));
                                     }
