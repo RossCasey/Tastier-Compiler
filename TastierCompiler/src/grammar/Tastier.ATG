@@ -461,6 +461,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                         foreach(FunctionType func in functionTypes) {
                                           if(func.Item1.Equals(sym.Item1)) {
                                             functionIndex = sym.Item2;
+                                            Console.WriteLine("Name Found");
                                           }
                                           paramsInFunction = functionParameters[functionIndex].Count();
                                         }
@@ -746,7 +747,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                       //stack returns variables in reverse order
                                       functionParameters[functionIndex].Reverse();
 
-                                      Console.WriteLine(functionParameters[functionIndex].Count());
+
 
                                       //add variable back to currentscope in original order
                                       foreach(Symbol s in functionParameters[functionIndex]) {
