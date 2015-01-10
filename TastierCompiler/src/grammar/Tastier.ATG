@@ -1125,7 +1125,6 @@ Stat                            (.  int type; int type1; int type2; string name;
                                       SemErr("object is not a procedure");
                                     }
 
-                                    int currentStackLevel = openScopes.Count;
                                     int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4);
                                     string procedureLabel = getLabelForProcedureName(lexicalLevelDifference, sym.Item1);
 
@@ -1880,7 +1879,7 @@ VarDecl<bool external>          (.
   } ';'
   ).
 
-ExternDecl                      (.  string name; bool external = true; Scope currentScope = openScopes.Peek(); int count = currentScope.Count; .)
+ExternDecl                      (.  string name; bool external = true; Scope currentScope = openScopes.Peek(); .)
 = "external"
   ( VarDecl<external>
   | "procedure" Ident<out name> ';'
