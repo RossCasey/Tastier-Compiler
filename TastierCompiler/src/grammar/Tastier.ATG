@@ -1914,7 +1914,9 @@ ParamDecl<bool external>          (.
                                         address = nextHeapAddress;
                                         nextHeapAddress++;
                                       } else {
+
                                         address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
+                                        Console.WriteLine(address);
                                       }
                                       currentScope.Push(new Symbol(name, (int)TastierKind.Var, type, openScopes.Count-1, address, dimensions));
                                     }
