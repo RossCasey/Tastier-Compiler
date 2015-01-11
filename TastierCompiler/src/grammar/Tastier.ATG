@@ -939,7 +939,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     int dimensions = 0; int pType; int pDim; int parameters = 0; int functionIndex = -1;
                                     Instruction inst; int paramsInFunction = 0;
                                     Stack<Instruction> parameterStack = new Stack<Instruction>();
-                                    bool firstParamDeclared = false; bool functionCalled = false; 
+                                    bool firstParamDeclared = false; bool functionCalled = false;
                                 .)
 
 = Ident<out name>               (.
@@ -1175,7 +1175,6 @@ Stat                            (.  int type; int type1; int type2; string name;
                                         if(!firstParamDeclared) {
                                           SemErr("Parameter missing or extra comma");
                                           firstParamDeclared = true;
-                                          functionCalled = true;
                                         } else {
                                           program.Add(new Instruction("@parameterMarker","Nop"));
                                         }
@@ -1205,7 +1204,24 @@ Stat                            (.  int type; int type1; int type2; string name;
                                       .)
         }
       ')'
-      ';'                         (.
+        ';'                         (.
+                                      if(parameters == 0) {
+                                      //if no paramters are declared then the marker must be removed
+                                      program.RemoveAt(program.Count() - 1);
+                                    }
+
+                                    //add paramter expressions back into program, now in reverse order
+                                    while(parameterStack.Count() != 0) {
+                                      inst = parameterStack.Pop();
+                                      program.Add(inst);
+                                    }
+
+                                    if(!functionCalled) {
+                                      functionCalled = true;
+                                    } else {
+                                      SemErr("Too many (), implying a function call of a funtcion");
+                                    }
+
                                     if ((TastierKind)sym.Item2 != TastierKind.Proc) {
                                       SemErr("object is not a procedure");
                                     }
@@ -1213,10 +1229,33 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4);
                                     string procedureLabel = getLabelForProcedureName(lexicalLevelDifference, sym.Item1);
 
-                                    if(sym.Item3 == (int)TastierType.Undefined) {
-                                      program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
-                                    } else {
-                                      program.Add(new Instruction("", "CallNonVoid " + lexicalLevelDifference + " " + procedureLabel));
+                                    type = sym.Item3;
+                                    dim = sym.Item6;
+
+                                    if(sym.Item3 != (int)TastierType.Undefined) {
+                                      //allocate space on stack for return value or function
+                                      program.Add(new Instruction("","Const 0"));
+                                    }
+                                    program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
+                                    if(sym.Item3 != (int)TastierType.Undefined) {
+                                      //remove returned value from stack
+                                      program.Add(new Instruction("","LoadG 1")); //load stack pointer
+                                      program.Add(new Instruction("","Const " + 1 ));
+                                      program.Add(new Instruction("","Sub"));
+                                      program.Add(new Instruction("","StoG 1"));  //pop return value
+                                    }
+
+
+                                    //the following instructions:
+                                    // 1 Store the returned value in a temporary location
+                                    // 2 Pop the parameters off the stack
+                                    // 3 Place the returned value on top of stack again
+
+                                    if(parameters > 0) {
+                                      program.Add(new Instruction("","LoadG 1")); //load stack pointer
+                                      program.Add(new Instruction("","Const " + parameters));
+                                      program.Add(new Instruction("","Sub"));
+                                      program.Add(new Instruction("","StoG 1"));  //pop parameters
                                     }
                                 .)
   )
