@@ -939,6 +939,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     int dimensions = 0; int pType; int pDim; int parameters = 0; int functionIndex = -1;
                                     Instruction inst; int paramsInFunction = 0;
                                     Stack<Instruction> parameterStack = new Stack<Instruction>();
+                                    bool firstParamDeclared = false; bool functionCalled = false; 
                                 .)
 
 = Ident<out name>               (.
