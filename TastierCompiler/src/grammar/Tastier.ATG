@@ -936,8 +936,9 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     Symbol sym; int dim; int dim1; int dim2;
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int arrayAccessType; bool firstAccess = true; bool isRecordOrArrayAccess = false;
-                                    int dimensions = 0; int pType; int pDim; int parameters; int functionIndex;
-                                    Instruction inst;
+                                    int dimensions = 0; int pType; int pDim; int parameters = 0; int functionIndex = -1;
+                                    Instruction inst; int paramsInFunction = 0;
+                                    Stack<Instruction> parameterStack = new Stack<Instruction>();
                                 .)
 
 = Ident<out name>               (.
