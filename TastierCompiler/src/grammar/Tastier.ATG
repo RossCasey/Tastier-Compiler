@@ -937,7 +937,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int arrayAccessType; bool firstAccess = true; bool isRecordOrArrayAccess = false;
                                     int dimensions = 0; int pType; int pDim; int parameters; int functionIndex;
-                                    Instruction inst; 
+                                    Instruction inst;
                                 .)
 
 = Ident<out name>               (.
@@ -1268,7 +1268,6 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     int index = program.Count() - 1;
                                     int size = 0;
                                     bool markerFound = false;
-                                    Instruction inst;
                                     while(!markerFound) {
                                       inst = program.ElementAt(index);
                                       if(inst.Item1 == "switchValueMarker") {
