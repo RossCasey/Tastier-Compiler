@@ -1133,7 +1133,67 @@ Stat                            (.  int type; int type1; int type2; string name;
                                 .)
 
 
-  | '(' ')' ';'                 (.
+  | '('                             (. program.Add(new Instruction("@parameterMarker","Nop"));  .)
+        [
+          Expr<out pType, out pDim>   (. parameters++;
+                                         firstParamDeclared= true;
+                                         if(parameters > paramsInFunction) {
+                                           SemErr("This function only takes " + paramsInFunction + " parameters");
+                                         } else {
+
+                                           Symbol param = functionParameters[functionIndex][parameters-1];
+                                           if((pType != param.Item3) || (pDim != param.Item6)) {
+                                             SemErr("Unexpected expression type in this parameter slot");
+                                           }
+
+                                           int programCounter = program.Count() -1;
+                                           inst = program.ElementAt(programCounter);
+                                           program.RemoveAt(programCounter);
+                                           while(!inst.Item1.Equals("@parameterMarker")) {
+                                             parameterStack.Push(inst);
+                                             programCounter--;
+                                             inst = program.ElementAt(programCounter);
+                                             program.RemoveAt(programCounter);
+                                           }
+                                         }
+                                      .)
+        ]
+        {
+          ','                         (.
+                                        if(!firstParamDeclared) {
+                                          SemErr("Parameter missing or extra comma");
+                                          firstParamDeclared = true;
+                                          functionCalled = true;
+                                        } else {
+                                          program.Add(new Instruction("@parameterMarker","Nop"));
+                                        }
+                                      .)
+          Expr<out pType, out pDim>   (. parameters++;
+                                         if(parameters > paramsInFunction) {
+                                           SemErr("This function only takes " + paramsInFunction + " parameters");
+                                         } else {
+
+                                           Symbol param = functionParameters[functionIndex][parameters-1];
+                                           if((pType != param.Item3) || (pDim != param.Item6)) {
+                                             SemErr("Unexpected expression type in this parameter slot");
+                                           }
+
+
+                                           int programCounter = program.Count() -1;
+                                           inst = program.ElementAt(programCounter);
+                                           program.RemoveAt(programCounter);
+                                           while(!inst.Item1.Equals("@parameterMarker")) {
+                                             parameterStack.Push(inst);
+                                             programCounter--;
+                                             inst = program.ElementAt(programCounter);
+                                             program.RemoveAt(programCounter);
+                                           }
+
+                                         }
+                                      .)
+        }
+      ')'
+      ';'                         (.
                                     if ((TastierKind)sym.Item2 != TastierKind.Proc) {
                                       SemErr("object is not a procedure");
                                     }
