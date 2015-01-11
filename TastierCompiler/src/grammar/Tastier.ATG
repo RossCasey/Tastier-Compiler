@@ -2,70 +2,51 @@ COMPILER Tastier
 
 //Ross Casey - 12301716
 
-/*
-  Strings are stored in data memory as a sequence of values. The first value
-  of which is its length. Eg the string "hello" would be stored in memory as:
-    [5][h][e][l][l][o]
-     0  1  2  3  4  5
-
-  where the characters are stored as their integer equivalent.
-
-  A string variable stores a pointer to the start of a string in memory. So
-  a variable assigned to the above example would store the value 0. The string
-  can then be accessed by the machine by reading the value in memory pointed to
-  by the variable and then loaded the next n values in memory where n is the
-  value pointed to by the variable.
-*/
-
-/*
-  The  and nextHeapAddress are needed in order to compute where
-  sequential values (in this case strings) can be placed in data memory.
-  Global variables start at address 3 increment so there is no room to place
-  a block of memory that could be used for strings. To fix this problem strings
-  are stored in memory only after all other values have been allocated memory
-  space. This is done by placing temporary instructions into the program when
-  using StoG to store a string memory. These temporary instructions contain
-  relative address which can be used later to calculate its absolute address.
-  The temporary instructions take the from:
-      new Instuction("StrReplace","<relative address>")
-  The nextHeapAddress variable keeps track of the next available address in memory.
-  This value is incremented as new values are stored. This allows for the
-  computation of the temporary, relative address.
-
-  The  is incremented every time a global variable is allocated
-  memory. This will allow the parser to go back and insert the absolute addresses later.
-  Once the program has been parsed fully, the parser then needs to go back and edit the
-  address used for strings. It iterates through all instructions and change them to
-      new Instruction("", "Const (<relative address> +)")
-
-  This allows for the allocation of as many global variables as necessary and there
-  is no wasted memory as all strings are assigned to the very next addresses in data
-  memory.
-*/
 
   /*
+    nextHeapAddress stores the next free location in heap memory. When an object needs to be stored in
+    memory (such as a string, array or record) the reference variable for that object will be set to the
+    current value of nextHeapAddress. nextHeapAddress will then be incremented by the size of the object
+    being stored. The counter ensures that objects are allocted sufficient space and that they do not
+    overwrite each other.
+
+    nextHeapAddress is initialised to 2 because:
     Address 0 is the pointer to the next free address in the heap
     Address 1 is needed as a temporary storage location for calculating the size of a memory allocation
+
+    Objects that are allocated memory at runtime need to allocate memory beginning at the last
+    value that was stored in nextHeapAddress at the end of compile time. To allow this, at the end of
+    compiliation, a function is created which will initialise the value of the runtime nextHeapAdress
+    pointer which is stored at heap address 0.
+
+    A new function is created called InitHeapAddress that is called by the machine before ConstDecl or
+    Main. The purpose of this function is to initialise the runtime value of nextHeapAddress so that it
+    may be used in the program.
   */
   int nextHeapAddress = 2;
-
-
-
-
-/*
-  When dealing with write statements with more than 1 argument it is necessary to
-  know the number of arguments that were passed to the write statement. This variable
-  allows us to keep track of the number of arguments in the write statement.
-*/
-  int numArgs = 0;
-
 
 
 /*
   First, let's declare all the types we're going to use.
 */
 
+/*
+  maxSystem type is used to determine whether a variable has a type define in the language
+  such as int, string, bool. Or whether it is a record defined by the user.
+
+  To determine this, when relevant, the compiler checks whether the type associated with a
+  variable is <= maxSystemType. If it is then it is a type define in the language. Otherwise
+  it is a record.
+*/
   int maxSystemType = 3;
+
+/*
+  Records that are defined by the user receive their types from this counter. When a record
+  if defined it's type is set to the value of this counter and the counter is then incrementer.
+
+  This ensures that different record definitions do not end up with the same type value or
+  a record definition does not get the same type number as a language defined type.
+*/
   int typesDefined = 4;
 
   enum TastierType : int {   // types for variables
@@ -75,14 +56,10 @@ COMPILER Tastier
     String        //new string type
   };
 
-  /*
-    new kind for constants. This stops us from re-assigning a constant as
-    only Variable Kinds can be reassigned.
-  */
   enum TastierKind : int {  // kinds of symbol
     Var,
     Proc,
-    Const
+    Const           //The allow a const to have the same types as a variable but be prevented from being assigned.
   };
 
 /*
@@ -96,6 +73,12 @@ COMPILER Tastier
   Parser.frame, but they're documented in this file, with the rest.
 */
 
+/*
+  I added an extra int to the end of the Symbol tuple
+  This int represents the number of dimensions the variable has (ie. is it an array)
+  If the number of dimensions is 0, then it is a single instance. If it is greater than
+  0 then it is an array with as many dimensions as are stored in the final int
+*/
   //using Symbol = System.Tuple<string, int, int, int, int, int>;
 
 /*
@@ -202,8 +185,8 @@ Program header = new Program();
 
   The boolean below "constantsDeclared" keeps track of whether any constants have
   been declared. If they have then we need to create a function to place them in.
-  If not we need to insert a empty function that has no operations as the machine
-  calls ConstDecl as the first function to execute before calling Main. The
+  If not we need to insert an empty function that has no operations as the machine
+  calls ConstDecl as a function to execute before calling Main. The
   ConstDecl function is then called, which will allocate and assign the constants
   and then Main is called, starting the program.
 */
@@ -295,26 +278,47 @@ string generateLabel() {
 */
 
 
-//stores the lists of variables for each record
+/*
+  In order to keep track of the variables that are defined within a record a
+  list of lists of symbols is used. Each record definition has its own list of
+  symbols. The symbols are the same as those used in the symbol tables for scopes.
+  The address field in the tuple is used as an offset for that variable in the record.
+
+  For example if a symbol of name "a" has an address 3
+  then the heap address that the recordName.a is stored at is equal to the pointer to
+  the record + 3
+*/
 class RecordVariables : List<List<Symbol>> {}
 
-//stores the name of a record types against the index that its symbols are stored at
+/*
+  This table keeps track of the record types that have been defined. Each type has
+  a name, its type number and the an index into recordVariables where its symbols
+  are stored so that record access can be performed.
+*/
 class RecordTypes : List<RecordType> {}
 
 RecordVariables recordVariables = new RecordVariables();
 RecordTypes recordTypes = new RecordTypes();
 
-//stores the index of a functions parameter list
+/*
+  Function types is similar to recordTypes. It stores the name of a function and
+  the index into functionParameters where the symbols for that functions parameters
+  are stored.
+*/
 class FunctionTypes : List<FunctionType> {}
 FunctionTypes functionTypes = new FunctionTypes();
 
-//stores the parameters types and positions of each function as a list of symbol lists
+/*
+  functionParameters operates in the same manner as recordVariables, it stores
+  the symbols that are used as parameters when the function is called.
+  This allows the compiler to determine how many parameters a function can have,
+  the order they must be passed in and the type they must be.
+*/
 class FunctionParameters : List<List<Symbol>> {}
 FunctionParameters functionParameters = new FunctionParameters();
 
 //keeps track of the next available index number for function parameter definitions
 int functionsDefined = 0;
-
 
 //keeps track of the next available index number for record types
 int recordsDefined = 0;
@@ -350,7 +354,11 @@ Symbol lookup(Stack<Scope> scopes, string name) {
 }
 
 
-//modify
+/*
+  This function searches for a variable in a record
+  and if found, returns the symbol from the recordVariables
+  list of symbols for that record.
+*/
 Symbol recordVariableLookup(int type, string varName) {
   int variableIndex = -1;
   foreach(RecordType rec in recordTypes) {
@@ -390,7 +398,7 @@ CHARACTERS
   dot = '.'.
 
 TOKENS
-  access = dot.
+  access = dot.                                 //used for record access
   ident  = letter {letter | digit}.
   number = digit {digit}.
   string = quote {letter | digit | special} quote.  //new string
@@ -412,11 +420,17 @@ AddOp<out Instruction inst>
 
 /*------------------------------------------------------------------------*/
 
+/*
+  Because all symbols now have a type and a dimension, both the type and
+  dimension must be return in order to do comparisons. This can be seen
+  here.
+*/
+
 Expr<out int type, out int dim> (.  int type1; int dim1; Instruction inst; .)
 = SimExpr<out type, out dim>
   [ RelOp<out inst>
     SimExpr<out type1, out dim1> (.
-                                    if ((type != type1) || (dim != dim1)) {
+                                    if ((type != type1) || (dim != dim1)) {   //compare types and dimensions
                                       SemErr("incompatible types");
                                     }
                                     else {
@@ -443,10 +457,12 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                     if (sym == null) {
                                       SemErr("reference to undefined variable " + name);
                                     } else {
-                                      type = sym.Item3;
+                                      type = sym.Item3;     //set return type and dimensions for current symbol
                                       dim = sym.Item6;
+
+                                      //a procedure does not have a memory location so don't load it
                                       if (sym.Item2 != (int)TastierKind.Proc) {
-                                        if ((sym.Item4 == 0) && (sym.Item2 != (int)TastierKind.Proc)) {
+                                        if ((sym.Item4 == 0)) {
                                           if (isExternal) {
                                             program.Add(new Instruction("", "LoadG " + sym.Item1));
                                             // if the symbol is external, we load it by name. The linker will resolve the name to an address.
@@ -458,6 +474,7 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                           program.Add(new Instruction("", "Load " + lexicalLevelDifference + " " + sym.Item5));
                                         }
                                       } else {
+                                        //perform a lookup on the functionTypes table to get the number of parameters
                                         foreach(FunctionType func in functionTypes) {
                                           if(func.Item1.Equals(sym.Item1)) {
                                             functionIndex = func.Item2;
@@ -469,19 +486,35 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                 .)
     [
 
-      '('                             (. program.Add(new Instruction("@parameterMarker","Nop"));  .)
+      '('                             (.
+                                        /*
+                                          the marker is used here so that when all the instructions
+                                          that are needed to produce the next expression in the parameter
+                                          list have been added to the program, these instruction can be removed
+                                          (by removing all instructions up to the marker) and are pushed onto
+                                          a stack. The reason for this is so that when all the instructions
+                                          needed to create the expressions are on the stack they can be placed onto
+                                          the stack. This reverses the order that the parameters are placed on the
+                                          stack so in the called function the first parameter will always be at the
+                                          same position in the stack.
+                                        */
+                                        program.Add(new Instruction("@parameterMarker","Nop"));
+                                      .)
         [
           Expr<out pType, out pDim>   (. parameters++;
                                          firstParamDeclared= true;
                                          if(parameters > paramsInFunction) {
                                            SemErr("This function only takes " + paramsInFunction + " parameters");
+                                           //check that the number of parameter <= the number of parameters the function takes
                                          } else {
 
                                            Symbol param = functionParameters[functionIndex][parameters-1];
                                            if((pType != param.Item3) || (pDim != param.Item6)) {
                                              SemErr("Unexpected expression type in this parameter slot");
+                                             //this checks that the type and dimensions of the expression in the current slot is correct for the function
                                            }
 
+                                           //here is where the instructions to produce the expressions are removed from the program and placed on the stack
                                            int programCounter = program.Count() -1;
                                            inst = program.ElementAt(programCounter);
                                            program.RemoveAt(programCounter);
@@ -496,10 +529,11 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
         ]
         {
           ','                         (.
+                                        //instructions here perform the same functions as above
                                         if(!firstParamDeclared) {
                                           SemErr("Parameter missing or extra comma");
                                           firstParamDeclared = true;
-                                          functionCalled = true;
+                                          //checks that a comma wasn't entered as the first character
                                         } else {
                                           program.Add(new Instruction("@parameterMarker","Nop"));
                                         }
@@ -555,11 +589,11 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                   int lexicalLevelDifference = Math.Abs(openScopes.Count - sym.Item4);
                                   string procedureLabel = getLabelForProcedureName(lexicalLevelDifference, sym.Item1);
 
-                                  type = sym.Item3;
+                                  type = sym.Item3;   //set type and dim equal to the return value of the function
                                   dim = sym.Item6;
 
                                   if(sym.Item3 != (int)TastierType.Undefined) {
-                                    //allocate space on stack for return value or function
+                                    //allocate space on stack for return value of function
                                     program.Add(new Instruction("","Const 0"));
                                   }
                                   program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
@@ -590,11 +624,18 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
                                     sym = recordVariableLookup(sym.Item3,name);
                                     if(sym == null) {
                                       SemErr(name + " is not defined in referenced record");
+                                      //this means that a variable of that name does not exist for that record
                                     } else {
-                                      type = sym.Item3;
+                                      type = sym.Item3; //set type and dim equal to those of the record symbol
                                       dim = sym.Item6;
+
+                                      //place the offset for that variable onto the stack
                                       program.Add(new Instruction("","Const " + (sym.Item5)));
+
+                                      //Add the pointer to the record and the offset
                                       program.Add(new Instruction("","Add"));
+
+                                      //load the value pointer to by the current value on the top of the stack
                                       program.Add(new Instruction("","MemLoad"));
                                     }
                                 .)
@@ -602,15 +643,22 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
     |'['
       Expr<out arrayAccessType, out dim1> (.
                                   dim--;
+                                  //for every access reduce the outputted dimensions by one. This allows a
+                                  //twice accessed 3d array to be assigned to a 1d array pointer
+
+
                                   if(dim < 0) {
                                     SemErr("Too many array accesses [ ]");
                                   }
 
+                                  //The expression inside the brackets must be an integer
                                   if((arrayAccessType != (int)TastierType.Integer) ||
                                     (dim1 != 0)){
                                     SemErr("Integer type expected for array access");
                                   }
 
+                                  //add the expression value to the pointer to the array and perform a memload
+                                  //to load the value pointed to in memory onto the stack
                                   program.Add(new Instruction("","Add"));
                                   program.Add(new Instruction("","MemLoad"));
                                 .)
@@ -639,11 +687,18 @@ Factor<out int type,out int dim>  (.  int n; Symbol sym; string name;  int array
   | "false"                     (.  program.Add(new Instruction("", "Const " + 0)); type = (int)TastierType.Boolean; dim = 0; .)
   | string                      (.
                                     /*
-                                      Strings are stored in the heap. The string is stored
-                                      as its length followed by a sequence of values.
-                                      The values are stored in memory by first placing them on
-                                      the stack and then using StoG to store them in data memory.
-                                      This is done for the length and every value in the string.
+                                      Strings are stored in heap memory as a sequence of values. The first value
+                                      of which is its length. Eg the string "hello" would be stored in memory as:
+                                        [5][h][e][l][l][o]
+                                         0  1  2  3  4  5
+
+                                      where the characters are stored as their integer equivalent.
+
+                                      A string variable stores a pointer to the start of a string in memory. So
+                                      a variable assigned to the above example would store the value 0. The string
+                                      can then be accessed by the machine by reading the value in memory pointed to
+                                      by the variable and then loaded the next n values in memory where n is the
+                                      value pointed to by the variable.
                                     */
                                     string value = t.val;
                                     char[] array = value.ToCharArray();
@@ -687,6 +742,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
 = "function"
   ("void"                       (.
                                     type = (int)TastierType.Undefined;
+                                    //this section sets the type of the function and dimesions of the function
                                 .)
   | Type<out type>
   | "record" Ident<out typeName> (.
@@ -717,10 +773,25 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                     openScopes.Push(new Scope());
                                     currentScope = openScopes.Peek();
 
+                                    /*
+                                      place a marker in the current scope symbol table, this will allow us to know
+                                      the symbols which were defined in the ParamDecls. A copy of these symbols will
+                                      be placed in the functionParameters list for this function so that the compiler
+                                      can check when a function is being called whether the number of parameters and
+                                      their types and dimensions are correct
+                                    */
+
                                     currentScope.Push(new Symbol("@FunctionMarker",-1,-1,-1,-1,-1));
+
+                                    //get the next available function definition number
                                     functionIndex = functionsDefined;
+
+                                    //add the function type to the functionTypes table
                                     functionTypes.Add(new FunctionType(name, functionIndex));
+
+                                    //create a list of symbols for the parameters of this functions
                                     functionParameters.Add(new List<Symbol>());
+
                                     functionsDefined++;
                                 .)
   '('
@@ -742,7 +813,10 @@ ProcDecl                        (.  string name; string label; Scope currentScop
 
 
                                     if(parameters > 0) {
-                                      //Remove symbol from symbol table and add it to symbol table for record
+                                      /*
+                                        Remove symbol from symbol table and placed it in the functionParameters
+                                        list for this function
+                                      */
                                       sym = currentScope.Pop();
                                       sym = new Symbol(sym.Item1, sym.Item2, sym.Item3, sym.Item4, sym.Item5, sym.Item6);
                                       while(sym.Item1 != "@FunctionMarker") {
@@ -756,12 +830,18 @@ ProcDecl                        (.  string name; string label; Scope currentScop
 
 
 
-                                      //add variable back to currentscope in original order
+                                      /*
+                                        add variable back to currentscope in original order
+                                        This is done so that the symbols defined in the parameters
+                                        part of the function are available within the function
+                                      */
+
                                       foreach(Symbol s in functionParameters[functionIndex]) {
                                         currentScope.Push(s);
                                       }
                                     } else {
-                                      currentScope.Pop(); //remove the function marker from symbol table
+                                      currentScope.Pop();
+                                      //remove the function marker from symbol table if there are no functions
                                     }
 
 
@@ -787,11 +867,23 @@ ProcDecl                        (.  string name; string label; Scope currentScop
 
 
                                     //load parameters passed by previous function into their local parameter space on stack
+                                    //if the function has a return value then the parameter will be one position further
+                                    //back in the stack
+
                                     int returnValueOffset = 1;
                                     if(type == (int)TastierType.Undefined) {
                                       returnValueOffset = 0;   //no extra space on stack for a return value
                                     }
 
+
+                                    /*
+                                      These instructions will read the value of the passed parameter on the
+                                      stack and store it in the location for the local variable. The values on
+                                      the stack are access using the StackLoad instruction. This loads the value on
+                                      the in the stack pointed to by the value at the top of the stack
+
+                                      If there is no return value then the first parameter is at rbp - 1
+                                    */
                                     int index = 1;
                                     foreach(Symbol s in functionParameters.ElementAt(functionIndex)) {
                                       program.Add(new Instruction("","LoadG 2"));     //load rbp
@@ -828,11 +920,18 @@ ProcDecl                        (.  string name; string label; Scope currentScop
                                 .)
     Expr<out returnType, out returnDim>
                                 (.
+                                    //check return type and function type are the same
                                     if((type != returnType) || (dimensions != returnDim)) {
                                       SemErr("Function type and return type do not match");
                                     }
                                     returnDeclared = true;
 
+                                    /*
+                                      This loads the return value into the the blank space
+                                      left for it by the calling function using the StackStore instruction.
+                                      This instruction stores into the stack position pointed to by the value
+                                      at the top of the stack, the next highest value on the stack
+                                    */
                                     program.Add(new Instruction("","LoadG 2")); //load rbp
                                     program.Add(new Instruction("","Const 1"));
                                     program.Add(new Instruction("","Sub"));     //calculate location for return value
@@ -841,6 +940,7 @@ ProcDecl                        (.  string name; string label; Scope currentScop
    ';'
   ]
   '}'                           (.
+                                    //Check that if the function is non-void that a return statement was made
                                     if((type != (int)TastierType.Undefined) && (!returnDeclared)) {
                                       SemErr("A return value has not been declared for this non-void function");
                                     }
@@ -970,6 +1070,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                           }
                                         }
                                       } else {
+                                          //perform a lookup on the functionTypes table to get the number of parameters
                                           foreach(FunctionType func in functionTypes) {
                                           if(func.Item1.Equals(sym.Item1)) {
                                             functionIndex = func.Item2;
@@ -987,6 +1088,11 @@ Stat                            (.  int type; int type1; int type2; string name;
                                   }
                                 .)
     Ident<out name>             (.
+                                    /*
+                                      In stat for both arrays and record access the value at the
+                                      pointed to on the stack most be loaded from memory every time
+                                      except the first time
+                                    */
                                     if(firstAccess) {
                                       isRecordOrArrayAccess = true;
                                       firstAccess = false;
@@ -996,12 +1102,16 @@ Stat                            (.  int type; int type1; int type2; string name;
 
                                     sym = recordVariableLookup(sym.Item3,name);
                                     if(sym == null) {
+                                      //this means that a variable of that name does not exist for that record
                                       SemErr(name + " is not defined in referenced record");
                                     } else {
-                                      type = sym.Item3;
+                                      type = sym.Item3; //set type and dim equal to those of the record symbol
                                       dim = sym.Item6;
                                       dimensions = sym.Item6;
+
+                                      //place the offset for that variable onto the stack
                                       program.Add(new Instruction("","Const " + (sym.Item5)));
+                                      //Add the pointer to the record and the offset
                                       program.Add(new Instruction("","Add"));
                                     }
                                 .)
@@ -1016,6 +1126,9 @@ Stat                            (.  int type; int type1; int type2; string name;
                                 .)
       Expr<out arrayAccessType, out dim1>  (.
                                   dimensions--;
+                                  //for every access reduce the outputted dimensions by one. This allows a
+                                  //twice accessed 3d array to be assigned to a 1d array pointer
+
                                   if(dimensions < 0) {
                                     SemErr("Too many array accesses [ ]");
                                   }
@@ -1023,7 +1136,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                   if((arrayAccessType != (int)TastierType.Integer) || (dim1 != 0)) {
                                     SemErr("Integer type expected for array access");
                                   }
-
+                                  //add the expression value to the pointer to the array
                                   program.Add(new Instruction("","Add"));
                                 .)
       ']'
@@ -1048,6 +1161,8 @@ Stat                            (.  int type; int type1; int type2; string name;
                                 .)
    ';'                          (.
                                     if(!isRecordOrArrayAccess) {
+                                      //if the array or record was not accessed then we are working with their pointer
+                                      //this can be access via the normal store instructions
                                       if (sym.Item4 == 0) {
                                         if (isExternal) {
                                           program.Add(new Instruction("", "StoG " + sym.Item1));
@@ -1061,6 +1176,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                         program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + sym.Item5));
                                       }
                                     } else {
+                                      //if an access was made the then value we are loading must be stored into memory
                                       program.Add(new Instruction("","MemStore"));
                                     }
                                 .)
@@ -1076,6 +1192,9 @@ Stat                            (.  int type; int type1; int type2; string name;
                                 .)
     ( "record"
       Ident<out name>           (.
+                                    //this allocate enough memory for record type name
+
+                                    //perform a lookup to get the recordType table entry for this record
                                     bool found = false;
                                     int variableIndex = -1;
                                     foreach(RecordType rec in recordTypes) {
@@ -1086,6 +1205,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     }
 
                                     if(found) {
+                                      //get the size of the record
                                       int recordSize = recordVariables[variableIndex].Count();
                                       //get next heap pointer
                                       program.Add(new Instruction("","LoadG 3"));
@@ -1120,12 +1240,14 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     program.Add(new Instruction("","LoadG 3"));
                                     program.Add(new Instruction("","LoadG 4")); //retrieve temporarily store address
                                     program.Add(new Instruction("","Add"));
-                                    program.Add(new Instruction("","StoG 3"));
+                                    program.Add(new Instruction("","StoG 3"));  //update nextHeapAddress
 
                                 .)
     )
     ')'
     ';'                         (.
+                                    //like above if an access was not made then the standard store instruction will
+                                    //work, otherwise a memstore must be performed
                                     if(!isRecordOrArrayAccess) {
                                       if (sym.Item4 == 0) {
                                         if (isExternal) {
@@ -1145,19 +1267,35 @@ Stat                            (.  int type; int type1; int type2; string name;
                                 .)
 
 
-  | '('                             (. program.Add(new Instruction("@parameterMarker","Nop"));  .)
+  | '('                             (.
+                                        /*
+                                          the marker is used here so that when all the instructions
+                                          that are needed to produce the next expression in the parameter
+                                          list have been added to the program, these instruction can be removed
+                                          (by removing all instructions up to the marker) and are pushed onto
+                                          a stack. The reason for this is so that when all the instructions
+                                          needed to create the expressions are on the stack they can be placed onto
+                                          the stack. This reverses the order that the parameters are placed on the
+                                          stack so in the called function the first parameter will always be at the
+                                          same position in the stack.
+                                        */
+                                        program.Add(new Instruction("@parameterMarker","Nop"));
+                                    .)
         [
           Expr<out pType, out pDim>   (. parameters++;
                                          firstParamDeclared= true;
                                          if(parameters > paramsInFunction) {
                                            SemErr("This function only takes " + paramsInFunction + " parameters");
+                                           //check that the number of parameter <= the number of parameters the function takes
                                          } else {
 
                                            Symbol param = functionParameters[functionIndex][parameters-1];
                                            if((pType != param.Item3) || (pDim != param.Item6)) {
                                              SemErr("Unexpected expression type in this parameter slot");
+                                             //this checks that the type and dimensions of the expression in the current slot is correct for the function
                                            }
 
+                                           //here is where the instructions to produce the expressions are removed from the program and placed on the stack
                                            int programCounter = program.Count() -1;
                                            inst = program.ElementAt(programCounter);
                                            program.RemoveAt(programCounter);
@@ -1172,6 +1310,7 @@ Stat                            (.  int type; int type1; int type2; string name;
         ]
         {
           ','                         (.
+                                        //instructions here perform the same functions as above
                                         if(!firstParamDeclared) {
                                           SemErr("Parameter missing or extra comma");
                                           firstParamDeclared = true;
@@ -1238,7 +1377,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     }
                                     program.Add(new Instruction("", "Call " + lexicalLevelDifference + " " + procedureLabel));
                                     if(sym.Item3 != (int)TastierType.Undefined) {
-                                      //remove returned value from stack
+                                      //remove returned value from stack as it will not be used
                                       program.Add(new Instruction("","LoadG 1")); //load stack pointer
                                       program.Add(new Instruction("","Const " + 1 ));
                                       program.Add(new Instruction("","Sub"));
@@ -1391,6 +1530,7 @@ Stat                            (.  int type; int type1; int type2; string name;
 
                                       Program fullCases = new Program();
 
+                                      //prepare the comparative part of the switch statement
                                       string nextCaseLabel;
                                       foreach (Instruction ins in cases) {
                                         if(ins.Item1 != "nextLabelMarker") {
@@ -1597,6 +1737,13 @@ Stat                            (.  int type; int type1; int type2; string name;
 
 | "write"
   Expr<out type,out dim>        (.
+                                    /*
+                                      When dealing with write statements with more than 1 argument it is necessary to
+                                      know the number of arguments that were passed to the write statement. This variable
+                                      allows us to keep track of the number of arguments in the write statement.
+                                    */
+                                      int numArgs = 0;
+
                                     /*
                                       There are 3 types of write instructions.
                                         1) Write: outputs value on top of stack
@@ -1933,28 +2080,6 @@ VarDecl<bool external>          (.
                                       address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     }
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address,dimensions));
-
-                                    /*if(!isArray) {
-
-                                      int stringAddress = nextHeapAddress;
-                                      nextHeapAddress = nextHeapAddress + recordType.Item3;
-
-                                      program.Add(new Instruction("","Const " + Convert.ToString(stringAddress + 3)));
-
-                                      if ((openScopes.Count-1) == 0) {
-                                        if (external) {
-                                          program.Add(new Instruction("", "StoG " + varName));
-                                          // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
-                                        } else {
-                                          program.Add(new Instruction("", "StoG " + (address+3)));
-                                        }
-                                      } else {
-                                        //There is no need for a lexical difference here as the record has just been declared
-                                        //in the current scope
-                                        int lexicalLevelDifference = 0;
-                                        program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
-                                      }
-                                    } */
                                 .)
     { ',' Ident<out varName>    (.
                                     //check that there are no name collisions
@@ -1974,35 +2099,19 @@ VarDecl<bool external>          (.
                                     }
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address, dimensions));
 
-
-                                    /*if(!isArray) {
-
-
-                                      int stringAddress = nextHeapAddress;
-                                      nextHeapAddress = nextHeapAddress + recordType.Item3;
-
-                                      //pointer to record in memory, will be replaced with absolute address later
-                                      program.Add(new Instruction("","Const " + Convert.ToString(stringAddress + 3)));
-
-                                      if ((openScopes.Count-1) == 0) {
-                                        if (external) {
-                                          program.Add(new Instruction("", "StoG " + varName));
-                                          // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
-                                        } else {
-                                          program.Add(new Instruction("", "StoG " + (address+3)));
-                                        }
-                                      } else {
-                                        //There is no need for a lexical difference here as the record has just been declared
-                                        //in the current scope
-                                        int lexicalLevelDifference = 0;
-                                        program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
-                                      }
-                                    }*/
                                 .)
   } ';'
   ).
 
 /*------------------------------------------------------------------------*/
+
+/*
+  ParamDecl are almost identical to VarDecl. The differences are:
+  - A ParamDecl does not require a semicolon at the end of it
+  - It does not allow multiple declarations of the same type using a comma eg. int a,b is not permitted
+
+  It is used for the parameter declarations in a function
+*/
 
 ParamDecl<bool external>          (.
                                     string name; int type; Scope currentScope = openScopes.Peek();
@@ -2075,28 +2184,6 @@ ParamDecl<bool external>          (.
                                       address = (currentScope.Count(s => s.Item2 == (int)TastierKind.Var) + currentScope.Count(s => s.Item2 == (int)TastierKind.Const));
                                     }
                                     currentScope.Push(new Symbol(varName, (int)TastierKind.Var, (int)type,openScopes.Count-1, address,dimensions));
-
-                                    /*if(!isArray) {
-
-                                      int stringAddress = nextHeapAddress;
-                                      nextHeapAddress = nextHeapAddress + recordType.Item3;
-
-                                      program.Add(new Instruction("","Const " + Convert.ToString(stringAddress + 3)));
-
-                                      if ((openScopes.Count-1) == 0) {
-                                        if (external) {
-                                          program.Add(new Instruction("", "StoG " + varName));
-                                          // if the symbol is external, we also store it by name. The linker will resolve the name to an address.
-                                        } else {
-                                          program.Add(new Instruction("", "StoG " + (address+3)));
-                                        }
-                                      } else {
-                                        //There is no need for a lexical difference here as the record has just been declared
-                                        //in the current scope
-                                        int lexicalLevelDifference = 0;
-                                        program.Add(new Instruction("", "Sto " + lexicalLevelDifference + " " + address));
-                                      }
-                                    } */
                                 .)
   ).
 
