@@ -936,7 +936,7 @@ Stat                            (.  int type; int type1; int type2; string name;
                                     Symbol sym; int dim; int dim1; int dim2;
                                     bool external = false; bool isExternal = false; Program incrementer;
                                     int arrayAccessType; bool firstAccess = true; bool isRecordOrArrayAccess = false;
-                                    int dimensions = 0;
+                                    int dimensions = 0; int pType; int pDim; 
                                 .)
 
 = Ident<out name>               (.
