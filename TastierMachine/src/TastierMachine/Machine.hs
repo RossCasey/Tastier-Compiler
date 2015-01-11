@@ -306,6 +306,11 @@ run = do
           put $ machine { rpc = rpc + 1, rtp = rtp - (1 + numArgs) }
           run
 
+        {-
+          This function loads the value from memory that is pointed to
+          by the value at the top of the stack and places the value on
+          the top of the stack
+        -}
         Instructions.MemLoad  -> do
           let address = (smem ! (rtp-1))
           let adjustedMemory = address - 3
@@ -313,12 +318,21 @@ run = do
           put $ machine { rpc = rpc + 1, smem = (smem // [(rtp-1, result)]) }
           run
 
+        {-
+          This function loads the value from the stack that is pointed to by
+          the value at the top fo the stack. And places the loaded value on top
+          of the stack
+        -}
         Instructions.StackLoad  -> do
           let address = (smem ! (rtp-1))
           let result = smem ! address
           put $ machine { rpc = rpc + 1, smem = (smem // [(rtp-1, result)]) }
           run
 
+        {-
+          This function stores the value on the top of the stack into the memory
+          location that is pointed to by the next highest value on the stack.
+        -}
         Instructions.MemStore  -> do
           let value = (smem ! (rtp - 1))
           let address = (smem ! (rtp - 2))
@@ -327,6 +341,11 @@ run = do
                           dmem = (dmem // [(adjustedMemory, value)]) }
           run
 
+
+        {-
+          This function stores the second highest value on the stack into
+          the stack position pointed to by the value at the top of the stack 
+        -}
         Instructions.StackStore -> do
           let value = (smem ! (rtp - 2))
           let address = (smem ! (rtp - 1))
